@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>脱・ホームレス：サバイバルシティ（バグ修正・究極完全版）</title>
+    <title>脱・ホームレス：サバイバルシティ（超完全版）</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         :root {
@@ -43,12 +43,28 @@
         .avatar-large { width: 120px; height: 120px; border-radius: 15px; background-size: cover; background-position: center; border: 4px solid #e74c3c; box-shadow: var(--clay-shadow-in); margin-bottom: 5px; background-color: #8d7b68;}
         .status-box { background: #8d7b68; width: 100%; padding: 8px; border-radius: 10px; margin-bottom: 5px; font-weight: bold; font-size: 16px; text-align: center; box-sizing: border-box; border: 2px solid #4a3b32; box-shadow: var(--clay-shadow-in);}
         .turn-text-clay { font-size: 15px; font-weight: bold; margin-bottom: 10px; text-align: center; background: #3e2f2a; padding: 5px 10px; border-radius: 20px; width: 100%; box-sizing: border-box;}
+        
+        .bankrupt { color: #e74c3c !important; animation: shake-btn 0.5s infinite; }
 
-        #game-board { display: grid; grid-template-columns: repeat(8, 80px); grid-template-rows: repeat(5, 80px); gap: 6px; background: #3e2f2a; padding: 15px; border-radius: 15px; border: var(--clay-border); box-shadow: var(--clay-shadow-out); }
-        .tile { border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; position: relative; color: #fdf5e6; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); border: 2px dashed #4a362a; box-shadow: var(--clay-shadow-in); transition: all 0.3s;}
-        .tile.normal { background-color: #998877; } .tile.can { background-color: #738c7d; border-color: #3b4d42; } .tile.trash { background-color: #8c737f; border-color: #4a3842; }
-        .tile.event { background-color: #b39254; border-color: #6e582e; } .tile.shelter { background-color: #677d73; } .tile.center { background-color: #b3624a; color: white; border: 2px solid #5e2d20; box-shadow: 0 0 15px rgba(224, 122, 95, 0.8);}
-        .owner-mark-clay { position: absolute; top: 2px; right: 2px; font-size: 11px; padding: 2px 4px; border-radius: 4px; display: none; font-weight: bold; color:white; box-shadow: 1px 1px 3px rgba(0,0,0,0.8); border: 1px solid #fff; z-index: 5;}
+        #game-board { display: grid; grid-template-columns: repeat(14, 60px); grid-template-rows: repeat(6, 60px); gap: 6px; background: #3e2f2a; padding: 15px; border-radius: 15px; border: var(--clay-border); box-shadow: var(--clay-shadow-out); }
+        .tile { border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; position: relative; color: #fdf5e6; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); border: 2px dashed #4a362a; box-shadow: var(--clay-shadow-in); transition: all 0.3s;}
+        
+        /* エリアごとのデザイン */
+        .tile.slum { border-bottom: 4px solid #5c4a44; background-color: #796859; }
+        .tile.commercial { border-bottom: 4px solid #d35400; background-color: #998877; }
+        .tile.luxury { border-bottom: 4px solid #bdc3c7; background-color: #bfaea0; }
+        
+        .tile.can { background-color: #738c7d; border-color: #3b4d42; } 
+        .tile.trash { background-color: #8c737f; border-color: #4a3842; }
+        .tile.event { background-color: #b39254; border-color: #6e582e; } 
+        .tile.shelter { background-color: #677d73; } 
+        .tile.job { background-color: #2980b9; border-color: #1a5276; }
+        .tile.shop { background-color: #8e44ad; border-color: #5b2c6f; }
+        .tile.koban { background-color: #c0392b; border-color: #7b241c; }
+        .tile.manhole { background-color: #34495e; border-color: #2c3e50; border-radius: 50%; }
+        .tile.center { background-color: #b3624a; color: white; border: 2px solid #5e2d20; box-shadow: 0 0 15px rgba(224, 122, 95, 0.8);}
+        
+        .owner-mark-clay { position: absolute; top: 2px; right: 2px; font-size: 10px; padding: 2px 4px; border-radius: 4px; display: none; font-weight: bold; color:white; box-shadow: 1px 1px 3px rgba(0,0,0,0.8); border: 1px solid #fff; z-index: 5;}
         .construction-mark { position: absolute; inset: 0; background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 10px, #2c3e50 10px, #2c3e50 20px); opacity: 0.8; border-radius: 8px; z-index: 4; display: none; justify-content: center; align-items: center; font-size: 20px; }
 
         .tile-highlight-branch { box-shadow: 0 0 20px #f1c40f, inset 0 0 15px rgba(241,196,15,0.8) !important; border: 4px solid #f1c40f !important; cursor: pointer; animation: pulse-branch 0.8s infinite alternate; z-index: 20 !important; transform: scale(1.15); }
@@ -56,14 +72,14 @@
         
         #branch-prompt { position: fixed; top: 15%; left: 0; width: 100%; background: rgba(46, 204, 113, 0.95); color: #fff; text-align: center; padding: 15px 0; font-size: 24px; font-weight: bold; z-index: 100; pointer-events: none; display: none; border-top: 4px dashed #fff; border-bottom: 4px dashed #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); box-sizing: border-box; animation: pop-in-out 0.5s ease-out; }
 
-        .player-token { width: 30px; height: 30px; border-radius: 5px; position: absolute; z-index: 10; transition: all 0.3s; background-size: cover; background-position: center; border-bottom: 4px solid; box-shadow: 0 4px 6px rgba(0,0,0,0.8); background-color: #8d7b68;}
+        .player-token { width: 24px; height: 24px; border-radius: 5px; position: absolute; z-index: 10; transition: all 0.3s; background-size: cover; background-position: center; border-bottom: 4px solid; box-shadow: 0 4px 6px rgba(0,0,0,0.8); background-color: #8d7b68;}
         .pos-0 { bottom: -5px; left: -5px; } .pos-1 { bottom: -5px; right: -5px; } .pos-2 { top: -5px; left: -5px; } .pos-3 { top: -5px; right: -5px; }
-        .truck-token { width: 44px; height: 44px; border-radius: 8px; position: absolute; z-index: 8; background-size: cover; background-position: center; border: 3px solid #3e2f2a; box-shadow: 0 4px 8px rgba(0,0,0,0.8); transition: all 0.4s; top: 50%; left: 50%; transform: translate(-50%, -50%); background-image: url('truck.jpg'); background-color: #8d7b68; }
-        .npc-token { width: 24px; height: 24px; border-radius: 50%; position: absolute; z-index: 6; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.8); border: 2px solid white; transition: all 0.4s;}
+        .truck-token { width: 36px; height: 36px; border-radius: 8px; position: absolute; z-index: 8; background-size: cover; background-position: center; border: 3px solid #3e2f2a; box-shadow: 0 4px 8px rgba(0,0,0,0.8); transition: all 0.4s; top: 50%; left: 50%; transform: translate(-50%, -50%); background-image: url('truck.jpg'); background-color: #8d7b68; }
+        .npc-token { width: 20px; height: 20px; border-radius: 50%; position: absolute; z-index: 6; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.8); border: 2px solid white; transition: all 0.4s;}
         .npc-police { background-color: #2980b9; top: -5px; right: -5px; } .npc-uncle { background-color: #8d6e63; top: -5px; left: -5px; } .npc-animal { background-color: #7f8c8d; bottom: 0; left: 50%; transform: translateX(-50%); }
 
         #right-column { display: flex; flex-direction: row; gap: 15px; width: auto; flex-wrap: wrap; justify-content: center; flex: 1;}
-        #action-panel { display: flex; flex-direction: column; gap: 8px; padding: 12px; width: 160px; box-sizing: border-box;}
+        #action-panel { display: flex; flex-direction: column; gap: 8px; padding: 12px; width: 170px; box-sizing: border-box;}
         .btn-clay { background-color: #e8dcc4; color: var(--clay-text); border: 3px solid #8d6e63; padding: 8px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 13px; text-align: left; transition: transform 0.1s, box-shadow 0.2s, background-color 0.2s; box-shadow: 2px 2px 0px rgba(0,0,0,0.4);}
         .btn-clay:disabled { background-color: #a89f91; border-color: #5c554b; cursor: not-allowed; opacity: 0.8; box-shadow: 2px 2px 0px rgba(0,0,0,0.2);}
         .btn-clay:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px rgba(0,0,0,0.4);}
@@ -75,6 +91,7 @@
         #all-players-list { display: flex; flex-direction: column; gap: 8px; }
         .mini-player-clay { background: #4a3b32; border: 2px solid; border-radius: 8px; padding: 6px; display: flex; align-items: center; gap: 8px; color: white; box-shadow: 2px 2px 4px rgba(0,0,0,0.4); transition: all 0.2s;}
         .avatar-small-clay { width: 36px; height: 36px; border-radius: 6px; background-size: cover; background-position: center; border: 2px solid; background-color: #8d7b68; flex-shrink: 0;}
+        .skill-badge { font-size: 9px; background: #e07a5f; padding: 2px 4px; border-radius: 4px; margin-top: 2px; display: inline-block; }
 
         #card-panel-clay { flex: 1; min-width: 320px; display: flex; gap: 10px; background: var(--clay-panel); border-radius: 15px; padding: 15px; border: var(--clay-border); overflow-x: auto; align-items: center; box-shadow: var(--clay-shadow-out);}
         .card-btn-clay { background: #fdf5e6; border: 3px solid #8d6e63; border-radius: 8px; padding: 10px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; min-width: 130px; display: flex; flex-direction: column; gap: 5px; color:#333; box-shadow: var(--clay-shadow-out);}
@@ -122,16 +139,16 @@
         #draw-anim-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); border: 4px solid #f1c40f; color: #fff; padding: 30px; border-radius: 15px; z-index: 350; display: none; text-align: center; animation: pop-in-out 1.5s forwards; pointer-events: none;}
         @keyframes pop-in-out { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, 50px) scale(0.5); opacity: 0; } }
         
-        #event-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 400; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        #event-picker-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px;}
-        .event-card-back { width: 80px; height: 120px; background: repeating-linear-gradient(45deg, #e07a5f, #e07a5f 10px, #c0392b 10px, #c0392b 20px); border: 4px solid #fff; border-radius: 10px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
-        .event-card-back:hover { transform: scale(1.1); box-shadow: 0 0 20px #f1c40f;}
-
         /* 設定関連のスタイル */
         #settings-btn { position: fixed; top: 10px; right: 10px; background: var(--clay-panel); color: #fdf5e6; border: 3px solid #8d6e63; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; z-index: 1000; box-shadow: var(--clay-shadow-out); display: flex; justify-content: center; align-items: center; padding: 0; transition: transform 0.1s; }
         #settings-btn:active { transform: translate(2px, 2px); box-shadow: none; }
-        #settings-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1001; display: none; justify-content: center; align-items: center; }
-        #settings-modal { background: var(--clay-bg); border: var(--clay-border); border-radius: 15px; padding: 20px; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(0,0,0,0.8); color: var(--clay-text); text-align: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; display: none; justify-content: center; align-items: center; }
+        .modal-box { background: var(--clay-bg); border: var(--clay-border); border-radius: 15px; padding: 20px; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(0,0,0,0.8); color: var(--clay-text); text-align: center; }
+
+        /* ミニゲーム用UI */
+        #mg-timer-display { font-size: 30px; font-weight: bold; color: #e74c3c; margin: 10px 0; }
+        .mg-btn { padding: 15px 30px; font-size: 20px; margin: 10px; cursor: pointer; border-radius: 10px; font-weight: bold; border: 4px solid #fff; }
+        .mg-btn.high { background: #e74c3c; color: white; } .mg-btn.low { background: #3498db; color: white; }
 
         /* --- スマホ向けレスポンシブ対応 --- */
         @media (max-width: 768px) {
@@ -146,7 +163,6 @@
             #game-screen { flex-direction: column; align-items: stretch; gap: 10px; }
             #left-column, #right-column { width: 100%; }
             
-            /* 左カラム（プレイヤー情報・天候）の最適化 */
             #portrait-active { flex-direction: row; flex-wrap: wrap; justify-content: space-around; padding: 10px; gap: 5px; }
             .active-id-clay { position: static; margin-bottom: 0; padding: 2px 8px; font-size: 12px; }
             .avatar-large { width: 60px; height: 60px; margin: 0; border-width: 2px; }
@@ -154,24 +170,21 @@
             .status-box { width: 30%; font-size: 12px; padding: 5px; margin: 0; }
             #online-indicator { width: 100%; text-align: center; margin-top: 5px; }
 
-            /* マップ（ゲームボード）は横スクロール可能に */
             #game-board-container { width: 100%; max-width: 100vw; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 5px; box-sizing: border-box; }
             #game-board { 
-                grid-template-columns: repeat(8, 65px); 
-                grid-template-rows: repeat(5, 65px); 
+                grid-template-columns: repeat(14, 45px); 
+                grid-template-rows: repeat(6, 45px); 
                 gap: 4px; padding: 10px; margin: 0 auto; width: max-content;
             }
-            .tile { font-size: 9px; }
-            .player-token { width: 24px; height: 24px; }
-            .truck-token { width: 36px; height: 36px; }
-            .npc-token { width: 20px; height: 20px; font-size: 11px; }
+            .tile { font-size: 8px; }
+            .player-token { width: 18px; height: 18px; }
+            .truck-token { width: 28px; height: 28px; }
+            .npc-token { width: 16px; height: 16px; font-size: 10px; }
 
-            /* アクションボタンを2列にして押しやすく */
             #action-panel { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; flex-direction: row; padding: 10px; }
             .btn-clay { padding: 12px 5px; font-size: 12px; text-align: center; }
             .btn-end-clay { grid-column: span 2; font-size: 16px; padding: 15px; }
 
-            /* プレイヤーリスト・手札・ログ */
             #player-list-panel { width: 100%; padding: 10px; }
             #all-players-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
@@ -182,14 +195,11 @@
             #log-panel-clay { width: 100%; padding: 10px; }
             #log { height: 100px; font-size: 11px; }
 
-            /* ポップアップ関連 */
-            #event-picker-container { grid-template-columns: repeat(2, 1fr); gap: 15px; }
             #turn-banner-text { font-size: 28px; padding: 15px 20px; }
             #dice-overlay { width: 85%; padding: 20px; box-sizing: border-box; }
             .dice { width: 50px; height: 50px; font-size: 30px; }
             #branch-prompt { font-size: 16px; padding: 10px; top: 10%; }
 
-            /* 設定ボタンのスマホ調整 */
             #settings-btn { width: 35px; height: 35px; font-size: 16px; top: 5px; right: 5px; border-width: 2px; }
         }
     </style>
@@ -198,8 +208,8 @@
 
     <button id="settings-btn" onclick="toggleSettingsModal()">⚙️</button>
 
-    <div id="settings-modal-overlay" onclick="if(event.target===this) toggleSettingsModal()">
-        <div id="settings-modal">
+    <div id="settings-modal-overlay" class="modal-overlay" onclick="if(event.target===this) toggleSettingsModal()">
+        <div class="modal-box">
             <h2 style="margin-top:0;">⚙️ 設定</h2>
             
             <div class="setup-section" style="background: #4a3b32; border-color: #2e1e18; color: #fdf5e6; text-align: left;">
@@ -216,7 +226,37 @@
         </div>
     </div>
 
-    <h1 id="main-title">🏠 脱・ホームレス：サバイバルシティ</h1>
+    <!-- ミニゲーム用モーダル -->
+    <div id="minigame-overlay" class="modal-overlay">
+        <div class="modal-box" style="background: #2c3e50; color: white;">
+            <h2>🎲 ハイ＆ロー チャレンジ</h2>
+            <p style="font-size: 14px;">運命のサイコロ！次に出る目は<br>【High(4〜6)】か【Low(1〜3)】か！？</p>
+            <div id="mg-timer-display">10</div>
+            <p>※当てれば強力なレアカード確定！</p>
+            <div>
+                <button class="mg-btn high" onclick="processMiniGame('high')">High (4〜6)</button>
+                <button class="mg-btn low" onclick="processMiniGame('low')">Low (1〜3)</button>
+            </div>
+            <div id="mg-result" style="font-size: 24px; font-weight: bold; margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <!-- ショップ用モーダル -->
+    <div id="shop-overlay" class="modal-overlay" onclick="if(event.target===this) closeShop()">
+        <div class="modal-box" style="max-width: 500px;">
+            <h2 style="margin-top:0;">🛒 闇市ショップ</h2>
+            <p>所持P: <span id="shop-p-display" style="font-size:20px; font-weight:bold; color:#d35400;">0</span> P</p>
+            <div style="display:flex; flex-direction:column; gap:10px; text-align: left;">
+                <button class="btn-clay" onclick="buyItem('bicycle', 5)">🚲 ボロボロの自転車 (5P)<br><span style="font-size:11px;">毎ターンサイコロのAPに +2 される。</span></button>
+                <button class="btn-clay" onclick="buyItem('shoes', 6)">👢 すり減った安全靴 (6P)<br><span style="font-size:11px;">ゴミ漁りの消費APが 2 ➔ 1 になる。</span></button>
+                <button class="btn-clay" onclick="buyItem('cart', 8)">🛒 大きなリヤカー (8P)<br><span style="font-size:11px;">陣地から得られる収入が 2倍 になる。</span></button>
+                <button class="btn-clay" onclick="buyItem('doll', 10)">🎎 身代わり人形 (10P)<br><span style="font-size:11px;">警察や収集車のペナルティを1度だけ完全に防ぐ(消費アイテム)。</span></button>
+            </div>
+            <button class="btn-large" style="width: 100%; margin-top: 15px; background: #7f8c8d; border-color:#2c3e50;" onclick="closeShop()">閉じる</button>
+        </div>
+    </div>
+
+    <h1 id="main-title">🏠 脱・ホームレス：サバイバルシティ<br><span style="font-size: 14px; color:#c0392b;">〜The Ultimate Edition〜</span></h1>
 
     <div id="end-turn-prompt">👉 ターン終了ボタンを押してください 🛑</div>
     <div id="branch-prompt">🛣️ 光っているマスをタップして進む道を選んでください</div>
@@ -225,7 +265,6 @@
     <div id="ap-popup-container"></div>
     <div id="round-summary-overlay"><h2>🌙 ラウンド終了レポート</h2><div id="round-summary-list"></div></div>
     <div id="draw-anim-overlay"><div style="font-size:50px;">🎴</div><div style="font-size:20px; font-weight:bold; margin-top:10px;">ターン開始ドロー！</div></div>
-    <div id="event-picker-overlay"><h2 style="color:#f1c40f; text-shadow: 2px 2px 4px #000;">🎴 運命のカードを1枚選べ！</h2><div id="event-picker-container"></div></div>
 
     <div id="setup-screen">
         <h2 style="color:var(--clay-text); margin-top:0;">ゲームモード選択</h2>
@@ -236,7 +275,10 @@
                 名前: <input type="text" id="online-name" value="あなた" class="name-input" maxlength="8">
                 キャラ: 
                 <select id="online-avatar" onchange="document.getElementById('online-preview').style.backgroundImage = `url('${this.value}')`">
-                    <option value="homelessA.jpg">キャラA</option><option value="homelessB.jpg">キャラB</option><option value="homelessC.jpg">キャラC</option><option value="homelessD.jpg">キャラD</option>
+                    <option value="homelessA.jpg">元アスリート (移動常時1AP)</option>
+                    <option value="homelessB.jpg">元営業マン (バイト成功率大)</option>
+                    <option value="homelessC.jpg">サバイバー (漁り失敗ペナ無効)</option>
+                    <option value="homelessD.jpg">元ヤン (他者と同マスで1P強奪)</option>
                 </select>
                 <div id="online-preview" class="avatar-preview" style="background-image: url('homelessA.jpg'); border-color: #3498db;"></div>
             </div>
@@ -247,10 +289,22 @@
 
         <div class="setup-section">
             <h3 style="margin-top:0; color:#f2c779;">🖥️ オフラインで遊ぶ (1〜4人)</h3>
-            <div class="setup-row" style="color:#e74c3c;">🔴 <input type="text" id="p1-name" value="P1" class="name-input" maxlength="8"><select id="p1-type"><option value="human">人間</option><option value="cpu">CPU</option></select><select id="p1-avatar" onchange="document.getElementById('p1-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessA.jpg">キャラA</option><option value="homelessB.jpg">キャラB</option><option value="homelessC.jpg">キャラC</option><option value="homelessD.jpg">キャラD</option></select><div id="p1-preview" class="avatar-preview" style="background-image: url('homelessA.jpg'); border-color: #e74c3c;"></div></div>
-            <div class="setup-row" style="color:#3498db;">🔵 <input type="text" id="p2-name" value="P2" class="name-input" maxlength="8"><select id="p2-type"><option value="human">人間</option><option value="cpu" selected>CPU</option><option value="none">不参加</option></select><select id="p2-avatar" onchange="document.getElementById('p2-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessB.jpg">キャラB</option><option value="homelessA.jpg">キャラA</option><option value="homelessC.jpg">キャラC</option><option value="homelessD.jpg">キャラD</option></select><div id="p2-preview" class="avatar-preview" style="background-image: url('homelessB.jpg'); border-color: #3498db;"></div></div>
-            <div class="setup-row" style="color:#2ecc71;">🟢 <input type="text" id="p3-name" value="P3" class="name-input" maxlength="8"><select id="p3-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select><select id="p3-avatar" onchange="document.getElementById('p3-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessC.jpg">キャラC</option><option value="homelessA.jpg">キャラA</option><option value="homelessB.jpg">キャラB</option><option value="homelessD.jpg">キャラD</option></select><div id="p3-preview" class="avatar-preview" style="background-image: url('homelessC.jpg'); border-color: #2ecc71;"></div></div>
-            <div class="setup-row" style="color:#f1c40f;">🟡 <input type="text" id="p4-name" value="P4" class="name-input" maxlength="8"><select id="p4-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select><select id="p4-avatar" onchange="document.getElementById('p4-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessD.jpg">キャラD</option><option value="homelessA.jpg">キャラA</option><option value="homelessB.jpg">キャラB</option><option value="homelessC.jpg">キャラC</option></select><div id="p4-preview" class="avatar-preview" style="background-image: url('homelessD.jpg'); border-color: #f1c40f;"></div></div>
+            <div class="setup-row" style="color:#e74c3c;">🔴 <input type="text" id="p1-name" value="P1" class="name-input" maxlength="8"><select id="p1-type"><option value="human">人間</option><option value="cpu">CPU</option></select>
+                <select id="p1-avatar" onchange="document.getElementById('p1-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessA.jpg">元アスリート</option><option value="homelessB.jpg">元営業マン</option><option value="homelessC.jpg">サバイバー</option><option value="homelessD.jpg">元ヤン</option></select>
+                <div id="p1-preview" class="avatar-preview" style="background-image: url('homelessA.jpg'); border-color: #e74c3c;"></div>
+            </div>
+            <div class="setup-row" style="color:#3498db;">🔵 <input type="text" id="p2-name" value="P2" class="name-input" maxlength="8"><select id="p2-type"><option value="human">人間</option><option value="cpu" selected>CPU</option><option value="none">不参加</option></select>
+                <select id="p2-avatar" onchange="document.getElementById('p2-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessB.jpg">元営業マン</option><option value="homelessA.jpg">元アスリート</option><option value="homelessC.jpg">サバイバー</option><option value="homelessD.jpg">元ヤン</option></select>
+                <div id="p2-preview" class="avatar-preview" style="background-image: url('homelessB.jpg'); border-color: #3498db;"></div>
+            </div>
+            <div class="setup-row" style="color:#2ecc71;">🟢 <input type="text" id="p3-name" value="P3" class="name-input" maxlength="8"><select id="p3-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
+                <select id="p3-avatar" onchange="document.getElementById('p3-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessC.jpg">サバイバー</option><option value="homelessA.jpg">元アスリート</option><option value="homelessB.jpg">元営業マン</option><option value="homelessD.jpg">元ヤン</option></select>
+                <div id="p3-preview" class="avatar-preview" style="background-image: url('homelessC.jpg'); border-color: #2ecc71;"></div>
+            </div>
+            <div class="setup-row" style="color:#f1c40f;">🟡 <input type="text" id="p4-name" value="P4" class="name-input" maxlength="8"><select id="p4-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
+                <select id="p4-avatar" onchange="document.getElementById('p4-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessD.jpg">元ヤン</option><option value="homelessA.jpg">元アスリート</option><option value="homelessB.jpg">元営業マン</option><option value="homelessC.jpg">サバイバー</option></select>
+                <div id="p4-preview" class="avatar-preview" style="background-image: url('homelessD.jpg'); border-color: #f1c40f;"></div>
+            </div>
             <button class="btn-large btn-brown" style="margin-top:15px;" onclick="startOfflineGame()">🎲 オフラインで開始</button>
         </div>
     </div>
@@ -274,9 +328,11 @@
                 <div id="active-p-id" class="active-id-clay">P1</div>
                 <div id="avatar-active" class="avatar-large"></div>
                 <div class="turn-text-clay" id="turn-info">あなたのターン</div>
-                <div class="status-box">💰 P: <span id="p-display">0</span> / 20</div>
+                <div id="skill-indicator" style="font-size: 11px; font-weight:bold; color: #f1c40f; margin-bottom: 5px; text-align: center;"></div>
+                <div class="status-box">💰 P: <span id="p-display">0</span> / 100</div>
                 <div class="status-box" style="background:var(--clay-ap);">⚡ AP: <span id="ap-display">0</span></div>
                 <div class="status-box" style="background:#8b5a50;">🚩 領土: <span id="territory-display">0</span></div>
+                <div id="items-indicator" style="font-size: 14px; margin-top: 5px; text-align: center;"></div>
                 <div id="online-indicator" style="margin-top:10px; font-size:12px; color:#2ecc71; display:none; font-weight:bold;">🟢 オンライン接続中</div>
             </div>
         </div>
@@ -290,9 +346,16 @@
                 <button id="btn-roll" class="btn-clay" onclick="rollDice()">🎲 サイコロを振る</button>
                 <button id="btn-move" class="btn-clay" onclick="actionMove()">🚶 移動</button>
                 <button id="btn-can" class="btn-clay" onclick="actionCan()">🥫 空き缶 (1AP)</button>
-                <button id="btn-trash" class="btn-clay" onclick="actionTrash()">🗑️ ゴミ漁り (2AP)</button>
+                <button id="btn-trash" class="btn-clay" onclick="actionTrash()">🗑️ ゴミ漁り</button>
                 <button id="btn-occupy" class="btn-clay" onclick="actionOccupy()">🚩 陣地占領 (3AP)</button>
-                <button id="btn-job" class="btn-clay" onclick="actionJob()">💼 小バイト (4AP)</button>
+                <button id="btn-job" class="btn-clay" style="border-color:#2980b9;" onclick="actionJob()">💼 バイト (4AP)</button>
+                
+                <hr style="width:100%; border-top:2px dashed #8d6e63; margin: 5px 0;">
+                <button id="btn-shop" class="btn-clay" style="border-color:#8e44ad;" onclick="openShop()">🛒 ショップ</button>
+                <button id="btn-manhole" class="btn-clay" style="border-color:#2c3e50;" onclick="actionManhole()">🕳️ ワープ (1AP)</button>
+                <button id="btn-pickpocket" class="btn-clay" style="border-color:#e74c3c; display:none;" onclick="actionPickpocket()">🔪 スリ (3AP)</button>
+                <button id="btn-steal-card" class="btn-clay" style="border-color:#e74c3c; display:none;" onclick="actionStealCard()">🃏 手札奪取 (2AP)</button>
+                
                 <div style="flex-grow:1; min-height:10px;"></div>
                 <button id="btn-end" class="btn btn-end-clay" onclick="endTurnClicked()">🛑 ターン終了</button>
             </div>
@@ -312,66 +375,95 @@
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
         /* =========================================================
-           1. ゲーム定数 ＆ 分岐マップ
+           1. ゲーム定数 ＆ 50マス大マップレイアウト
         ========================================================= */
+        const WIN_POINT = 100;
+
+        // キャラクター判別ロジック
+        function getCharType(avatarUrl) {
+            if(avatarUrl.includes("A")) return { id: "athlete", name: "元アスリート", desc: "移動常に1AP / 雨ペナ無効" };
+            if(avatarUrl.includes("B")) return { id: "sales", name: "元営業マン", desc: "バイト成功率 70%" };
+            if(avatarUrl.includes("C")) return { id: "survivor", name: "サバイバー", desc: "漁り失敗時の警察無効" };
+            if(avatarUrl.includes("D")) return { id: "yankee", name: "元ヤン", desc: "同マス者から自動1P奪取" };
+            return { id: "athlete", name: "元アスリート", desc: "" };
+        }
+
+        // 全50マスのレイアウト (14x6グリッド)
         const baseMapLayout = [
-            { id: 0, col: 1, row: 4, next: [1], isCenter: true },
-            { id: 1, col: 1, row: 3, next: [2] },
-            { id: 2, col: 1, row: 2, next: [3] },
-            { id: 3, col: 2, row: 2, next: [4] },
-            { id: 4, col: 3, row: 2, next: [5, 20] }, 
-            { id: 5, col: 4, row: 2, next: [6] },
-            { id: 6, col: 5, row: 2, next: [7, 22] }, 
-            { id: 7, col: 6, row: 2, next: [8] },
-            { id: 8, col: 7, row: 2, next: [9, 24] }, 
-            { id: 9, col: 8, row: 2, next: [10] },
-            { id: 10, col: 8, row: 3, next: [11] },
-            { id: 11, col: 8, row: 4, next: [12] },
-            { id: 12, col: 8, row: 5, next: [13] },
-            { id: 13, col: 7, row: 5, next: [14] },
-            { id: 14, col: 6, row: 5, next: [15] },
-            { id: 15, col: 5, row: 5, next: [16] }, 
-            { id: 16, col: 4, row: 5, next: [17] },
-            { id: 17, col: 3, row: 5, next: [18] }, 
-            { id: 18, col: 2, row: 5, next: [19] },
-            { id: 10, col: 8, row: 3, next: [11] }, // (Note: original duplicate id:10 handled via generation loop, but array is structured)
-            { id: 20, col: 3, row: 3, next: [21] }, 
-            { id: 21, col: 3, row: 4, next: [17] },
-            { id: 22, col: 5, row: 3, next: [23] }, 
-            { id: 23, col: 5, row: 4, next: [15] },
-            { id: 24, col: 7, row: 1, next: [25] }, 
-            { id: 25, col: 8, row: 1, next: [9] }
+            // --- スラム街 (Slum) ---
+            {id: 0, col: 1, row: 5, next: [1], type: "center", name: "スタート", area: "slum"},
+            {id: 1, col: 2, row: 5, next: [2, 5], type: "trash", name: "ゴミ山", area: "slum"},
+            {id: 2, col: 3, row: 5, next: [3], type: "can", name: "空き缶", area: "slum"},
+            {id: 3, col: 4, row: 5, next: [4], type: "normal", name: "スラム道", area: "slum"},
+            {id: 4, col: 5, row: 5, next: [13], type: "event", name: "イベント", area: "slum"},
+            {id: 5, col: 2, row: 4, next: [6], type: "manhole", name: "マンホール", area: "slum"},
+            {id: 6, col: 3, row: 4, next: [7], type: "can", name: "空き缶", area: "slum"},
+            {id: 7, col: 4, row: 4, next: [8], type: "normal", name: "裏路地(一通)", area: "slum"}, // branch 一方通行
+            {id: 8, col: 5, row: 4, next: [13], type: "shelter", name: "避難所", area: "slum"},
+            {id: 9, col: 1, row: 4, next: [10], type: "trash", name: "ゴミ山", area: "slum"},
+            {id: 10, col: 1, row: 3, next: [11], type: "normal", name: "スラム道", area: "slum"},
+            {id: 11, col: 2, row: 3, next: [12], type: "event", name: "イベント", area: "slum"},
+            {id: 12, col: 3, row: 3, next: [6], type: "normal", name: "スラム道", area: "slum"},
+
+            // --- 商業エリア (Commercial) ---
+            {id: 13, col: 6, row: 5, next: [14], type: "koban", name: "交番(停止)", area: "commercial"},
+            {id: 14, col: 7, row: 5, next: [15, 20], type: "job", name: "バイト先", area: "commercial"},
+            {id: 15, col: 8, row: 5, next: [16], type: "shop", name: "ショップ", area: "commercial"},
+            {id: 16, col: 9, row: 5, next: [17], type: "normal", name: "商業通り", area: "commercial"},
+            {id: 17, col: 10, row: 5, next: [18], type: "job", name: "バイト先", area: "commercial"},
+            {id: 18, col: 10, row: 4, next: [19], type: "event", name: "イベント", area: "commercial"},
+            {id: 19, col: 9, row: 4, next: [27], type: "manhole", name: "マンホール", area: "commercial"},
+            {id: 20, col: 7, row: 4, next: [21], type: "normal", name: "商業通り", area: "commercial"},
+            {id: 21, col: 6, row: 4, next: [22], type: "job", name: "バイト先", area: "commercial"},
+            {id: 22, col: 5, row: 4, next: [23], type: "shop", name: "ショップ", area: "commercial"},
+            {id: 23, col: 5, row: 3, next: [24], type: "event", name: "イベント", area: "commercial"},
+            {id: 24, col: 6, row: 3, next: [25], type: "normal", name: "商業通り", area: "commercial"},
+            {id: 25, col: 7, row: 3, next: [26], type: "shelter", name: "避難所", area: "commercial"},
+            {id: 26, col: 8, row: 3, next: [27], type: "job", name: "バイト先", area: "commercial"},
+            
+            // --- 高級住宅街 (Luxury) ---
+            {id: 27, col: 9, row: 3, next: [28], type: "koban", name: "交番(停止)", area: "luxury"},
+            {id: 28, col: 10, row: 3, next: [29, 36], type: "normal", name: "高級住宅街", area: "luxury"},
+            {id: 29, col: 11, row: 3, next: [30], type: "event", name: "イベント", area: "luxury"},
+            {id: 30, col: 12, row: 3, next: [31], type: "normal", name: "高級住宅街", area: "luxury"},
+            {id: 31, col: 12, row: 2, next: [32], type: "shop", name: "高級店", area: "luxury"},
+            {id: 32, col: 11, row: 2, next: [33], type: "normal", name: "裏路地(一通)", area: "luxury"},
+            {id: 33, col: 10, row: 2, next: [34], type: "manhole", name: "マンホール", area: "luxury"},
+            {id: 34, col: 9, row: 2, next: [35], type: "normal", name: "高級住宅街", area: "luxury"},
+            {id: 35, col: 8, row: 2, next: [26], type: "normal", name: "高級住宅街", area: "luxury"}, // loop back slightly
+            {id: 36, col: 10, row: 1, next: [37], type: "normal", name: "高級住宅街", area: "luxury"},
+            {id: 37, col: 11, row: 1, next: [38], type: "event", name: "イベント", area: "luxury"},
+            {id: 38, col: 12, row: 1, next: [39], type: "shelter", name: "避難所", area: "luxury"},
+            {id: 39, col: 13, row: 1, next: [40], type: "normal", name: "高級住宅街", area: "luxury"},
+            {id: 40, col: 13, row: 2, next: [41], type: "event", name: "イベント", area: "luxury"},
+            {id: 41, col: 13, row: 3, next: [42], type: "normal", name: "高級住宅街", area: "luxury"},
+            {id: 42, col: 13, row: 4, next: [43], type: "normal", name: "高級住宅街", area: "luxury"},
+            {id: 43, col: 12, row: 4, next: [44], type: "job", name: "裏バイト", area: "luxury"},
+            {id: 44, col: 11, row: 4, next: [45], type: "koban", name: "交番(停止)", area: "luxury"},
+            {id: 45, col: 11, row: 5, next: [46], type: "normal", name: "支援所前", area: "luxury"},
+            {id: 46, col: 12, row: 5, next: [47], type: "normal", name: "支援所前", area: "luxury"},
+            {id: 47, col: 13, row: 5, next: [], type: "center", name: "更生支援ｾﾝﾀｰ", area: "luxury"}
         ];
 
-        function generateRandomMap() {
-            const pool = [
-                {type: "normal", name: "ただの道"}, {type: "normal", name: "ただの道"}, {type: "normal", name: "ただの道"},
-                {type: "can", name: "空き缶"}, {type: "can", name: "空き缶"},
-                {type: "trash", name: "ゴミ山"}, {type: "trash", name: "ゴミ山"},
-                {type: "event", name: "イベント"}, {type: "event", name: "イベント"}, 
-                {type: "shelter", name: "避難所"}
-            ];
-            // Deduplicate baseMapLayout just in case
-            const uniqueLayout = Array.from(new Set(baseMapLayout.map(a => a.id)))
-                .map(id => {
-                    return baseMapLayout.find(a => a.id === id)
-                });
-            return uniqueLayout.map(tile => {
-                if (tile.isCenter) return { ...tile, type: "center", name: "更生センター" };
-                let r = pool[Math.floor(Math.random() * pool.length)];
-                return { ...tile, type: r.type, name: r.name };
-            });
-        }
-        
-        let mapData = []; 
+        let mapData = baseMapLayout; 
 
         const deckData = [
-            { id: 0, name: "ステルス行動", icon: "🔵", desc: "次の敵回避", color: "#3498db" }, { id: 1, name: "雨具ゲット", icon: "🔵", desc: "雨の影響を無効化", color: "#3498db" },
-            { id: 2, name: "身分証明書", icon: "🔵", desc: "+1P＆次回警察無効", color: "#3498db" }, { id: 3, name: "通報", icon: "🔴", desc: "他者ランダムに次回AP-2", color: "#e74c3c" },
-            { id: 4, name: "缶泥棒", icon: "🔴", desc: "他者から最大2P奪う", color: "#e74c3c" }, { id: 5, name: "領土挑戦状", icon: "🔴", desc: "運で他人の陣地強奪", color: "#e74c3c" },
-            { id: 6, name: "支援面談", icon: "🟢", desc: "+5P＆次回AP+2", color: "#2ecc71" }, { id: 7, name: "炊き出し", icon: "🟢", desc: "+3P", color: "#2ecc71" },
-            { id: 8, name: "リュック", icon: "🟢", desc: "手札上限+2枚", color: "#2ecc71" }, { id: 9, name: "今日の運勢", icon: "🟡", desc: "50%で±3P", color: "#f1c40f" },
-            { id: 10, name: "野良猫の導き", icon: "🟡", desc: "+2P", color: "#f1c40f" }, { id: 11, name: "密かなバイト", icon: "🟡", desc: "50%で+6P or -3P", color: "#f1c40f" }
+            { id: 0, name: "ステルス行動", icon: "🔵", desc: "次の敵回避", color: "#3498db" }, 
+            { id: 1, name: "雨具ゲット", icon: "🔵", desc: "雨の影響を無効化", color: "#3498db" },
+            { id: 2, name: "身分証明書", icon: "🔵", desc: "+1P＆次回警察無効", color: "#3498db" }, 
+            { id: 3, name: "通報", icon: "🔴", desc: "他者ランダムに次回AP-2", color: "#e74c3c" },
+            { id: 4, name: "缶泥棒", icon: "🔴", desc: "他者から最大2P奪う", color: "#e74c3c" }, 
+            { id: 5, name: "領土挑戦状", icon: "🔴", desc: "運で他人の陣地強奪", color: "#e74c3c" },
+            { id: 6, name: "支援面談", icon: "🟢", desc: "+5P＆次回AP+2", color: "#2ecc71" }, 
+            { id: 7, name: "炊き出し", icon: "🟢", desc: "+3P", color: "#2ecc71" },
+            { id: 8, name: "リュック", icon: "🟢", desc: "手札上限+2枚", color: "#2ecc71" }, 
+            { id: 9, name: "今日の運勢", icon: "🟡", desc: "50%で±3P", color: "#f1c40f" },
+            { id: 10, name: "野良猫の導き", icon: "🟡", desc: "+2P", color: "#f1c40f" }, 
+            { id: 11, name: "密かなバイト", icon: "🟡", desc: "50%で+6P or -3P", color: "#f1c40f" },
+            // --- 追加 大逆転カード ---
+            { id: 12, name: "大暴落", icon: "🔴", desc: "全員のPが半分に", color: "#8e44ad" },
+            { id: 13, name: "下剋上", icon: "🔴", desc: "自分よりPが多い人とP入れ替え", color: "#8e44ad" },
+            { id: 14, name: "宝くじ当選", icon: "🟡", desc: "10%で+15P", color: "#f39c12" }
         ];
         
         const pIdColors = ["#e74c3c", "#3498db", "#2ecc71", "#f1c40f"];
@@ -388,12 +480,14 @@
         let gameOver = false;           
         let cpuActing = false;
 
-        let truckPos = 12; let policePos = 6; let unclePos = 0; let animalPos = 3;
+        let truckPos = 12; let policePos = 36; let unclePos = 2; let animalPos = 9;
         let isRainy = false; let constructionPos = -1; let constructionTimer = 0;
         let currentDisplayTurn = -1;
         
-        let isEventPicking = false; let eventCards = []; 
         let isBranchPicking = false; let currentBranchOptions = [];
+        
+        // ミニゲーム関連
+        let mgActive = false; let mgTimer = null; let mgTimeLeft = 10;
 
         let peer = null; let connections = []; let conn = null; 
         let isOnline = false; let myPlayerId = 0; 
@@ -402,7 +496,6 @@
         /* =========================================================
            3. ネットワーク通信管理
         ========================================================= */
-        // STUNサーバーを設定したPeerインスタンスを生成する関数
         function createPeer() {
             return new Peer({
                 config: {
@@ -417,7 +510,6 @@
             });
         }
 
-        // 変数の代入問題を解決するための関数
         function applyState(state) {
             if(state.players !== undefined) players = state.players;
             if(state.turn !== undefined) turn = state.turn;
@@ -432,11 +524,21 @@
             if(state.gameOver !== undefined) gameOver = state.gameOver;
             if(state.diceRolled !== undefined) diceRolled = state.diceRolled;
             if(state.canPickedThisTurn !== undefined) canPickedThisTurn = state.canPickedThisTurn;
-            if(state.isEventPicking !== undefined) isEventPicking = state.isEventPicking;
-            if(state.eventCards !== undefined) eventCards = state.eventCards;
             if(state.isBranchPicking !== undefined) isBranchPicking = state.isBranchPicking;
             if(state.currentBranchOptions !== undefined) currentBranchOptions = state.currentBranchOptions;
             if(state.mapData !== undefined) mapData = state.mapData;
+            if(state.mgActive !== undefined) mgActive = state.mgActive;
+        }
+
+        function createPlayerObj(id, name, isCPU, owner, avatar) {
+            let charData = getCharType(avatar);
+            return {
+                id: id, name: name, isCPU: isCPU, owner: owner, pos: 0, p: 0, ap: 0, 
+                hand: [], maxHand: 7, stealth: false, rainGear: false, hasID: false, 
+                bonusAP: 0, penaltyAP: 0, protected: false, skipTurn: false, cannotMove: false,
+                color: pIdColors[id], avatar: avatar, charType: charData.id, charName: charData.name,
+                items: { bicycle: false, shoes: false, cart: false, doll: false }
+            };
         }
 
         function hostGame() {
@@ -448,7 +550,7 @@
                 document.getElementById("setup-screen").style.display = "none"; document.getElementById("lobby-screen").style.display = "block"; document.getElementById("host-controls").style.display = "block";
                 document.getElementById("lobby-room-id").innerHTML = `部屋ID: <br><span style="background:#fff; color:#000; padding:5px; border-radius:5px; user-select:all; display:inline-block; margin-top:5px; font-weight:bold;">${id}</span><br><span style="font-size:12px; color:#bdc3c7;">友達にこのIDを教えてください</span>`;
                 isOnline = true; myPlayerId = 0;
-                players = [{ id: 0, name: myName, isCPU: false, owner: 0, pos: 0, p: 0, ap: 0, hand: [], maxHand: 7, stealth: false, rainGear: false, hasID: false, bonusAP: 0, penaltyAP: 0, protected: false, skipTurn: false, color: pIdColors[0], avatar: myAvatar }];
+                players = [createPlayerObj(0, myName, false, 0, myAvatar)];
                 renderLobby();
             });
             peer.on('connection', (connection) => { connections.push(connection); connection.on('data', (data) => handleNetworkData(data, connection)); });
@@ -457,7 +559,7 @@
         function joinGame() {
             let roomId = prompt("「部屋ID」を入力してください:"); 
             if(!roomId) return;
-            roomId = roomId.trim(); // 空白が混ざるのを防ぐ
+            roomId = roomId.trim();
             
             let myName = document.getElementById("online-name").value || "ゲスト"; let myAvatar = document.getElementById("online-avatar").value;
             statusDiv.innerText = "接続中..."; 
@@ -478,18 +580,18 @@
             if (data.type === 'join_lobby' && myPlayerId === 0) {
                 if (players.length >= 4) return;
                 let newId = players.length;
-                players.push({ id: newId, name: data.name, isCPU: false, owner: senderConnection.peer, pos: 0, p: 0, ap: 0, hand: [], maxHand: 7, stealth: false, rainGear: false, hasID: false, bonusAP: 0, penaltyAP: 0, protected: false, skipTurn: false, color: pIdColors[newId], avatar: data.avatar });
+                players.push(createPlayerObj(newId, data.name, false, senderConnection.peer, data.avatar));
                 senderConnection.send({ type: 'assign_id', assignedId: newId });
                 renderLobby(); broadcastLobby();
             }
             else if (data.type === 'assign_id') { myPlayerId = data.assignedId; }
             else if (data.type === 'lobby_update') { players = data.players; renderLobby(); }
             else if (data.type === 'start_game') {
-                applyState(data.state); // 修正箇所
+                applyState(data.state);
                 document.getElementById("lobby-screen").style.display = "none"; transitionToGameScreen(); initBoard(); updateUI(false);
             }
             else if (data.type === 'state') {
-                applyState(data.state); // 修正箇所
+                applyState(data.state);
                 updateUI(false); 
                 if (myPlayerId === 0) broadcastState(senderConnection);
             } 
@@ -501,13 +603,13 @@
             }
             else if (data.type === 'guest_action' && myPlayerId === 0) {
                 if (data.action === 'end_turn') endTurnLogic();
-                else if (data.action === 'update_state') { applyState(data.state); updateUI(true); } // 修正箇所
+                else if (data.action === 'update_state') { applyState(data.state); updateUI(true); }
             }
         }
 
         function broadcastLobby() { connections.forEach(c => c.send({ type: 'lobby_update', players: players })); }
         function broadcastState(excludeConnection = null) {
-            let statePayload = { players, turn, territories, truckPos, policePos, unclePos, animalPos, isRainy, constructionPos, constructionTimer, gameOver, diceRolled, canPickedThisTurn, isEventPicking, eventCards, isBranchPicking, currentBranchOptions, mapData };
+            let statePayload = { players, turn, territories, truckPos, policePos, unclePos, animalPos, isRainy, constructionPos, constructionTimer, gameOver, diceRolled, canPickedThisTurn, isBranchPicking, currentBranchOptions, mgActive, mapData };
             if (myPlayerId === 0) { connections.forEach(c => { if (c !== excludeConnection) c.send({ type: 'state', state: statePayload }); }); } 
             else if (conn) { conn.send({ type: 'state', state: statePayload }); }
         }
@@ -519,12 +621,13 @@
             const list = document.getElementById("lobby-players-list"); list.innerHTML = "";
             players.forEach(p => {
                 let typeText = p.isCPU ? "🤖 CPU" : (p.owner === 0 ? "👑 ホスト" : "👤 ゲスト");
-                list.innerHTML += `<div class="lobby-player-item" style="border-color: ${p.color};"><div class="avatar-small-clay" style="background-image: url('${p.avatar}'); border-color: ${p.color};"></div><div style="font-weight: bold; font-size: 16px;">${p.name} <span style="font-size:12px; color:#bdc3c7;">[${typeText}]</span></div></div>`;
+                list.innerHTML += `<div class="lobby-player-item" style="border-color: ${p.color};"><div class="avatar-small-clay" style="background-image: url('${p.avatar}'); border-color: ${p.color};"></div><div style="font-weight: bold; font-size: 16px;">${p.name} <span style="font-size:12px; color:#bdc3c7;">[${typeText}]</span><br><span style="font-size:11px; color:#f1c40f;">${p.charName}</span></div></div>`;
             });
         }
         function addCPUToLobby() {
             if (players.length >= 4) { alert("最大4人までです！"); return; }
-            let newId = players.length; players.push({ id: newId, name: `CPU ${newId}`, isCPU: true, owner: 0, pos: 0, p: 0, ap: 0, hand: [], maxHand: 7, stealth: false, rainGear: false, hasID: false, bonusAP: 0, penaltyAP: 0, protected: false, skipTurn: false, color: pIdColors[newId], avatar: cpuAvatars[newId] });
+            let newId = players.length; 
+            players.push(createPlayerObj(newId, `CPU ${newId}`, true, 0, cpuAvatars[newId]));
             renderLobby(); broadcastLobby();
         }
 
@@ -533,13 +636,11 @@
         ========================================================= */
         function startOnlineGame() {
             if (players.length < 2) { alert("最低2人必要です！"); return; }
-            mapData = generateRandomMap(); 
-            unclePos = mapData[Math.floor(Math.random() * mapData.length)].id;
             drawCardForTurn(turn);
-            let statePayload = { players, turn, territories, truckPos, policePos, unclePos, animalPos, isRainy, constructionPos, constructionTimer, gameOver, diceRolled, canPickedThisTurn, isEventPicking, eventCards, isBranchPicking, currentBranchOptions, mapData };
+            let statePayload = { players, turn, territories, truckPos, policePos, unclePos, animalPos, isRainy, constructionPos, constructionTimer, gameOver, diceRolled, canPickedThisTurn, isBranchPicking, currentBranchOptions, mgActive, mapData };
             connections.forEach(c => c.send({ type: 'start_game', state: statePayload }));
             
-            document.getElementById("lobby-screen").style.display = "none"; transitionToGameScreen(); initBoard(); log("ゲームスタート！"); updateUI(true);
+            document.getElementById("lobby-screen").style.display = "none"; transitionToGameScreen(); initBoard(); log("ゲームスタート！100Pを目指せ！"); updateUI(true);
         }
 
         function startOfflineGame() {
@@ -551,14 +652,11 @@
                 {name: document.getElementById("p4-name").value || "P4", type: document.getElementById("p4-type").value, avatar: document.getElementById("p4-avatar").value}
             ];
             players = [];
-            config.forEach((c, index) => { if (c.type !== "none") { players.push({ id: players.length, name: c.name, isCPU: c.type === "cpu", owner: 0, pos: 0, p: 0, ap: 0, hand: [], maxHand: 7, stealth: false, rainGear: false, hasID: false, bonusAP: 0, penaltyAP: 0, protected: false, skipTurn: false, color: pIdColors[index], avatar: c.avatar }); } });
+            config.forEach((c, index) => { if (c.type !== "none") { players.push(createPlayerObj(players.length, c.name, c.type === "cpu", 0, c.avatar)); } });
             if(players.length < 2) { alert("最低2人のプレイヤーが必要です！"); return; }
             
-            mapData = generateRandomMap(); 
-            unclePos = mapData[Math.floor(Math.random() * mapData.length)].id;
             drawCardForTurn(turn);
-
-            transitionToGameScreen(); initBoard(); log("オフラインゲーム スタート！"); updateUI(true);
+            transitionToGameScreen(); initBoard(); log("オフラインゲーム スタート！100Pを目指せ！"); updateUI(true);
         }
 
         function transitionToGameScreen() { document.getElementById("setup-screen").style.display = "none"; document.getElementById("game-screen").style.display = "flex"; if(isOnline) document.getElementById("online-indicator").style.display = "block"; }
@@ -566,8 +664,8 @@
         function initBoard() {
             const board = document.getElementById("game-board"); board.innerHTML = "";
             mapData.forEach((tile) => {
-                let div = document.createElement("div"); div.className = `tile ${tile.type}`;
-                div.innerHTML = `<div style="z-index:2; font-size:10px;">${tile.name}</div><div class="owner-mark-clay" id="owner-${tile.id}" style="z-index:3;"></div><div class="construction-mark" id="const-${tile.id}">🚧</div>`; 
+                let div = document.createElement("div"); div.className = `tile ${tile.type} ${tile.area}`;
+                div.innerHTML = `<div style="z-index:2; font-size:9px; text-align:center;">${tile.name}</div><div class="owner-mark-clay" id="owner-${tile.id}" style="z-index:3;"></div><div class="construction-mark" id="const-${tile.id}">🚧</div>`; 
                 div.id = `tile-${tile.id}`;
                 div.style.gridColumn = tile.col; div.style.gridRow = tile.row; board.appendChild(div);
             });
@@ -653,8 +751,8 @@
                 let c = deckData[cardId]; let btn = document.createElement("div"); btn.className = "card-btn-clay"; btn.style.borderColor = c.color;
                 btn.innerHTML = `<div class="card-title-clay">${c.icon} ${c.name}</div><div style="font-size:16px; margin:5px 0;">${c.desc}</div>`;
                 
-                let isCardDisabled = notMyTurn || !diceRolled || p.ap < 2 || isEventPicking || isBranchPicking;
-                let isDiscardDisabled = notMyTurn || isEventPicking || isBranchPicking;
+                let isCardDisabled = notMyTurn || !diceRolled || p.ap < 2 || mgActive || isBranchPicking;
+                let isDiscardDisabled = notMyTurn || mgActive || isBranchPicking;
 
                 let actionDiv = document.createElement("div"); actionDiv.className = "card-actions";
                 let useBtn = document.createElement("button"); useBtn.className = "card-mini-btn"; useBtn.innerText = "使用(2AP)";
@@ -667,20 +765,6 @@
 
                 actionDiv.appendChild(useBtn); actionDiv.appendChild(discardBtn);
                 btn.appendChild(actionDiv); container.appendChild(btn);
-            });
-        }
-
-        function renderEventPicker() {
-            const overlay = document.getElementById("event-picker-overlay"); const container = document.getElementById("event-picker-container");
-            if (!isEventPicking) { overlay.style.display = "none"; return; }
-            
-            overlay.style.display = "flex"; container.innerHTML = "";
-            let isMyChar = false; if (isOnline) { isMyChar = (players[turn].id === myPlayerId); } else { isMyChar = !players[turn].isCPU; }
-
-            eventCards.forEach((cId, index) => {
-                let cardBack = document.createElement("div"); cardBack.className = "event-card-back";
-                cardBack.onclick = () => { if (isMyChar) pickEventCard(index); };
-                container.appendChild(cardBack);
             });
         }
 
@@ -712,52 +796,75 @@
             let turnText = "";
             if (p.isCPU) { turnText = `${p.name} (CPU) のターン`; } else if (isOnline) { if (p.id === myPlayerId) turnText = "あなたのターン！"; else turnText = `相手(${p.name})のターン...`; } else { turnText = `${p.name} のターン`; }
             document.getElementById("turn-info").innerText = turnText;
+            document.getElementById("skill-indicator").innerText = `★ ${p.charName} (${getCharType(p.avatar).desc})`;
             
             const idTab = document.getElementById("active-p-id"); idTab.innerText = `P${p.id + 1}`; idTab.style.backgroundColor = p.color;
             document.getElementById("avatar-active").style.borderColor = p.color; document.getElementById("avatar-active").style.backgroundImage = `url('${p.avatar}')`;
-            document.getElementById("p-display").innerText = p.p; document.getElementById("ap-display").innerText = p.ap;
+            
+            let pDisplay = document.getElementById("p-display"); pDisplay.innerText = p.p;
+            if(p.p < 0) pDisplay.classList.add("bankrupt"); else pDisplay.classList.remove("bankrupt");
+            
+            document.getElementById("ap-display").innerText = p.ap;
             let owned = Object.values(territories).filter(id => id === p.id).length; document.getElementById("territory-display").innerText = owned;
+            
+            let itemsTxt = [];
+            if(p.items.bicycle) itemsTxt.push("🚲"); if(p.items.shoes) itemsTxt.push("👢");
+            if(p.items.cart) itemsTxt.push("🛒"); if(p.items.doll) itemsTxt.push("🎎");
+            document.getElementById("items-indicator").innerHTML = itemsTxt.length > 0 ? `所持: ${itemsTxt.join(" ")}` : "";
 
             const listContainer = document.getElementById("all-players-list"); listContainer.innerHTML = "";
             players.forEach((op, i) => {
                 let activeStyle = (i === turn) ? "box-shadow: 0 0 12px #f1c40f; border-color: #f1c40f; background: #5c4a44;" : `border-color:${op.color}; opacity:0.9;`;
                 let typeLabel = op.isCPU ? "<span style='color:#bdc3c7;'>(CPU)</span>" : (isOnline && op.id === myPlayerId ? "<span style='color:#2ecc71;'>(あなた)</span>" : "");
                 let skipLabel = op.skipTurn ? "💤" : "";
-                listContainer.innerHTML += `<div class="mini-player-clay" style="${activeStyle}"><div class="avatar-small-clay" style="border-color:${op.color}; background-image: url('${op.avatar}'); flex-shrink:0;"></div><div style="font-size: 11px; font-weight: bold; line-height: 1.3; overflow:hidden;"><div style="color:${op.color}; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${op.name} ${typeLabel} ${skipLabel}</div><div style="color:#fdf5e6;">💰${op.p}P | 🎴${op.hand.length}/${op.maxHand}枚</div></div></div>`;
+                let opPText = op.p < 0 ? `<span style="color:#e74c3c;">${op.p}P</span>` : `${op.p}P`;
+                listContainer.innerHTML += `<div class="mini-player-clay" style="${activeStyle}"><div class="avatar-small-clay" style="border-color:${op.color}; background-image: url('${op.avatar}'); flex-shrink:0;"></div><div style="font-size: 11px; font-weight: bold; line-height: 1.3; overflow:hidden;"><div style="color:${op.color}; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${op.name} ${typeLabel} ${skipLabel}</div><div style="color:#fdf5e6;">💰${opPText} | 🎴${op.hand.length}/${op.maxHand}枚</div></div></div>`;
             });
             
             let isOverLimit = p.hand.length > p.maxHand;
             if (isOverLimit) notMyTurn = true; 
 
-            let canRoll = !notMyTurn && !diceRolled && !p.isCPU && !isEventPicking && !isBranchPicking;
+            let canRoll = !notMyTurn && !diceRolled && !p.isCPU && !mgActive && !isBranchPicking;
             document.getElementById("btn-roll").disabled = !canRoll; toggleHighlight("btn-roll", canRoll);
 
-            let moveCost = isRainy && !p.rainGear ? 2 : 1; 
+            let moveCost = isRainy && !p.rainGear && p.charType !== "athlete" ? 2 : 1; 
             let currentTile = mapData.find(t => t.id === p.pos);
             let validNextTiles = currentTile.next.filter(id => id !== constructionPos);
             
-            let canMove = !notMyTurn && !p.isCPU && diceRolled && p.ap >= moveCost && validNextTiles.length > 0 && !isEventPicking && !isBranchPicking;
+            let canMove = !notMyTurn && !p.isCPU && diceRolled && p.ap >= moveCost && validNextTiles.length > 0 && !p.cannotMove && !mgActive && !isBranchPicking;
             document.getElementById("btn-move").innerText = `🚶 移動 (${moveCost}AP)`; document.getElementById("btn-move").disabled = !canMove;
             
             let tType = currentTile.type;
-            let canOccupyLogic = ["normal","can","trash"].includes(tType) && territories[p.pos] !== p.id && p.pos !== unclePos;
+            let canOccupyLogic = ["normal","can","trash","job"].includes(tType) && territories[p.pos] !== p.id && p.pos !== unclePos;
             let blockedByAnimal = (p.pos === animalPos);
 
-            let canActionCan = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 1 && tType === "can" && canPickedThisTurn < 3 && (!isRainy || p.rainGear) && !blockedByAnimal && !isEventPicking && !isBranchPicking;
-            let canActionTrash = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 2 && tType === "trash" && (!isRainy || p.rainGear) && !blockedByAnimal && !isEventPicking && !isBranchPicking;
-            let canActionOccupy = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 3 && canOccupyLogic && !isEventPicking && !isBranchPicking;
-            let canActionJob = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 4 && !isEventPicking && !isBranchPicking;
-            let canUseAnyCard = (!notMyTurn && !p.isCPU && diceRolled && p.ap >= 2 && p.hand.length > 0 && !isEventPicking && !isBranchPicking);
-
-            document.getElementById("btn-can").disabled = !canActionCan; document.getElementById("btn-trash").disabled = !canActionTrash;
-            document.getElementById("btn-occupy").disabled = !canActionOccupy; document.getElementById("btn-job").disabled = !canActionJob;
+            let canActionCan = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 1 && tType === "can" && canPickedThisTurn < 3 && (!isRainy || p.rainGear) && !blockedByAnimal && !mgActive && !isBranchPicking;
+            let trashCost = p.items.shoes ? 1 : 2;
+            let canActionTrash = !notMyTurn && !p.isCPU && diceRolled && p.ap >= trashCost && tType === "trash" && (!isRainy || p.rainGear) && !blockedByAnimal && !mgActive && !isBranchPicking;
+            let canActionOccupy = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 3 && canOccupyLogic && !mgActive && !isBranchPicking;
+            let canActionJob = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 4 && tType === "job" && !mgActive && !isBranchPicking;
+            let canUseAnyCard = (!notMyTurn && !p.isCPU && diceRolled && p.ap >= 2 && p.hand.length > 0 && !mgActive && !isBranchPicking);
             
+            let canShop = !notMyTurn && !p.isCPU && diceRolled && tType === "shop" && p.p >= 0 && !mgActive && !isBranchPicking;
+            let canManhole = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 1 && tType === "manhole" && !mgActive && !isBranchPicking;
+
+            document.getElementById("btn-can").disabled = !canActionCan; 
+            document.getElementById("btn-trash").innerText = `🗑️ ゴミ漁り (${trashCost}AP)`; document.getElementById("btn-trash").disabled = !canActionTrash;
+            document.getElementById("btn-occupy").disabled = !canActionOccupy; 
+            document.getElementById("btn-job").disabled = !canActionJob;
+            document.getElementById("btn-shop").style.display = tType === "shop" ? "block" : "none"; document.getElementById("btn-shop").disabled = !canShop;
+            document.getElementById("btn-manhole").style.display = tType === "manhole" ? "block" : "none"; document.getElementById("btn-manhole").disabled = !canManhole;
+            
+            let targets = players.filter(op => op.id !== p.id && op.pos === p.pos);
+            let pvpDisplay = targets.length > 0 ? "block" : "none";
+            let canPvP = !notMyTurn && !p.isCPU && diceRolled && targets.length > 0 && !mgActive && !isBranchPicking;
+            document.getElementById("btn-pickpocket").style.display = pvpDisplay; document.getElementById("btn-pickpocket").disabled = !(canPvP && p.ap >= 3);
+            document.getElementById("btn-steal-card").style.display = pvpDisplay; document.getElementById("btn-steal-card").disabled = !(canPvP && p.ap >= 2);
+
             const promptEl = document.getElementById("end-turn-prompt"); const endBtnEl = document.getElementById("btn-end");
-            let canEnd = !notMyTurn && !p.isCPU && diceRolled && !isEventPicking && !isBranchPicking && !isOverLimit; endBtnEl.disabled = !canEnd;
+            let canEnd = !notMyTurn && !p.isCPU && diceRolled && !mgActive && !isBranchPicking && !isOverLimit; endBtnEl.disabled = !canEnd;
 
-            let noOtherActions = (!canActionCan && !canActionTrash && !canActionOccupy && !canActionJob && !canUseAnyCard && !canMove);
             let shouldPrompt = false;
-            
             if (isOverLimit) {
                 promptEl.style.display = "block"; promptEl.innerHTML = "手札が上限を超えています！<br>👉 カードを使用するか捨ててください";
                 endBtnEl.classList.remove("btn-end-highlight"); toggleHighlight("btn-end", false);
@@ -787,7 +894,7 @@
             }
 
             let actualNotMyTurn = (!isMyChar || p.isCPU || cpuActing || p.skipTurn);
-            renderHand(p, actualNotMyTurn); renderEventPicker(); updateTokens(); checkWin(p);
+            renderHand(p, actualNotMyTurn); updateTokens(); checkWin(p);
 
             if (isOnline && broadcast && myPlayerId === 0) broadcastState(); 
 
@@ -814,8 +921,12 @@
 
             clearInterval(rollInterval); d1El.className = "dice stopped"; d2El.className = "dice stopped"; d1El.innerText = d1; d2El.innerText = d2;
 
-            let totalAP = d1 + d2 - p.penaltyAP + p.bonusAP; if(totalAP < 0) totalAP = 0; 
+            let totalAP = d1 + d2 - p.penaltyAP + p.bonusAP; 
+            if(p.items.bicycle) totalAP += 2;
+            if(totalAP < 0) totalAP = 0; 
+            
             let calcText = `${d1} + ${d2} = ${d1+d2}AP`;
+            if (p.items.bicycle) calcText += ` (🚲自転車 +2)`;
             if (p.penaltyAP > 0) calcText += ` (ペナ -${p.penaltyAP})`; if (p.bonusAP > 0) calcText += ` (ボーナス +${p.bonusAP})`; calcText += ` ＝ ${totalAP}AP 獲得！`;
             resultEl.innerHTML = calcText;
 
@@ -823,8 +934,26 @@
 
             p.ap += totalAP; diceRolled = true; p.bonusAP = 0; p.penaltyAP = 0;
             triggerAPPopup(p.id, totalAP, "ダイスロール"); log(`<span class="highlight">${p.name}</span> はサイコロを振り ${totalAP}AP 獲得！`);
+            
+            // 陣地収入処理 (借金時は0)
             let owned = Object.values(territories).filter(id => id === p.id).length;
-            if(owned > 0) { p.p += owned; triggerAPPopup(p.id, owned, "陣地ボーナス"); log(`🚩 陣地収入！ ${owned}P を獲得！`); }
+            if(owned > 0) {
+                if (p.p >= 0) {
+                    let income = 0;
+                    Object.keys(territories).forEach(tId => {
+                        if(territories[tId] === p.id) {
+                            let area = mapData.find(t=>t.id == tId).area;
+                            if (area === "slum") income += 1;
+                            else if (area === "commercial") income += 2;
+                            else if (area === "luxury") income += 3;
+                        }
+                    });
+                    if (p.items.cart) income *= 2;
+                    p.p += income; triggerAPPopup(p.id, income, "陣地収入"); log(`🚩 陣地収入！ ${income}P を獲得！`);
+                } else {
+                    log(`<span class="danger">📉 借金状態のため、陣地収入を全没収された！</span>`);
+                }
+            }
             
             triggerActionSync();
         }
@@ -842,47 +971,158 @@
             }
         }
 
+        function checkYankeeSkill(movedP) {
+            let targets = players.filter(op => op.id !== movedP.id && op.pos === movedP.pos && op.p > 0);
+            targets.forEach(t => {
+                if (movedP.charType === "yankee") {
+                    t.p -= 1; movedP.p += 1; log(`👊 元ヤンの凄み！ ${movedP.name} は ${t.name} から 1P 奪い取った！`);
+                }
+                if (t.charType === "yankee" && movedP.p > 0) {
+                    movedP.p -= 1; t.p += 1; log(`👊 元ヤンの凄み！ ${t.name} は近づいてきた ${movedP.name} から 1P 奪い取った！`);
+                }
+            });
+        }
+
         function executeMove(targetId) {
-            let p = players[turn]; let cost = isRainy && !p.rainGear ? 2 : 1; p.ap -= cost; triggerAPPopup(p.id, -cost, "移動"); 
+            let p = players[turn]; let cost = isRainy && !p.rainGear && p.charType !== "athlete" ? 2 : 1; p.ap -= cost; triggerAPPopup(p.id, -cost, "移動"); 
             p.pos = targetId; 
+            
+            checkYankeeSkill(p);
+
+            let tType = mapData.find(t => t.id === p.pos).type;
+            if (tType === "koban") {
+                log(`🚓 交番だ！職務質問で足止めされ、これ以上【移動】できない！`);
+                p.cannotMove = true; 
+            }
 
             if (p.pos === policePos) { 
-                if(p.hasID) { p.hasID = false; log(`🔵 ${p.name} は身分証明書で警察をやり過ごした！`); }
+                if(applyItemProtection(p, "警察")) { /* 無効化済み */ }
+                else if(p.stealth) { log(`💨 ${p.name} はステルスで警察をやり過ごした！`); }
+                else if(p.hasID) { p.hasID = false; log(`🔵 ${p.name} は身分証明書で警察をやり過ごした！`); }
                 else { log(`<span class="danger">👮‍♂️ 警察に接触！職務質問でターン終了＆次回AP-2！</span>`); triggerAPPopup(p.id, -p.ap, "AP全没収 (警察)"); p.ap = 0; p.penaltyAP += 2; triggerActionSync(); return; }
             }
             if (p.pos === unclePos) { 
                 log(`<span class="danger">🧓 厄介なおじさんの縄張りに入ってしまった！カード1枚破棄＆ターン強制終了！</span>`); 
                 if (p.hand.length > 0) p.hand.pop(); 
-                triggerAPPopup(p.id, -p.ap, "AP全没収 (おじさん)"); 
-                p.ap = 0; 
-                triggerActionSync(); 
-                return; 
+                triggerAPPopup(p.id, -p.ap, "AP全没収 (おじさん)"); p.ap = 0; triggerActionSync(); return; 
             }
             
-            let tType = mapData.find(t => t.id === p.pos).type;
-            if (tType === "event") { eventCards = Array.from({length: 8}, () => Math.floor(Math.random() * deckData.length)); isEventPicking = true; log(`🎴 イベントマスに到着！運命の1枚を選べ！`); } 
+            if (tType === "event") { 
+                mgActive = true; 
+                if(!p.isCPU) {
+                    if (isOnline && p.id === myPlayerId) { showMiniGameUI(); } 
+                    else if (!isOnline) { showMiniGameUI(); }
+                }
+                triggerActionSync();
+                return;
+            } 
             else if (tType === "shelter") { p.stealth = true; log(`🏕️ 避難所で休んだ。ステルス状態になり次回の敵を回避！`); }
+            
             triggerActionSync();
         }
+        
+        function applyItemProtection(p, source) {
+            if (p.items.doll) {
+                p.items.doll = false;
+                log(`🎎 身代わり人形が身代わりになった！${source}のペナルティを無効化！`);
+                return true;
+            }
+            return false;
+        }
 
-        function pickEventCard(index) {
-            let p = players[turn]; let cardId = eventCards[index]; p.hand.push(cardId);
-            log(`🎴 ${p.name} は「${deckData[cardId].name}」を手に入れた！`); triggerAPPopup(p.id, 0, "カード獲得");
-            isEventPicking = false; eventCards = []; triggerActionSync();
+        // ミニゲーム処理
+        function showMiniGameUI() {
+            document.getElementById("minigame-overlay").style.display = "flex";
+            document.getElementById("mg-result").innerText = "";
+            mgTimeLeft = 10; document.getElementById("mg-timer-display").innerText = mgTimeLeft;
+            clearInterval(mgTimer);
+            mgTimer = setInterval(() => {
+                mgTimeLeft--; document.getElementById("mg-timer-display").innerText = mgTimeLeft;
+                if(mgTimeLeft <= 0) { clearInterval(mgTimer); processMiniGame("timeout"); }
+            }, 1000);
+        }
+
+        async function processMiniGame(choice) {
+            clearInterval(mgTimer); document.getElementById("minigame-overlay").style.display = "none";
+            let p = players[turn];
+            if (choice === "timeout") { log(`⏳ 迷いすぎた...イベントチャンスを逃した。`); } 
+            else {
+                let roll = Math.floor(Math.random() * 6) + 1;
+                let isHigh = roll >= 4;
+                let win = (choice === "high" && isHigh) || (choice === "low" && !isHigh);
+                log(`🎲 ハイ＆ロー チャレンジ！出目は【${roll}】！`);
+                if (win) {
+                    let cardId = Math.floor(Math.random() * deckData.length); // 大逆転含む全カード
+                    p.hand.push(cardId);
+                    log(`✨ 見事的中！レアカード「${deckData[cardId].name}」を手に入れた！`); triggerAPPopup(p.id, 0, "レアカード獲得");
+                } else {
+                    log(`💀 ハズレ...何も得られなかった。`);
+                }
+            }
+            mgActive = false; triggerActionSync();
         }
 
         function discardCard(index) { let p = players[turn]; p.hand.splice(index, 1); log(`🗑️ ${p.name} はカードを1枚捨てた。`); triggerActionSync(); }
 
         function actionCan() { players[turn].ap -= 1; players[turn].p += 1; canPickedThisTurn++; triggerAPPopup(players[turn].id, -1, "空き缶"); log(`🥫 空き缶を拾った！+1P`); triggerActionSync(); }
         function actionTrash() {
-            let p = players[turn]; p.ap -= 2; triggerAPPopup(p.id, -2, "ゴミ漁り"); let gain = Math.floor(Math.random() * 6); 
-            if(gain === 0) { if(p.stealth) { log(`💨 ステルスで警察を回避！`); } else if(p.hasID) { p.hasID = false; log(`🔵 身分証明書で警察をやり過ごした！`); } else { log(`👮 失敗！【警察官】に見つかった！ 次回AP-2！`); p.penaltyAP = 2; } } 
-            else { p.p += gain; log(`🗑️ ゴミ漁りで ${gain}P 見つけた！`); } triggerActionSync();
+            let p = players[turn]; let cost = p.items.shoes ? 1 : 2; p.ap -= cost; triggerAPPopup(p.id, -cost, "ゴミ漁り"); let gain = Math.floor(Math.random() * 6); 
+            if(gain === 0) { 
+                if(p.stealth) { log(`💨 ステルスで警察を回避！`); } 
+                else if(p.hasID) { p.hasID = false; log(`🔵 身分証明書で警察をやり過ごした！`); } 
+                else if(p.charType === "survivor") { log(`🌿 サバイバーの勘！警察を事前に察知してペナルティを回避！`); }
+                else { log(`👮 失敗！【警察官】に見つかった！ 次回AP-2！`); p.penaltyAP = 2; } 
+            } else { p.p += gain; log(`🗑️ ゴミ漁りで ${gain}P 見つけた！`); } triggerActionSync();
         }
         function actionOccupy() { let p = players[turn]; p.ap -= 3; territories[p.pos] = p.id; triggerAPPopup(p.id, -3, "陣地占領"); log(`🚩 「${mapData.find(t=>t.id===p.pos).name}」を陣地化した！`); triggerActionSync(); }
         function actionJob() {
-            let p = players[turn]; p.ap -= 4; triggerAPPopup(p.id, -4, "小バイト");
-            if(Math.random() > 0.5) { p.p += 5; log(`💼 小バイト成功！ 5P 獲得！`); } else { log(`💼 小バイト失敗...`); } triggerActionSync();
+            let p = players[turn]; p.ap -= 4; triggerAPPopup(p.id, -4, "バイト");
+            let chance = p.charType === "sales" ? 0.7 : 0.5;
+            if(Math.random() < chance) { p.p += 10; log(`💼 バイト大成功！ 10P 獲得！`); } else { log(`💼 ミスをした...バイト失敗。`); } triggerActionSync();
+        }
+        function actionManhole() {
+            let p = players[turn]; p.ap -= 1; triggerAPPopup(p.id, -1, "ワープ");
+            let manholes = mapData.filter(t => t.type === "manhole" && t.id !== p.pos);
+            p.pos = manholes[Math.floor(Math.random() * manholes.length)].id;
+            log(`🕳️ マンホールを通って別のエリアにワープした！`);
+            checkYankeeSkill(p); triggerActionSync();
+        }
+        function actionPickpocket() {
+            let p = players[turn]; p.ap -= 3; triggerAPPopup(p.id, -3, "スリ");
+            let targets = players.filter(op => op.id !== p.id && op.pos === p.pos);
+            let target = targets[Math.floor(Math.random() * targets.length)];
+            if(Math.random() > 0.5) {
+                let steal = Math.floor(Math.random() * 5) + 1; steal = Math.min(steal, Math.max(0, target.p));
+                target.p -= steal; p.p += steal; log(`🔪 スリ成功！ ${target.name} から ${steal}P 奪い取った！`);
+            } else { p.p -= 2; log(`🔪 失敗！見つかってしまい、逃げる途中に 2P 落とした...`); }
+            triggerActionSync();
+        }
+        function actionStealCard() {
+            let p = players[turn]; p.ap -= 2; triggerAPPopup(p.id, -2, "手札奪取");
+            let targets = players.filter(op => op.id !== p.id && op.pos === p.pos && op.hand.length > 0);
+            if(targets.length > 0) {
+                let target = targets[Math.floor(Math.random() * targets.length)];
+                let cardIndex = Math.floor(Math.random() * target.hand.length);
+                let cardId = target.hand.splice(cardIndex, 1)[0];
+                p.hand.push(cardId); log(`🃏 手札奪取成功！ ${target.name} からカードを1枚奪った！`);
+            } else { log(`🃏 失敗...相手はカードを持っていなかった。`); }
+            triggerActionSync();
+        }
+
+        // ショップ機能
+        function openShop() {
+            document.getElementById("shop-p-display").innerText = players[turn].p;
+            document.getElementById("shop-overlay").style.display = "flex";
+        }
+        function closeShop() { document.getElementById("shop-overlay").style.display = "none"; }
+        function buyItem(itemKey, price) {
+            let p = players[turn];
+            if (p.p < price) { alert("ポイントが足りません！"); return; }
+            if (p.items[itemKey]) { alert("すでに所持しています！"); return; }
+            p.p -= price; p.items[itemKey] = true;
+            log(`🛒 ショップでアイテムを購入した！ (-${price}P)`);
+            document.getElementById("shop-p-display").innerText = p.p;
+            triggerActionSync();
         }
         
         function useCard(index, cardId) {
@@ -892,17 +1132,26 @@
             else if(cardId === 2) { p.hasID = true; p.p += 1; log(`🔵 身分証をゲット！+1P ＆ 次回の警察をスルー！`); }
             else if(cardId === 3) { let others = players.filter(t => t.id !== p.id); let target = others[Math.floor(Math.random() * others.length)]; target.penaltyAP += 2; log(`🔴 通報成功！ ${target.name} は次回AP-2！`); }
             else if(cardId === 4) { let others = players.filter(t => t.id !== p.id && t.p > 0); if(others.length > 0) { let target = others[Math.floor(Math.random() * others.length)]; let steal = Math.min(2, target.p); target.p -= steal; p.p += steal; log(`🔴 缶泥棒！ ${target.name} から ${steal}P 奪った！`); } else { log(`🔴 奪える相手がいなかった...`); } }
-            else if(cardId === 5) { let roll = Math.floor(Math.random() * 6) + 1; if(roll >= 4) { let eTerrs = Object.keys(territories).filter(k => territories[k] !== p.id); if(eTerrs.length > 0) { let tTile = eTerrs[Math.floor(Math.random() * eTerrs.length)]; territories[tTile] = p.id; log(`🔴 領土挑戦（出目${roll}）成功！マス[${tTile}]を強奪した！`); } else { log(`🔴 奪える領土がなかった...`); } } else { log(`🔴 領土挑戦（出目${roll}）失敗...`); } }
+            else if(cardId === 5) { let roll = Math.floor(Math.random() * 6) + 1; if(roll >= 4) { let eTerrs = Object.keys(territories).filter(k => territories[k] !== p.id); if(eTerrs.length > 0) { let tTile = eTerrs[Math.floor(Math.random() * eTerrs.length)]; territories[tTile] = p.id; log(`🔴 領土挑戦（出目${roll}）成功！マス[${mapData.find(m=>m.id==tTile).name}]を強奪した！`); } else { log(`🔴 奪える領土がなかった...`); } } else { log(`🔴 領土挑戦（出目${roll}）失敗...`); } }
             else if(cardId === 6) { p.p += 5; p.bonusAP += 2; log(`🟢 支援面談完了！ +5P ＆ 次回AP+2！`); }
             else if(cardId === 7) { p.p += 3; log(`🟢 炊き出し発見！ +3P 獲得！`); }
             else if(cardId === 8) { p.maxHand += 2; log(`🟢 リュックサック装備！ 手札上限が ${p.maxHand} 枚に拡張！`); }
             else if(cardId === 9) { let roll = Math.floor(Math.random() * 6) + 1; if(roll >= 4) { p.p += 3; log(`🟡 運勢良し（出目${roll}）+3P！`); } else { p.p = Math.max(0, p.p - 3); log(`🟡 凶...（出目${roll}）-3P。`); } }
             else if(cardId === 10) { p.p += 2; log(`🟡 野良猫の導き！ +2P 獲得！`); }
             else if(cardId === 11) { if(Math.random() > 0.5) { p.p += 6; log(`🟡 密かなバイト大成功！+6P！`); } else { p.p = Math.max(0, p.p - 3); log(`🟡 密かなバイト失敗...-3P。`); } }
+            else if(cardId === 12) { players.forEach(op => op.p = Math.floor(op.p / 2)); log(`😱 大暴落発生！ 全プレイヤーの所持Pが半分になった！`); }
+            else if(cardId === 13) { 
+                let others = players.filter(op => op.id !== p.id && op.p > p.p);
+                if(others.length > 0) {
+                    let target = others.reduce((max, obj) => (max.p > obj.p) ? max : obj);
+                    let temp = p.p; p.p = target.p; target.p = temp; log(`🔥 下剋上！！ ${p.name} とトップの ${target.name} の所持Pが入れ替わった！`);
+                } else { log(`🔥 下剋上失敗...自分よりPが多いプレイヤーがいなかった。`); }
+            }
+            else if(cardId === 14) { if(Math.random() < 0.1) { p.p += 15; log(`🎉 宝くじ当選！！！ 15P獲得！`); } else { log(`📄 ハズレ...現実は甘くない。`); } }
             triggerActionSync();
         }
 
-        function triggerActionSync() { if (isOnline && myPlayerId !== 0) { conn.send({ type: 'guest_action', action: 'update_state', state: { players, turn, territories, truckPos, policePos, unclePos, animalPos, isRainy, constructionPos, constructionTimer, gameOver, diceRolled, canPickedThisTurn, isEventPicking, eventCards, isBranchPicking, currentBranchOptions, mapData } }); } else { updateUI(true); } }
+        function triggerActionSync() { if (isOnline && myPlayerId !== 0) { conn.send({ type: 'guest_action', action: 'update_state', state: { players, turn, territories, truckPos, policePos, unclePos, animalPos, isRainy, constructionPos, constructionTimer, gameOver, diceRolled, canPickedThisTurn, isBranchPicking, currentBranchOptions, mgActive, mapData } }); } else { updateUI(true); } }
 
         /* =========================================================
            8. ターン終了 ＆ ラウンド進行 ＆ NPC移動計算
@@ -914,7 +1163,7 @@
         }
 
         async function endTurnLogic() {
-            let p = players[turn]; p.ap = 0; diceRolled = false; canPickedThisTurn = 0;
+            let p = players[turn]; p.ap = 0; diceRolled = false; canPickedThisTurn = 0; p.cannotMove = false;
             
             if (turn === players.length - 1) { await processRoundEventsAsync(); }
 
@@ -941,26 +1190,36 @@
             
             isRainy = (Math.random() < 0.20); digest.push(isRainy ? "🌧️ 天候: 雨 (移動2AP/漁り不可)" : "☀️ 天候: 晴れ");
             if (constructionTimer > 0) { constructionTimer--; if(constructionTimer === 0) { digest.push(`🚧 工事終了: 道が開通した！`); constructionPos = -1; }
-            } else if (Math.random() < 0.10) { constructionPos = mapData[Math.floor(Math.random() * mapData.length)].id; if(constructionPos !== 0) { constructionTimer = 2; digest.push(`🚧 新規工事: マス[${constructionPos}]が封鎖`); } else { constructionPos = -1; } }
+            } else if (Math.random() < 0.10) { constructionPos = mapData[Math.floor(Math.random() * mapData.length)].id; if(constructionPos !== 0) { constructionTimer = 2; digest.push(`🚧 新規工事: マスが封鎖`); } else { constructionPos = -1; } }
 
-            let tRoll = Math.floor(Math.random() * 8) + 1; 
+            let tRoll = Math.floor(Math.random() * 12) + 1; 
             let truckMove = getDestRandom(truckPos, tRoll);
             truckPos = truckMove.finalPos;
             digest.push(`🛻 収集車: ${tRoll}マス爆走`);
             players.forEach(p => {
-                if (truckMove.hitList.includes(p.pos)) {
-                    if (p.stealth) { digest.push(`💨 ${p.name}: ステルスで収集車を回避`); } 
+                if (truckMove.hitList.includes(p.pos) || truckPos === p.pos) {
+                    if (applyItemProtection(p, "収集車")) { digest.push(`🎎 ${p.name}: 身代わり人形が犠牲に！`); }
+                    else if (p.stealth) { digest.push(`💨 ${p.name}: ステルスで収集車を回避`); } 
                     else if (Math.random() < 0.70) { let lost = Math.floor(p.p / 2); p.p -= lost; digest.push(`<span style="color:#e74c3c;">☠️ ${p.name}: 収集車に轢かれた (P半減)</span>`); } 
                     else { digest.push(`💨 ${p.name}: 収集車を間一髪で回避`); }
                 }
             });
 
-            policePos = getDestRandom(policePos, Math.floor(Math.random() * 3) + 1).finalPos;
-            players.forEach(p => { if(p.pos === policePos) { if(p.stealth) { digest.push(`💨 ${p.name}: ステルスで警察を回避`); } else if (p.hasID) { p.hasID = false; digest.push(`🔵 ${p.name}: 身分証で警察を回避`); } else { digest.push(`<span style="color:#e74c3c;">👮‍♂️ ${p.name}: 警察に捕まった (次回AP-2)</span>`); p.penaltyAP += 2; } } });
+            // エリアに基づくNPCワープ徘徊
+            let luxuryTiles = mapData.filter(t => t.area === "luxury");
+            policePos = luxuryTiles[Math.floor(Math.random() * luxuryTiles.length)].id;
+            let slumTiles = mapData.filter(t => t.area === "slum");
+            animalPos = slumTiles[Math.floor(Math.random() * slumTiles.length)].id;
+            unclePos = slumTiles[Math.floor(Math.random() * slumTiles.length)].id;
 
-            animalPos = getDestRandom(animalPos, Math.floor(Math.random() * 4) + 1).finalPos;
-            let animalTile = mapData.find(t => t.id === animalPos);
-            if(animalTile && (animalTile.type === 'can' || animalTile.type === 'trash')) { digest.push(`🐀 野良動物: 資源マスを物色中`); }
+            players.forEach(p => { if(p.pos === policePos) { 
+                if (applyItemProtection(p, "警察")) { digest.push(`🎎 ${p.name}: 身代わり人形が犠牲に！`); }
+                else if(p.stealth) { digest.push(`💨 ${p.name}: ステルスで警察を回避`); } 
+                else if (p.hasID) { p.hasID = false; digest.push(`🔵 ${p.name}: 身分証で警察を回避`); } 
+                else { digest.push(`<span style="color:#e74c3c;">👮‍♂️ ${p.name}: 警察に捕まった (次回AP-2)</span>`); p.penaltyAP += 2; } 
+            } });
+
+            digest.push(`🐀 野良動物: スラムを徘徊中`);
 
             players.forEach(p => p.stealth = false);
             digest.forEach(msg => logLocal(msg)); updateTokens();
@@ -969,33 +1228,38 @@
             await displayRoundSummary(digest);
         }
 
-        function checkWin(p) { if (p.pos === 0 && p.p >= 20 && !gameOver) { log(`🏆 ${p.name} が20Pを持って更生支援センターに到達！クリア！`); gameOver = true; setTimeout(() => alert(`${p.name} の勝利！`), 500); } }
+        function checkWin(p) { if (p.pos === 47 && p.p >= WIN_POINT && !gameOver) { log(`🏆 ${p.name} が ${WIN_POINT}P を持って更生支援センターに到達！クリア！`); gameOver = true; setTimeout(() => alert(`${p.name} の勝利！`), 500); } }
 
         /* =========================================================
            9. CPUの自動制御
         ========================================================= */
         async function processCPUTurn() {
-            let p = players[turn]; await sleep(3500); 
+            let p = players[turn]; await sleep(2500); 
             
             while (p.hand.length > p.maxHand) { discardCard(0); await sleep(500); }
-            if (isEventPicking) { pickEventCard(Math.floor(Math.random() * 8)); await sleep(1000); }
+            if (mgActive) { await processMiniGame(Math.random() > 0.5 ? "high" : "low"); await sleep(1000); }
             if (!diceRolled) { await rollDice(); await sleep(500); }
 
-            while(p.ap > 0 && !gameOver && turn === p.id && !p.skipTurn && !isEventPicking && p.hand.length <= p.maxHand) {
+            while(p.ap > 0 && !gameOver && turn === p.id && !p.skipTurn && !mgActive && p.hand.length <= p.maxHand && !p.cannotMove) {
                 let currentTile = mapData.find(t => t.id === p.pos);
                 let validNextTiles = currentTile.next.filter(id => id !== constructionPos);
                 let acted = false;
-                let mCost = isRainy && !p.rainGear ? 2 : 1; 
+                let mCost = isRainy && !p.rainGear && p.charType !== "athlete" ? 2 : 1; 
                 let canMove = p.ap >= mCost && validNextTiles.length > 0;
                 
-                if (p.p >= 20 && p.pos !== 0 && canMove) { executeMove(validNextTiles[Math.floor(Math.random() * validNextTiles.length)]); acted = true; }
+                let others = players.filter(op => op.id !== p.id && op.pos === p.pos);
+
+                if (p.p >= WIN_POINT && canMove) { executeMove(validNextTiles[0]); acted = true; } // とりあえず直進
+                else if (others.length > 0 && p.ap >= 3 && Math.random() > 0.6) { actionPickpocket(); acted = true; }
                 else if (p.hand.length > 0 && p.ap >= 2 && Math.random() > 0.7) { useCard(0, p.hand[0]); acted = true; }
-                else if (p.ap >= 3 && ["normal","can","trash"].includes(currentTile.type) && territories[p.pos] !== p.id && Math.random() > 0.3 && p.pos !== unclePos) { actionOccupy(); acted = true; }
+                else if (p.ap >= 3 && ["normal","can","trash","job"].includes(currentTile.type) && territories[p.pos] !== p.id && Math.random() > 0.4 && p.pos !== unclePos) { actionOccupy(); acted = true; }
+                else if (currentTile.type === "job" && p.ap >= 4 && Math.random() > 0.3) { actionJob(); acted = true; }
+                else if (currentTile.type === "shop" && p.p >= 10 && !p.items.doll) { p.p -= 10; p.items.doll = true; log(`🛒 ${p.name} は身代わり人形を購入した。`); acted = true; triggerActionSync(); }
                 else if (currentTile.type === "can" && p.ap >= 1 && canPickedThisTurn < 3 && (!isRainy || p.rainGear) && p.pos !== animalPos) { actionCan(); acted = true; }
-                else if (currentTile.type === "trash" && p.ap >= 2 && p.p < 15 && Math.random() > 0.4 && (!isRainy || p.rainGear) && p.pos !== animalPos) { actionTrash(); acted = true; }
+                else if (currentTile.type === "trash" && p.ap >= (p.items.shoes?1:2) && p.p < 30 && Math.random() > 0.4 && (!isRainy || p.rainGear) && p.pos !== animalPos) { actionTrash(); acted = true; }
                 else if (canMove) { executeMove(validNextTiles[Math.floor(Math.random() * validNextTiles.length)]); acted = true; }
                 
-                if (isEventPicking) { await sleep(1000); pickEventCard(Math.floor(Math.random() * 8)); acted = true;}
+                if (mgActive) { await sleep(1000); await processMiniGame(Math.random() > 0.5 ? "high" : "low"); acted = true;}
                 if(!acted) break; await sleep(1000);
             }
             if(!gameOver && turn === p.id) { await sleep(500); endTurnLogic(); }
@@ -1006,55 +1270,38 @@
         ========================================================= */
         function toggleSettingsModal() {
             const overlay = document.getElementById('settings-modal-overlay');
-            if (overlay.style.display === 'flex') {
-                overlay.style.display = 'none';
-            } else {
-                overlay.style.display = 'flex';
-            }
+            if (overlay.style.display === 'flex') overlay.style.display = 'none';
+            else overlay.style.display = 'flex';
         }
 
         function returnToTitle() {
             if (!confirm("現在のゲームは破棄されます。タイトルに戻りますか？")) return;
             
-            // 状態の初期化
             gameOver = false; players = []; turn = 0; diceRolled = false; canPickedThisTurn = 0; territories = {}; cpuActing = false;
-            truckPos = 12; policePos = 6; unclePos = 0; animalPos = 3;
+            truckPos = 12; policePos = 36; unclePos = 2; animalPos = 9;
             isRainy = false; constructionPos = -1; constructionTimer = 0; currentDisplayTurn = -1;
-            isEventPicking = false; eventCards = []; isBranchPicking = false; currentBranchOptions = [];
+            mgActive = false; isBranchPicking = false; currentBranchOptions = []; clearInterval(mgTimer);
 
-            // 通信の切断
             if (conn) { conn.close(); conn = null; }
             if (peer) { peer.destroy(); peer = null; }
             isOnline = false; myPlayerId = 0; connections = [];
 
-            // UIの初期化
-            document.getElementById("log").innerHTML = "";
-            document.getElementById("connection-status").innerText = "";
-            document.getElementById("turn-banner-overlay").style.display = "none";
-            document.getElementById("dice-overlay").style.display = "none";
-            document.getElementById("round-summary-overlay").style.display = "none";
-            document.getElementById("draw-anim-overlay").style.display = "none";
-            document.getElementById("event-picker-overlay").style.display = "none";
-            document.getElementById("branch-prompt").style.display = "none";
-            document.getElementById("end-turn-prompt").style.display = "none";
-            document.getElementById("online-indicator").style.display = "none";
+            document.getElementById("log").innerHTML = ""; document.getElementById("connection-status").innerText = "";
+            document.getElementById("turn-banner-overlay").style.display = "none"; document.getElementById("dice-overlay").style.display = "none";
+            document.getElementById("round-summary-overlay").style.display = "none"; document.getElementById("draw-anim-overlay").style.display = "none";
+            document.getElementById("minigame-overlay").style.display = "none"; document.getElementById("branch-prompt").style.display = "none";
+            document.getElementById("end-turn-prompt").style.display = "none"; document.getElementById("online-indicator").style.display = "none";
+            document.getElementById("shop-overlay").style.display = "none";
 
-            // 画面切り替え
             toggleSettingsModal();
-            document.getElementById("game-screen").style.display = "none";
-            document.getElementById("lobby-screen").style.display = "none";
+            document.getElementById("game-screen").style.display = "none"; document.getElementById("lobby-screen").style.display = "none";
             document.getElementById("setup-screen").style.display = "block";
         }
 
         function changeLayout(mode) {
             const viewport = document.querySelector("meta[name=viewport]");
-            if (mode === "desktop") {
-                // PCと同じ幅を強制し、画面を縮小表示させる
-                viewport.setAttribute("content", "width=1200");
-            } else {
-                // スマホ用のレスポンシブ表示に戻す
-                viewport.setAttribute("content", "width=device-width, initial-scale=1.0");
-            }
+            if (mode === "desktop") viewport.setAttribute("content", "width=1200");
+            else viewport.setAttribute("content", "width=device-width, initial-scale=1.0");
         }
     </script>
 </body>
