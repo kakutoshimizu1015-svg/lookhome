@@ -127,6 +127,12 @@
         .event-card-back { width: 80px; height: 120px; background: repeating-linear-gradient(45deg, #e07a5f, #e07a5f 10px, #c0392b 10px, #c0392b 20px); border: 4px solid #fff; border-radius: 10px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
         .event-card-back:hover { transform: scale(1.1); box-shadow: 0 0 20px #f1c40f;}
 
+        /* 設定関連のスタイル */
+        #settings-btn { position: fixed; top: 10px; right: 10px; background: var(--clay-panel); color: #fdf5e6; border: 3px solid #8d6e63; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; z-index: 1000; box-shadow: var(--clay-shadow-out); display: flex; justify-content: center; align-items: center; padding: 0; transition: transform 0.1s; }
+        #settings-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+        #settings-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1001; display: none; justify-content: center; align-items: center; }
+        #settings-modal { background: var(--clay-bg); border: var(--clay-border); border-radius: 15px; padding: 20px; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(0,0,0,0.8); color: var(--clay-text); text-align: center; }
+
         /* --- スマホ向けレスポンシブ対応 --- */
         @media (max-width: 768px) {
             h1 { font-size: 18px; margin: 5px 0; }
@@ -182,12 +188,35 @@
             #dice-overlay { width: 85%; padding: 20px; box-sizing: border-box; }
             .dice { width: 50px; height: 50px; font-size: 30px; }
             #branch-prompt { font-size: 16px; padding: 10px; top: 10%; }
+
+            /* 設定ボタンのスマホ調整 */
+            #settings-btn { width: 35px; height: 35px; font-size: 16px; top: 5px; right: 5px; border-width: 2px; }
         }
     </style>
 </head>
 <body>
 
-    <h1>🏠 脱・ホームレス：サバイバルシティ</h1>
+    <button id="settings-btn" onclick="toggleSettingsModal()">⚙️</button>
+
+    <div id="settings-modal-overlay" onclick="if(event.target===this) toggleSettingsModal()">
+        <div id="settings-modal">
+            <h2 style="margin-top:0;">⚙️ 設定</h2>
+            
+            <div class="setup-section" style="background: #4a3b32; border-color: #2e1e18; color: #fdf5e6; text-align: left;">
+                <div style="font-weight:bold; margin-bottom: 5px;">表示モード:</div>
+                <select id="layout-mode" onchange="changeLayout(this.value)" style="width: 100%; padding: 8px; font-size: 14px; border-radius: 5px;">
+                    <option value="responsive">スマホ用レイアウト（推奨）</option>
+                    <option value="desktop">PC用レイアウト（縮小表示）</option>
+                </select>
+                <div style="font-size: 11px; color: #e8dcc4; margin-top: 5px;">※スマホでPCと同じ画面比率で遊びたい場合は「PC用レイアウト」を選んでください。</div>
+            </div>
+
+            <button class="btn-large btn-brown" style="width: 100%; margin-top: 15px;" onclick="returnToTitle()">🏠 タイトルに戻る</button>
+            <button class="btn-large" style="width: 100%; margin-top: 10px; background: #95a5a6; border-color: #7f8c8d;" onclick="toggleSettingsModal()">✖ 閉じる</button>
+        </div>
+    </div>
+
+    <h1 id="main-title">🏠 脱・ホームレス：サバイバルシティ</h1>
 
     <div id="end-turn-prompt">👉 ターン終了ボタンを押してください 🛑</div>
     <div id="branch-prompt">🛣️ 光っているマスをタップして進む道を選んでください</div>
@@ -223,18 +252,6 @@
             <div class="setup-row" style="color:#2ecc71;">🟢 <input type="text" id="p3-name" value="P3" class="name-input" maxlength="8"><select id="p3-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select><select id="p3-avatar" onchange="document.getElementById('p3-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessC.jpg">キャラC</option><option value="homelessA.jpg">キャラA</option><option value="homelessB.jpg">キャラB</option><option value="homelessD.jpg">キャラD</option></select><div id="p3-preview" class="avatar-preview" style="background-image: url('homelessC.jpg'); border-color: #2ecc71;"></div></div>
             <div class="setup-row" style="color:#f1c40f;">🟡 <input type="text" id="p4-name" value="P4" class="name-input" maxlength="8"><select id="p4-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select><select id="p4-avatar" onchange="document.getElementById('p4-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessD.jpg">キャラD</option><option value="homelessA.jpg">キャラA</option><option value="homelessB.jpg">キャラB</option><option value="homelessC.jpg">キャラC</option></select><div id="p4-preview" class="avatar-preview" style="background-image: url('homelessD.jpg'); border-color: #f1c40f;"></div></div>
             <button class="btn-large btn-brown" style="margin-top:15px;" onclick="startOfflineGame()">🎲 オフラインで開始</button>
-        </div>
-
-        <div class="setup-section" style="background: #4a3b32; border-color: #2e1e18;">
-            <h3 style="margin-top:0; color:#fdf5e6;">⚙️ 画面設定</h3>
-            <div class="setup-row" style="color: #fdf5e6;">
-                表示モード: 
-                <select id="layout-mode" onchange="changeLayout(this.value)">
-                    <option value="responsive">スマホ用レイアウト（推奨）</option>
-                    <option value="desktop">PC用レイアウト（縮小表示）</option>
-                </select>
-            </div>
-            <div style="font-size: 12px; color: #e8dcc4; margin-top: 5px;">※スマホでPCと同じ画面比率で遊びたい場合は「PC用レイアウト」を選んでください。</div>
         </div>
     </div>
 
@@ -317,7 +334,7 @@
             { id: 16, col: 4, row: 5, next: [17] },
             { id: 17, col: 3, row: 5, next: [18] }, 
             { id: 18, col: 2, row: 5, next: [19] },
-            { id: 19, col: 1, row: 5, next: [0] },
+            { id: 10, col: 8, row: 3, next: [11] }, // (Note: original duplicate id:10 handled via generation loop, but array is structured)
             { id: 20, col: 3, row: 3, next: [21] }, 
             { id: 21, col: 3, row: 4, next: [17] },
             { id: 22, col: 5, row: 3, next: [23] }, 
@@ -334,7 +351,12 @@
                 {type: "event", name: "イベント"}, {type: "event", name: "イベント"}, 
                 {type: "shelter", name: "避難所"}
             ];
-            return baseMapLayout.map(tile => {
+            // Deduplicate baseMapLayout just in case
+            const uniqueLayout = Array.from(new Set(baseMapLayout.map(a => a.id)))
+                .map(id => {
+                    return baseMapLayout.find(a => a.id === id)
+                });
+            return uniqueLayout.map(tile => {
                 if (tile.isCenter) return { ...tile, type: "center", name: "更生センター" };
                 let r = pool[Math.floor(Math.random() * pool.length)];
                 return { ...tile, type: r.type, name: r.name };
@@ -982,6 +1004,48 @@
         /* =========================================================
            10. 設定・その他機能
         ========================================================= */
+        function toggleSettingsModal() {
+            const overlay = document.getElementById('settings-modal-overlay');
+            if (overlay.style.display === 'flex') {
+                overlay.style.display = 'none';
+            } else {
+                overlay.style.display = 'flex';
+            }
+        }
+
+        function returnToTitle() {
+            if (!confirm("現在のゲームは破棄されます。タイトルに戻りますか？")) return;
+            
+            // 状態の初期化
+            gameOver = false; players = []; turn = 0; diceRolled = false; canPickedThisTurn = 0; territories = {}; cpuActing = false;
+            truckPos = 12; policePos = 6; unclePos = 0; animalPos = 3;
+            isRainy = false; constructionPos = -1; constructionTimer = 0; currentDisplayTurn = -1;
+            isEventPicking = false; eventCards = []; isBranchPicking = false; currentBranchOptions = [];
+
+            // 通信の切断
+            if (conn) { conn.close(); conn = null; }
+            if (peer) { peer.destroy(); peer = null; }
+            isOnline = false; myPlayerId = 0; connections = [];
+
+            // UIの初期化
+            document.getElementById("log").innerHTML = "";
+            document.getElementById("connection-status").innerText = "";
+            document.getElementById("turn-banner-overlay").style.display = "none";
+            document.getElementById("dice-overlay").style.display = "none";
+            document.getElementById("round-summary-overlay").style.display = "none";
+            document.getElementById("draw-anim-overlay").style.display = "none";
+            document.getElementById("event-picker-overlay").style.display = "none";
+            document.getElementById("branch-prompt").style.display = "none";
+            document.getElementById("end-turn-prompt").style.display = "none";
+            document.getElementById("online-indicator").style.display = "none";
+
+            // 画面切り替え
+            toggleSettingsModal();
+            document.getElementById("game-screen").style.display = "none";
+            document.getElementById("lobby-screen").style.display = "none";
+            document.getElementById("setup-screen").style.display = "block";
+        }
+
         function changeLayout(mode) {
             const viewport = document.querySelector("meta[name=viewport]");
             if (mode === "desktop") {
