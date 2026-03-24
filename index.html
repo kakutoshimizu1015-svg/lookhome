@@ -224,6 +224,18 @@
             <div class="setup-row" style="color:#f1c40f;">🟡 <input type="text" id="p4-name" value="P4" class="name-input" maxlength="8"><select id="p4-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select><select id="p4-avatar" onchange="document.getElementById('p4-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessD.jpg">キャラD</option><option value="homelessA.jpg">キャラA</option><option value="homelessB.jpg">キャラB</option><option value="homelessC.jpg">キャラC</option></select><div id="p4-preview" class="avatar-preview" style="background-image: url('homelessD.jpg'); border-color: #f1c40f;"></div></div>
             <button class="btn-large btn-brown" style="margin-top:15px;" onclick="startOfflineGame()">🎲 オフラインで開始</button>
         </div>
+
+        <div class="setup-section" style="background: #4a3b32; border-color: #2e1e18;">
+            <h3 style="margin-top:0; color:#fdf5e6;">⚙️ 画面設定</h3>
+            <div class="setup-row" style="color: #fdf5e6;">
+                表示モード: 
+                <select id="layout-mode" onchange="changeLayout(this.value)">
+                    <option value="responsive">スマホ用レイアウト（推奨）</option>
+                    <option value="desktop">PC用レイアウト（縮小表示）</option>
+                </select>
+            </div>
+            <div style="font-size: 12px; color: #e8dcc4; margin-top: 5px;">※スマホでPCと同じ画面比率で遊びたい場合は「PC用レイアウト」を選んでください。</div>
+        </div>
     </div>
 
     <div id="lobby-screen" style="display:none;" class="panel">
@@ -965,6 +977,20 @@
                 if(!acted) break; await sleep(1000);
             }
             if(!gameOver && turn === p.id) { await sleep(500); endTurnLogic(); }
+        }
+
+        /* =========================================================
+           10. 設定・その他機能
+        ========================================================= */
+        function changeLayout(mode) {
+            const viewport = document.querySelector("meta[name=viewport]");
+            if (mode === "desktop") {
+                // PCと同じ幅を強制し、画面を縮小表示させる
+                viewport.setAttribute("content", "width=1200");
+            } else {
+                // スマホ用のレスポンシブ表示に戻す
+                viewport.setAttribute("content", "width=device-width, initial-scale=1.0");
+            }
         }
     </script>
 </body>
