@@ -138,10 +138,10 @@
         #log span.highlight { color: #f1c40f; font-weight: bold;} #log span.danger { color: #e74c3c; font-weight: bold;} #log span.system { color: #3498db; font-weight: bold;}
 
         /* モーダル・ポップアップ等 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
         .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(25, 30, 35, 0.95); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 25px; width: 90%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); color: #fff; text-align: center; margin: 0;}
         
-        #toast-message { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(231, 76, 60, 0.95); color: white; padding: 15px 30px; border-radius: 10px; z-index: 11000; display: none; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; border: 2px solid #fff; }
+        #toast-message { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(231, 76, 60, 0.95); color: white; padding: 15px 30px; border-radius: 10px; z-index: 40000; display: none; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; border: 2px solid #fff; }
         #branch-prompt, #end-turn-prompt { position: fixed; left: 0; width: 100%; text-align: center; padding: 12px 0; font-weight: bold; z-index: 10050; pointer-events: none; display: none; text-shadow: 0 2px 5px rgba(0,0,0,0.8); box-sizing: border-box; }
         #branch-prompt { top: 8%; background: rgba(46, 204, 113, 0.9); color: #fff; font-size: 20px; backdrop-filter: blur(5px); animation: pop-in-out 0.5s ease-out; }
         #end-turn-prompt { top: 12%; background: rgba(231, 76, 60, 0.9); color: #fff; font-size: 24px; backdrop-filter: blur(5px); animation: pulse-banner 1.5s infinite; }
@@ -177,15 +177,20 @@
         #win-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #f1c40f, #e67e22, #c0392b); z-index: 10800; display: none; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; animation: win-bg-anim 2s infinite alternate; cursor: pointer;}
         @keyframes win-bg-anim { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
         
-        #confirm-modal-overlay, #join-modal-overlay, #ranking-overlay { z-index: 30000 !important; }
-        #mg-result-overlay { z-index: 10005 !important; cursor:pointer; }
+        /* z-indexの調整：確認画面や設定を最優先に */
+        #settings-btn { position: fixed; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; z-index: 30000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; padding: 0; transition: 0.2s; backdrop-filter: blur(5px);}
+        #settings-btn:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
+        #settings-modal-overlay { z-index: 31000 !important; }
+        
+        #confirm-modal-overlay { z-index: 32000 !important; }
+        #ranking-overlay { z-index: 32000 !important; }
+        #mg-result-overlay { z-index: 25000 !important; cursor:pointer; }
         #story-overlay { z-index: 10004 !important; }
         #target-picker-overlay { z-index: 10006 !important; }
         #shop-overlay { z-index: 10002 !important; }
         #round-summary-overlay { z-index: 10007 !important; }
         #police-alert-overlay, #job-result-overlay { z-index: 10008 !important; cursor: pointer; }
 
-        #ranking-overlay .modal-box { max-width: 500px; background: linear-gradient(135deg, #f39c12, #d35400); color: #fff; border: none; overflow: hidden; position: relative;}
         .confetti { position: absolute; width: 8px; height: 16px; background: red; animation: fall linear infinite; border-radius: 2px;}
         @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
 
@@ -199,10 +204,6 @@
         .truck-highlight { opacity: 1 !important; box-shadow: 0 0 30px #e74c3c, inset 0 0 20px #e74c3c !important; border: 3px solid #ff0000 !important; transform: scale(1.2); z-index: 50; }
         .police-highlight { opacity: 1 !important; box-shadow: 0 0 30px #3498db, inset 0 0 20px #3498db !important; border: 3px solid #2980b9 !important; transform: scale(1.2); z-index: 50; }
 
-        /* UIボタン等 */
-        #settings-btn { position: fixed; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; z-index: 20000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; padding: 0; transition: 0.2s; backdrop-filter: blur(5px);}
-        #settings-btn:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
-        #settings-modal-overlay { z-index: 20001 !important; }
         .sell-card-btn { font-size: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding: 8px; border-radius: 6px; cursor: pointer; margin: 4px; color: #fff; transition: 0.2s;}
         .sell-card-btn:hover { background: #e74c3c; border-color: #c0392b;}
         .story-btn { padding: 15px; font-size: 15px; font-weight: normal; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s;}
@@ -374,8 +375,7 @@
             <h2 style="margin-top:0; color:#e84393;">🛒 カードショップ</h2>
             <p style="margin:10px 0 20px 0;">所持P: <span id="shop-p-display" style="font-size:28px; font-weight:bold; color:#fff;">0</span> P</p>
             
-            <div id="shop-items-list" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; text-align: left;">
-            </div>
+            <div id="shop-items-list" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; text-align: left;"></div>
             
             <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
             <h3 style="margin:0 0 10px 0; font-size:14px; opacity:0.8;">🃏 手札を売る (+2P)</h3>
@@ -417,7 +417,7 @@
         <h1 id="blood-text" style="color:#ff4757; text-shadow: 0 4px 20px rgba(0,0,0,0.8); font-size: 36px; margin-top:20px;"></h1>
     </div>
 
-    <!-- UI -->
+    <!-- メインUI群 -->
     <h1 id="main-title">STREET SURVIVAL<br><span style="font-size: 12px; color:var(--text-sub); font-weight:normal; letter-spacing:2px;">脱・ホームレス：The Ultimate Edition</span></h1>
 
     <div id="end-turn-prompt">👉 ターンを終了してください 🛑</div>
@@ -425,13 +425,14 @@
     
     <div id="dice-overlay">
         <div id="dice-message" style="color:var(--text-sub);">サイコロを振っています...</div>
-        <div class="dice-container"><div id="dice-1" class="dice">1</div><div id="dice-2" class="dice">1</div><div id="dice-3" class="dice" style="display:none;">1</div></div>
+        <div class="dice-container"><div id="dice-1" class="dice">1</div><div id="dice-2" class="dice">1</div></div>
         <div id="dice-result"></div>
     </div>
     
     <div id="turn-banner-overlay"><div id="turn-banner-text"></div></div>
     <div id="ap-popup-container"></div>
 
+    <!-- セットアップ画面 -->
     <div id="setup-screen" class="panel">
         <h2 style="margin-top:0;">MODE SELECT</h2>
         <div class="setup-section">
@@ -496,6 +497,7 @@
         </div>
     </div>
 
+    <!-- 待機ロビー -->
     <div id="lobby-screen" class="panel" style="display:none;">
         <h2 style="margin-top:0;">WAITING LOBBY</h2>
         <div id="lobby-room-id" style="margin-bottom:20px; font-size:14px; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px;"></div>
@@ -891,7 +893,6 @@
             });
         }
 
-        /* --- UI関連とエフェクト --- */
         function logLocal(msg) { const logDiv = document.getElementById("log"); logDiv.innerHTML += `<div>> ${msg}</div>`; logDiv.scrollTop = logDiv.scrollHeight; }
         function log(msg) { logLocal(msg); if(isOnline && myPlayerId === 0) broadcastLog(msg); } 
         function showTurnBanner(p) {
@@ -1616,6 +1617,29 @@
                 if(!acted) break; await sleep(1000);
             }
             if(!gameOver && turn === p.id) { await sleep(500); endTurnLogic(); }
+        }
+
+        function toggleSettingsModal() { const overlay = document.getElementById('settings-modal-overlay'); overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex'; }
+        function promptReturnToTitle() { document.getElementById('confirm-modal-overlay').style.display = 'flex'; }
+        function closeConfirmModal() { document.getElementById('confirm-modal-overlay').style.display = 'none'; }
+
+        function executeReturnToTitle() {
+            closeConfirmModal();
+            gameOver = false; players = []; turn = 0; diceRolled = false; canPickedThisTurn = 0; territories = {}; cpuActing = false;
+            isRainy = false; weatherState = "sunny"; roundCount = 1; constructionPos = -1; constructionTimer = 0; currentDisplayTurn = -1;
+            mgActive = false; isBranchPicking = false; currentBranchOptions = []; clearInterval(mgTimer); if(slotAnimInterval) clearInterval(slotAnimInterval);
+            if (conn) { conn.close(); conn = null; } if (peer) { peer.destroy(); peer = null; } isOnline = false; myPlayerId = 0; connections = [];
+            
+            document.getElementById("log").innerHTML = ""; document.getElementById("connection-status").innerText = "";
+            document.querySelectorAll(".modal-overlay").forEach(el => el.style.display = "none");
+            document.body.className = "sunny";
+            document.getElementById("game-screen").style.display = "none"; document.getElementById("lobby-screen").style.display = "none";
+            document.getElementById("setup-screen").style.display = "block";
+        }
+
+        function changeLayout(mode) {
+            const viewport = document.querySelector("meta[name=viewport]");
+            if (mode === "desktop") viewport.setAttribute("content", "width=1200"); else viewport.setAttribute("content", "width=device-width, initial-scale=1.0");
         }
     </script>
 </body>
