@@ -44,7 +44,9 @@
         .btn-brown { background:#8d6e63; border-color:#4a3b32; } .btn-brown:hover { background:#a1887f; }
 
         .lobby-player-item { background: #4a3b32; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; color: white; border: 2px solid #3e2f2a; box-shadow: 2px 2px 5px rgba(0,0,0,0.5);}
-        
+        .remove-cpu-btn { background: #e74c3c; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; font-weight: bold; box-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .remove-cpu-btn:hover { background: #c0392b; }
+
         #game-screen { display: none; width: 100%; max-width: 1800px; flex-direction: column; align-items: center;}
         .panel { background-color: var(--clay-panel); border-radius: 15px; padding: 15px; box-shadow: var(--clay-shadow-out); border: var(--clay-border); color: #fdf5e6; transition: background-color 0.5s, border-color 0.5s; }
 
@@ -174,26 +176,35 @@
         .summary-item { font-size: 18px; margin: 10px 0; font-weight: bold; opacity: 0; animation: fade-in-right 0.3s forwards; }
         @keyframes fade-in-right { to { opacity: 1; transform: translateX(0); } from { opacity: 0; transform: translateX(-20px); } }
 
-        /* カード全画面取得・結果アニメーション */
+        /* イベント・専用演出アニメーション群 */
         #mg-result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 4000; display: none; justify-content: center; align-items: center; text-align: center; cursor:pointer;}
         #card-get-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: none; justify-content: center; align-items: center; text-align: center; }
         .card-get-anim-box { background: var(--clay-panel); border: 8px solid #f1c40f; border-radius: 20px; padding: 40px; color: #fff; box-shadow: 0 0 50px rgba(241,196,15,0.8); transform: scale(0.5); opacity: 0; }
         @keyframes card-get-anim { 0% { transform: scale(0.1) rotate(-20deg); opacity: 0; } 20% { transform: scale(1.2) rotate(10deg); opacity: 1; } 40% { transform: scale(1) rotate(0deg); opacity: 1; } 80% { transform: scale(1) rotate(0deg); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
         
+        #blood-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9000; pointer-events:none; flex-direction:column; justify-content:center; align-items:center; background-color: rgba(150, 0, 0, 0.4); }
+        @keyframes blood-splash { 0% { transform: scale(0.1); opacity: 0; } 50% { transform: scale(1.5); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        
+        #police-alert-overlay { z-index: 9500; cursor: pointer; }
+        #job-result-overlay { z-index: 9500; cursor: pointer; }
+
         /* 勝利演出 */
         #win-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, #f1c40f, #e67e22, #c0392b);
             z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center;
-            color: white; text-align: center; animation: win-bg-anim 2s infinite alternate;
+            color: white; text-align: center; animation: win-bg-anim 2s infinite alternate; cursor: pointer;
         }
         @keyframes win-bg-anim { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
-        /* 設定関連のスタイル */
+        /* 設定・各モーダル */
         #settings-btn { position: fixed; top: 10px; right: 10px; background: var(--clay-panel); color: #fdf5e6; border: 3px solid #8d6e63; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; z-index: 1000; box-shadow: var(--clay-shadow-out); display: flex; justify-content: center; align-items: center; padding: 0; transition: transform 0.1s; }
         #settings-btn:active { transform: translate(2px, 2px); box-shadow: none; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; display: none; justify-content: center; align-items: center; }
-        .modal-box { background: var(--clay-bg); border: var(--clay-border); border-radius: 15px; padding: 20px; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(0,0,0,0.8); color: var(--clay-text); text-align: center; }
+        .modal-box { background: var(--clay-bg); border: var(--clay-border); border-radius: 15px; padding: 20px; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(0,0,0,0.8); color: var(--clay-text); text-align: center; margin:auto;}
+        
+        #confirm-modal-overlay { z-index: 10005 !important; }
+        #join-modal-overlay { z-index: 10005 !important; }
         
         .sell-card-btn { font-size: 11px; background: #fff; border: 2px solid #8d6e63; padding: 5px; border-radius: 6px; cursor: pointer; margin: 3px; font-weight:bold;}
         .sell-card-btn:hover { background: #e07a5f; color: #fff;}
@@ -221,7 +232,6 @@
             .name-input { width: 70px; }
             .btn-large { width: 100%; margin: 5px 0; padding: 12px; font-size: 15px; }
             
-            /* 新レイアウトのスマホ調整 */
             #top-bar { flex-direction: column; gap: 10px; margin-bottom: 10px;}
             #left-status-area { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px;}
             #weather-panel { width: 45%; }
@@ -258,7 +268,7 @@
 <body class="sunny">
 
     <!-- トースト通知 -->
-    <div id="toast-message" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(231, 76, 60, 0.95); color: white; padding: 15px 30px; border-radius: 10px; z-index: 10000; display: none; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; border: 2px solid #fff;"></div>
+    <div id="toast-message" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(231, 76, 60, 0.95); color: white; padding: 15px 30px; border-radius: 10px; z-index: 10010; display: none; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; border: 2px solid #fff;"></div>
 
     <!-- 確認モーダル -->
     <div id="confirm-modal-overlay" class="modal-overlay" onclick="if(event.target===this) closeConfirmModal()">
@@ -303,7 +313,34 @@
             <p style="font-size: 12px; color: #bdc3c7; margin-top: 20px;">(画面タップで戻る)</p>
         </div>
     </div>
+    
+    <!-- 警察アラート演出オーバーレイ -->
+    <div id="police-alert-overlay" class="modal-overlay" onclick="this.style.display='none'">
+        <div class="modal-box" style="background:#2980b9; color:white; border-color:#fff;">
+            <div style="font-size:60px;">🚓</div>
+            <h2 id="police-alert-title">警察に補導された！</h2>
+            <p>次回 AP-2 のペナルティ</p>
+            <p style="font-size:12px; color:#bdc3c7; margin-top:20px;">(タップして戻る)</p>
+        </div>
+    </div>
+    
+    <!-- バイト結果演出オーバーレイ -->
+    <div id="job-result-overlay" class="modal-overlay" onclick="this.style.display='none'">
+        <div id="job-result-box" class="modal-box">
+            <div id="job-result-icon" style="font-size:60px;"></div>
+            <h2 id="job-result-title" style="margin-top:10px;"></h2>
+            <p id="job-result-text" style="font-weight:bold; font-size:18px;"></p>
+            <p style="font-size:12px; color:#bdc3c7; margin-top:20px;">(タップして戻る)</p>
+        </div>
+    </div>
 
+    <!-- 血しぶき(轢き逃げ)演出 -->
+    <div id="blood-overlay">
+        <div style="font-size: 120px; animation: blood-splash 0.5s forwards;">🩸</div>
+        <h1 id="blood-text" style="color:red; text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff; font-size: 50px; margin-top:20px; text-align:center;"></h1>
+    </div>
+
+    <!-- 設定モーダル -->
     <div id="settings-modal-overlay" class="modal-overlay" onclick="if(event.target===this) toggleSettingsModal()">
         <div class="modal-box">
             <h2 style="margin-top:0;">⚙️ 設定</h2>
@@ -424,19 +461,19 @@
         <div class="setup-section">
             <h3 style="margin-top:0; color:#f2c779;">🖥️ オフラインで遊ぶ (1〜4人)</h3>
             <div class="setup-row" style="color:#e74c3c;">🔴 <input type="text" id="p1-name" value="P1" class="name-input" maxlength="8"><select id="p1-type"><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p1-avatar" onchange="document.getElementById('p1-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessA.jpg">元アスリート</option><option value="homelessB.jpg">元営業マン</option><option value="homelessC.jpg">サバイバー</option><option value="homelessD.jpg">元ヤン</option></select>
+                <select id="p1-avatar" onchange="document.getElementById('p1-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessA.jpg">元アスリート (移動常時1AP)</option><option value="homelessB.jpg">元営業マン (バイト成功率大)</option><option value="homelessC.jpg">サバイバー (漁り失敗ペナ無効)</option><option value="homelessD.jpg">元ヤン (他者と同マスで1P強奪)</option></select>
                 <div id="p1-preview" class="avatar-preview" style="background-image: url('homelessA.jpg'); border-color: #e74c3c;"></div>
             </div>
             <div class="setup-row" style="color:#3498db;">🔵 <input type="text" id="p2-name" value="P2" class="name-input" maxlength="8"><select id="p2-type"><option value="human">人間</option><option value="cpu" selected>CPU</option><option value="none">不参加</option></select>
-                <select id="p2-avatar" onchange="document.getElementById('p2-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessB.jpg">元営業マン</option><option value="homelessA.jpg">元アスリート</option><option value="homelessC.jpg">サバイバー</option><option value="homelessD.jpg">元ヤン</option></select>
+                <select id="p2-avatar" onchange="document.getElementById('p2-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessB.jpg">元営業マン (バイト成功率大)</option><option value="homelessA.jpg">元アスリート (移動常時1AP)</option><option value="homelessC.jpg">サバイバー (漁り失敗ペナ無効)</option><option value="homelessD.jpg">元ヤン (他者と同マスで1P強奪)</option></select>
                 <div id="p2-preview" class="avatar-preview" style="background-image: url('homelessB.jpg'); border-color: #3498db;"></div>
             </div>
             <div class="setup-row" style="color:#2ecc71;">🟢 <input type="text" id="p3-name" value="P3" class="name-input" maxlength="8"><select id="p3-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p3-avatar" onchange="document.getElementById('p3-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessC.jpg">サバイバー</option><option value="homelessA.jpg">元アスリート</option><option value="homelessB.jpg">元営業マン</option><option value="homelessD.jpg">元ヤン</option></select>
+                <select id="p3-avatar" onchange="document.getElementById('p3-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessC.jpg">サバイバー (漁り失敗ペナ無効)</option><option value="homelessA.jpg">元アスリート (移動常時1AP)</option><option value="homelessB.jpg">元営業マン (バイト成功率大)</option><option value="homelessD.jpg">元ヤン (他者と同マスで1P強奪)</option></select>
                 <div id="p3-preview" class="avatar-preview" style="background-image: url('homelessC.jpg'); border-color: #2ecc71;"></div>
             </div>
             <div class="setup-row" style="color:#f1c40f;">🟡 <input type="text" id="p4-name" value="P4" class="name-input" maxlength="8"><select id="p4-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p4-avatar" onchange="document.getElementById('p4-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessD.jpg">元ヤン</option><option value="homelessA.jpg">元アスリート</option><option value="homelessB.jpg">元営業マン</option><option value="homelessC.jpg">サバイバー</option></select>
+                <select id="p4-avatar" onchange="document.getElementById('p4-preview').style.backgroundImage = `url('${this.value}')`"><option value="homelessD.jpg">元ヤン (他者と同マスで1P強奪)</option><option value="homelessA.jpg">元アスリート (移動常時1AP)</option><option value="homelessB.jpg">元営業マン (バイト成功率大)</option><option value="homelessC.jpg">サバイバー (漁り失敗ペナ無効)</option></select>
                 <div id="p4-preview" class="avatar-preview" style="background-image: url('homelessD.jpg'); border-color: #f1c40f;"></div>
             </div>
         </div>
@@ -458,7 +495,20 @@
     <div id="lobby-screen" style="display:none;" class="panel">
         <h2 style="color:var(--clay-text); margin-top:0;">待機ロビー</h2>
         <div id="lobby-room-id" style="margin-bottom:20px; font-size:18px;"></div>
+        
+        <!-- 自分(ゲスト含む)のキャラクター変更機能 -->
+        <div id="lobby-player-settings" style="display:none; background: #8d6e63; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: white;">
+            <b>自分のキャラクター変更</b><br>
+            <select id="lobby-avatar-select" style="margin-top: 5px; width: 80%; padding: 5px; border-radius: 5px;" onchange="changeMyAvatar(this.value)">
+                <option value="homelessA.jpg">元アスリート (移動常時1AP)</option>
+                <option value="homelessB.jpg">元営業マン (バイト成功率大)</option>
+                <option value="homelessC.jpg">サバイバー (漁り失敗ペナ無効)</option>
+                <option value="homelessD.jpg">元ヤン (他者と同マスで1P強奪)</option>
+            </select>
+        </div>
+
         <div id="lobby-players-list" style="margin-bottom:20px; display:flex; flex-direction:column; gap:10px; text-align:left; max-width: 300px; margin-left: auto; margin-right: auto;"></div>
+        
         <div id="host-controls" style="display:none; text-align:center;">
             <button class="btn-large btn-brown" onclick="addCPUToLobby()">🤖 CPUを追加</button><br><br>
             
@@ -777,13 +827,12 @@
 
         let truckPos = 0; let policePos = 0; let unclePos = 0; let animalPos = 0;
         let isRainy = false; let constructionPos = -1; let constructionTimer = 0;
-        let weatherState = "sunny"; // sunny, cloudy, rainy
+        let weatherState = "sunny"; 
         let roundCount = 0;
         let currentDisplayTurn = -1;
         
         let isBranchPicking = false; let currentBranchOptions = [];
         
-        // ミニゲーム関連
         let mgActive = false; let mgTimer = null; let mgTimeLeft = 10;
         let mgType = ""; let mgValue = 0;
         let slotReels = [0,0,0]; let slotStopped = [false, false, false]; let slotAnimInterval = null;
@@ -802,15 +851,14 @@
             setTimeout(() => { toast.style.display = "none"; }, 3000);
         }
 
+        // スマホやモバイル回線からの接続性を上げるため、STUNサーバーを複数設定
         function createPeer() {
             return new Peer({
                 config: {
                     'iceServers': [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
-                        { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
-                        { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" }
+                        { urls: 'stun:global.stun.twilio.com:3478' }
                     ]
                 }
             });
@@ -846,7 +894,7 @@
                 id: id, name: name, isCPU: isCPU, owner: owner, pos: 0, p: 0, ap: 0, 
                 hand: [], maxHand: 7, stealth: false, rainGear: false, hasID: false, 
                 bonusAP: 0, penaltyAP: 0, protected: false, skipTurn: false, cannotMove: false,
-                color: pIdColors[id], avatar: avatar, charType: charData.id, charName: charData.name,
+                color: pIdColors[id % 4], avatar: avatar, charType: charData.id, charName: charData.name,
                 items: { bicycle: false, shoes: false, cart: false, doll: false }
             };
         }
@@ -855,10 +903,11 @@
             let myName = document.getElementById("online-name").value || "ホスト"; let myAvatar = document.getElementById("online-avatar").value;
             statusDiv.innerText = "部屋を作成中..."; 
             peer = createPeer(); 
-            peer.on('error', (err) => { statusDiv.innerHTML = "<span style='color:#e74c3c;'>通信エラー: P2P接続に失敗しました。<br>通信環境を変えて再試行してください。</span>"; console.error(err); });
+            peer.on('error', (err) => { statusDiv.innerHTML = "<span style='color:#e74c3c;'>通信エラー: P2P接続に失敗しました。<br>Wi-Fiとモバイル回線を切り替えて再試行してください。</span>"; console.error(err); });
             peer.on('open', (id) => { 
                 document.getElementById("setup-screen").style.display = "none"; document.getElementById("lobby-screen").style.display = "block"; document.getElementById("host-controls").style.display = "block";
                 document.getElementById("lobby-room-id").innerHTML = `部屋ID: <br><span style="background:#fff; color:#000; padding:5px; border-radius:5px; user-select:all; display:inline-block; margin-top:5px; font-weight:bold;">${id}</span><br><span style="font-size:12px; color:#bdc3c7;">友達にこのIDを教えてください</span>`;
+                document.getElementById("lobby-player-settings").style.display = "block";
                 isOnline = true; myPlayerId = 0;
                 players = [createPlayerObj(0, myName, false, 0, myAvatar)];
                 renderLobby();
@@ -888,6 +937,7 @@
                 conn = peer.connect(roomId);
                 conn.on('open', () => { 
                     isOnline = true; document.getElementById("setup-screen").style.display = "none"; document.getElementById("lobby-screen").style.display = "block"; document.getElementById("guest-controls").style.display = "block"; document.getElementById("lobby-room-id").innerHTML = `接続先: ${roomId}`;
+                    document.getElementById("lobby-player-settings").style.display = "block";
                     conn.on('data', handleNetworkData);
                     conn.send({ type: 'join_lobby', name: myName, avatar: myAvatar });
                 });
@@ -920,11 +970,23 @@
                 else if (data.eventType === 'round_summary') { displayRoundSummary(data.data.digest); }
                 else if (data.eventType === 'card_anim') { showCardAcquisition(data.data.cardId); }
                 else if (data.eventType === 'mg_result') { showMgResult(data.data.isWin, data.data.msg, data.data.cardId); }
+                else if (data.eventType === 'blood_anim') { showBloodAnim(data.data.targetName); }
+                else if (data.eventType === 'police_anim') { showPoliceAnim(data.data.targetName); }
                 if (myPlayerId === 0) { connections.forEach(c => { if (c.peer !== senderConnection.peer) c.send(data); }); }
             }
             else if (data.type === 'guest_action' && myPlayerId === 0) {
                 if (data.action === 'end_turn') endTurnLogic();
                 else if (data.action === 'update_state') { applyState(data.state); updateUI(true); }
+                else if (data.action === 'change_avatar') {
+                    let pIndex = players.findIndex(p => p.owner === senderConnection.peer);
+                    if (pIndex !== -1) {
+                        let charData = getCharType(data.avatar);
+                        players[pIndex].avatar = data.avatar;
+                        players[pIndex].charType = charData.id;
+                        players[pIndex].charName = charData.name;
+                        renderLobby(); broadcastLobby();
+                    }
+                }
             }
         }
 
@@ -937,19 +999,47 @@
         function broadcastLog(msg, excludeConnection = null) {
             if (myPlayerId === 0) { connections.forEach(c => { if (c !== excludeConnection) c.send({ type: 'log', msg: msg }); }); } else if (conn) { conn.send({ type: 'log', msg: msg }); }
         }
+        function broadcastGameEvent(eventType, data) {
+            let payload = { type: 'game_event', eventType: eventType, data: data };
+            if (myPlayerId === 0) { connections.forEach(c => c.send(payload)); } 
+            else if (conn) { conn.send(payload); }
+        }
 
         function renderLobby() {
             const list = document.getElementById("lobby-players-list"); list.innerHTML = "";
-            players.forEach(p => {
+            players.forEach((p, index) => {
                 let typeText = p.isCPU ? "🤖 CPU" : (p.owner === 0 ? "👑 ホスト" : "👤 ゲスト");
-                list.innerHTML += `<div class="lobby-player-item" style="border-color: ${p.color};"><div class="avatar-small-clay" style="background-image: url('${p.avatar}'); border-color: ${p.color};"></div><div style="font-weight: bold; font-size: 16px;">${p.name} <span style="font-size:12px; color:#bdc3c7;">[${typeText}]</span><br><span style="font-size:11px; color:#f1c40f;">${p.charName}</span></div></div>`;
+                let deleteBtn = "";
+                if (p.isCPU && myPlayerId === 0) {
+                    deleteBtn = `<button class="remove-cpu-btn" onclick="removePlayerFromLobby(${index})">✖</button>`;
+                }
+                list.innerHTML += `<div class="lobby-player-item" style="border-color: ${p.color};"><div class="avatar-small-clay" style="background-image: url('${p.avatar}'); border-color: ${p.color};"></div><div style="font-weight: bold; font-size: 16px; flex-grow:1;">${p.name} <span style="font-size:12px; color:#bdc3c7;">[${typeText}]</span><br><span style="font-size:11px; color:#f1c40f;">${p.charName}</span></div>${deleteBtn}</div>`;
             });
         }
+        
         function addCPUToLobby() {
             if (players.length >= 4) { showToast("最大4人までです！"); return; }
             let newId = players.length; 
             players.push(createPlayerObj(newId, `CPU ${newId}`, true, 0, cpuAvatars[newId]));
             renderLobby(); broadcastLobby();
+        }
+
+        function removePlayerFromLobby(index) {
+            players.splice(index, 1);
+            players.forEach((p, i) => { p.id = i; p.color = pIdColors[i % 4]; });
+            renderLobby(); broadcastLobby();
+        }
+
+        function changeMyAvatar(newAvatar) {
+            if (isOnline) {
+                if (myPlayerId === 0) {
+                    let charData = getCharType(newAvatar);
+                    players[0].avatar = newAvatar; players[0].charType = charData.id; players[0].charName = charData.name;
+                    renderLobby(); broadcastLobby();
+                } else if (conn) {
+                    conn.send({ type: 'guest_action', action: 'change_avatar', avatar: newAvatar });
+                }
+            }
         }
 
         function initializeMapSelection(sizeId) {
@@ -1056,6 +1146,41 @@
             popup.className = `ap-popup ${colorClass}`; popup.style.borderColor = p.color;
             popup.innerHTML = `<span style="color:${p.color}">${p.name}</span> <br> <span style="font-size:26px;">${sign}${amount} AP</span> <br> <span style="font-size:13px; color:#bdc3c7;">${reason}</span>`;
             container.appendChild(popup); setTimeout(() => popup.remove(), 2000);
+        }
+
+        function showBloodAnim(targetName) {
+            const overlay = document.getElementById('blood-overlay');
+            document.getElementById('blood-text').innerText = `${targetName} が轢かれた！`;
+            overlay.style.display = 'flex';
+            setTimeout(() => { overlay.style.display = 'none'; }, 2000);
+        }
+
+        function showPoliceAnim(targetName) {
+            const overlay = document.getElementById('police-alert-overlay');
+            document.getElementById('police-alert-title').innerText = `🚓 ${targetName} 補導！`;
+            overlay.style.display = 'flex';
+            setTimeout(() => { overlay.style.display = 'none'; }, 3000);
+        }
+
+        function showJobResult(isSuccess, pts) {
+            const overlay = document.getElementById('job-result-overlay');
+            const box = document.getElementById('job-result-box');
+            const icon = document.getElementById('job-result-icon');
+            const title = document.getElementById('job-result-title');
+            const text = document.getElementById('job-result-text');
+
+            if (isSuccess) {
+                box.style.background = "#f1c40f"; box.style.color = "#333"; box.style.borderColor = "#f39c12";
+                icon.innerText = "💼🎉";
+                title.innerText = "バイト大成功！";
+                text.innerText = `${pts}P 獲得！`;
+            } else {
+                box.style.background = "#2c3e50"; box.style.color = "white"; box.style.borderColor = "#1a252f";
+                icon.innerText = "😭";
+                title.innerText = "バイト失敗...";
+                text.innerText = "ミスをして怒られた。\n報酬なし。";
+            }
+            overlay.style.display = 'flex';
         }
 
         let pendingCardId = -1;
@@ -1225,6 +1350,7 @@
             let canActionTrash = !notMyTurn && !p.isCPU && diceRolled && p.ap >= trashCost && tType === "trash" && (!isRainy || p.rainGear) && !blockedByAnimal && !mgActive && !isBranchPicking;
             let canActionOccupy = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 3 && canOccupyLogic && !mgActive && !isBranchPicking;
             let canActionJob = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 4 && tType === "job" && !mgActive && !isBranchPicking;
+            let canUseAnyCard = (!notMyTurn && !p.isCPU && diceRolled && p.ap >= 2 && p.hand.length > 0 && !mgActive && !isBranchPicking);
             
             let canShop = !notMyTurn && !p.isCPU && diceRolled && tType === "shop" && p.p >= 0 && !mgActive && !isBranchPicking;
             let canManhole = !notMyTurn && !p.isCPU && diceRolled && p.ap >= 1 && tType === "manhole" && !mgActive && !isBranchPicking;
@@ -1381,6 +1507,18 @@
                 p.cannotMove = true; 
             }
 
+            if (p.pos === policePos) { 
+                if(applyItemProtection(p, "警察")) { /* 無効化済み */ }
+                else if(p.stealth) { log(`💨 ${p.name} はステルスで警察をやり過ごした！`); }
+                else if(p.hasID) { p.hasID = false; log(`🔵 ${p.name} は身分証明書で警察をやり過ごした！`); }
+                else { log(`<span class="danger">👮‍♂️ 警察に接触！職務質問でターン終了＆次回AP-2！</span>`); triggerAPPopup(p.id, -p.ap, "AP全没収 (警察)"); p.ap = 0; p.penaltyAP += 2; triggerActionSync(); return; }
+            }
+            if (p.pos === unclePos) { 
+                log(`<span class="danger">🧓 厄介なおじさんの縄張りに入ってしまった！カード1枚破棄＆ターン強制終了！</span>`); 
+                if (p.hand.length > 0) p.hand.pop(); 
+                triggerAPPopup(p.id, -p.ap, "AP全没収 (おじさん)"); p.ap = 0; triggerActionSync(); return; 
+            }
+            
             if (tType === "event") { 
                 if(!p.isCPU) {
                     if (!isOnline || p.id === myPlayerId) { startMiniGame(); } 
@@ -1507,7 +1645,6 @@
             triggerActionSync();
         }
 
-
         function discardCard(index) { let p = players[turn]; p.hand.splice(index, 1); log(`🗑️ ${p.name} はカードを1枚捨てた。`); triggerActionSync(); }
 
         function actionCan() { players[turn].ap -= 1; players[turn].p += 1; canPickedThisTurn++; triggerAPPopup(players[turn].id, -1, "空き缶"); log(`🥫 空き缶を拾った！+1P`); triggerActionSync(); }
@@ -1521,11 +1658,20 @@
             } else { p.p += gain; log(`🗑️ ゴミ漁りで ${gain}P 見つけた！`); } triggerActionSync();
         }
         function actionOccupy() { let p = players[turn]; p.ap -= 3; territories[p.pos] = p.id; triggerAPPopup(p.id, -3, "陣地占領"); log(`🚩 「${mapData.find(t=>t.id===p.pos).name}」を陣地化した！`); triggerActionSync(); }
+        
         function actionJob() {
             let p = players[turn]; p.ap -= 4; triggerAPPopup(p.id, -4, "バイト");
             let chance = p.charType === "sales" ? 0.7 : 0.5;
-            if(Math.random() < chance) { p.p += 10; log(`💼 バイト大成功！ 10P 獲得！`); } else { log(`💼 ミスをした...バイト失敗。`); } triggerActionSync();
+            let isSuccess = Math.random() < chance;
+            
+            let pts = 0;
+            if(isSuccess) { pts = 10; p.p += pts; log(`💼 バイト大成功！ 10P 獲得！`); } 
+            else { log(`💼 ミスをした...バイト失敗。`); } 
+            
+            if(!p.isCPU) showJobResult(isSuccess, pts);
+            triggerActionSync();
         }
+
         function actionManhole() {
             let p = players[turn]; p.ap -= 1; triggerAPPopup(p.id, -1, "ワープ");
             let manholes = mapData.filter(t => t.type === "manhole" && t.id !== p.pos);
@@ -1702,7 +1848,13 @@
             players.forEach(p => {
                 if (truckMove.hitList.includes(p.pos) || truckPos === p.pos) {
                     if (applyItemProtection(p, "収集車")) { log(`🎎 ${p.name}: 身代わり人形が犠牲になり轢かれずに済んだ！`); }
-                    else if (Math.random() < 0.70) { let lost = Math.floor(p.p / 2); p.p -= lost; log(`<span class="danger">☠️ ギャァァァ！ ${p.name} は収集車に轢き逃げされた！ (P半減)</span>`); triggerAPPopup(p.id, -lost, "轢き逃げ"); } 
+                    else if (Math.random() < 0.70) { 
+                        let lost = Math.floor(p.p / 2); p.p -= lost; 
+                        log(`<span class="danger">☠️ ギャァァァ！ ${p.name} は収集車に轢き逃げされた！ (P半減)</span>`); 
+                        triggerAPPopup(p.id, -lost, "轢き逃げ"); 
+                        broadcastGameEvent('blood_anim', { targetName: p.name });
+                        showBloodAnim(p.name);
+                    } 
                     else { log(`💨 ${p.name} は間一髪で収集車を回避した！`); }
                 }
             });
@@ -1733,7 +1885,12 @@
                     if (policeMove.hitList.includes(p.pos) || policePos === p.pos) {
                         if (applyItemProtection(p, "警察")) { log(`🎎 ${p.name}: 身代わり人形が犠牲になり補導されずに済んだ！`); }
                         else if (p.hasID) { p.hasID = false; log(`🔵 ${p.name}: 身分証で警察を回避`); } 
-                        else { log(`<span class="danger">👮‍♂️ ${p.name}: 警察に補導された！ (次回AP-2)</span>`); p.penaltyAP += 2; triggerAPPopup(p.id, -2, "補導");}
+                        else { 
+                            log(`<span class="danger">👮‍♂️ ${p.name}: 警察に補導された！ (次回AP-2)</span>`); 
+                            p.penaltyAP += 2; triggerAPPopup(p.id, -2, "補導");
+                            broadcastGameEvent('police_anim', { targetName: p.name });
+                            showPoliceAnim(p.name);
+                        }
                     }
                 });
             }
