@@ -695,7 +695,8 @@ window.applyGameState = function(state) {
     destTile = state.destTile;
     
     cpuActing = false;
-    currentDisplayTurn = -1;
+    
+    // ❌ currentDisplayTurn = -1; は通信のたびに毎回相手のターン演出がでてしまうので削除！
     
     initBoard();
     updateUI();
@@ -995,8 +996,19 @@ function showTurnBanner(player) {
     ], { duration: 1500, fill: "forwards" });
 }
 
-function triggerAPPopup(playerId, amount, reason = "") {
+function triggerAPPopup(playerId, amount, reason = "", isRemote = false) {
     if (reason === "移動") return;
+    
+    // 🌐 オンライン通信: 自分がアクションを起こした側なら、他の人にもポップアップ命令を送る
+    if (typeof isOnlineMode !== 'undefined' && isOnlineMode && !isRemote) {
+        let msg = { type: 'ap_popup', playerId: playerId, amount: amount, reason: reason };
+        if (typeof isHost !== 'undefined' && isHost) { 
+            if (typeof broadcastNetworkData === 'function') broadcastNetworkData(msg); 
+        } else if (typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) {
+            hostConnection.send(msg);
+        }
+    }
+
     const container = document.getElementById("ap-popup-container");
     const player = players.find(p => p.id === playerId);
     if (!player) return;
@@ -2865,6 +2877,15 @@ function handleNetworkData(data, senderPeerId = null, conn = null) {
             setAnimating(false); // アニメーション終了
         }, 1800);
     }
+    else if (data.type === 'ap_popup') {
+        if (isHost) {
+            Object.values(connections).forEach(conn => {
+                if (conn.peer !== senderPeerId && conn.open) conn.send(data);
+            });
+        }
+        // 受信した命令でポップアップを表示 (第4引数を true にして再送信ループを防ぐ)
+        triggerAPPopup(data.playerId, data.amount, data.reason, true);
+    }
 }
 
 window.executeCreateRoom = function() {
@@ -3214,29 +3235,6 @@ window.startOnlineGame = async function() {
 // ==========================================
 document.getElementById('main-title').style.display = 'none';
 document.getElementById('setup-screen').style.display = 'none';
-
-window.executeReturnToTitle = function() {
-    if (isOnlineMode || myRoomId) {
-        if (peer) {
-            try { peer.destroy(); } catch(e) {}
-            peer = null;
-        }
-        connections = {};
-        hostConnection = null;
-        myRoomId = null;
-        isOnlineMode = false;
-        isHost = false;
-        lobbyPlayers = [];
-    }
-    
-    executeReturnToTitleBase();
-    
-    document.getElementById('main-title').style.display = 'none';
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('mode-select-overlay').style.display = 'none';
-    document.getElementById('online-lobby-modal').style.display = 'none';
-    document.getElementById('title-screen-overlay').style.display = 'flex';
-};
 
 window.goToModeSelect = function() {
     document.getElementById('title-screen-overlay').style.display = 'none';
