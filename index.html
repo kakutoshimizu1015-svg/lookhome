@@ -1627,6 +1627,7 @@ document.querySelectorAll('[id$="-avatar"]').forEach(sel=>{
             </div>
             
             <div id="host-settings" style="display: none; margin-top: 15px; background: #5c4a44; padding: 10px; border-radius: 10px; color: white;">
+                <button class="btn-large btn-blue" style="width: 100%; margin-bottom: 10px; padding: 8px;" onclick="window.addCpuPlayer()">🤖 CPUを追加</button>
                 マップ: <select id="online-map-size"><option value="small">スモール</option><option value="medium" selected>ミディアム</option><option value="large">ラージ</option></select>
                 ラウンド: <select id="online-max-rounds"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option></select>
                 <br>
@@ -1853,7 +1854,10 @@ function tryCreateRoomProcess() {
         config: {
             'iceServers': [
                 { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' }
             ]
         }
     };
@@ -1866,7 +1870,8 @@ function tryCreateRoomProcess() {
         lobbyPlayers = [{
             userId: myUserId,
             name: document.getElementById("my-online-name").value || "Player",
-            charType: document.getElementById("my-online-avatar").value || "athlete"
+            charType: document.getElementById("my-online-avatar").value || "athlete",
+            isCPU: false
         }];
         showLobbyUI();
         updateLobbyUI(lobbyPlayers, myUserId);
@@ -1888,6 +1893,9 @@ function tryCreateRoomProcess() {
     });
     
     peer.on('error', (err) => {
+        if(err.type === 'peer-unavailable'){
+            return; // 検索時の不在エラーは無視
+        }
         if(err.type === 'unavailable-id'){
             peer.destroy();
             currentRoomIndex++;
@@ -1905,7 +1913,17 @@ window.executeSearchRooms = function() {
     container.innerHTML = '<div style="text-align:center; padding:20px;">🔍 部屋を探しています...<br><small>しばらくお待ちください</small></div>';
     let foundRooms = [];
     
-    const peerConfig = { config: { 'iceServers': [ { urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' } ] } };
+    const peerConfig = { 
+        config: { 
+            'iceServers': [ 
+                { urls: 'stun:stun.l.google.com:19302' }, 
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' }
+            ] 
+        } 
+    };
     if (!peer || peer.disconnected) {
         peer = new Peer(myUserId, peerConfig);
     }
@@ -1922,7 +1940,7 @@ window.executeSearchRooms = function() {
             let timeoutId = setTimeout(() => {
                 if (tempConn) tempConn.close();
                 checkDone();
-            }, 3000);
+            }, 5000);
             
             tempConn.on('open', () => {
                 tempConn.send({ type: 'info_request' });
@@ -1941,7 +1959,10 @@ window.executeSearchRooms = function() {
                 }
             });
             
-            tempConn.on('error', () => { clearTimeout(timeoutId); checkDone(); });
+            tempConn.on('error', (err) => { 
+                if(err.type === 'peer-unavailable') { clearTimeout(timeoutId); checkDone(); return; }
+                clearTimeout(timeoutId); checkDone(); 
+            });
             tempConn.on('close', () => { clearTimeout(timeoutId); checkDone(); });
             
             function checkDone() {
@@ -1958,6 +1979,7 @@ window.executeSearchRooms = function() {
     } else {
         peer.on('open', startScan);
         peer.on('error', (err) => {
+            if(err.type === 'peer-unavailable') return;
             container.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">通信エラー: ' + err.type + '</div>';
         });
     }
@@ -2013,7 +2035,17 @@ function executeJoin(roomId, password) {
     showToast("部屋に接続中...");
     
     if (!peer || peer.disconnected) {
-        const peerConfig = { config: { 'iceServers': [ { urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' } ] } };
+        const peerConfig = { 
+            config: { 
+                'iceServers': [ 
+                    { urls: 'stun:stun.l.google.com:19302' }, 
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun3.l.google.com:19302' },
+                    { urls: 'stun:stun4.l.google.com:19302' }
+                ] 
+            } 
+        };
         peer = new Peer(myUserId, peerConfig);
     }
     
@@ -2026,7 +2058,8 @@ function executeJoin(roomId, password) {
                 user: {
                     userId: myUserId,
                     name: document.getElementById("my-online-name").value || "Player",
-                    charType: document.getElementById("my-online-avatar").value || "sales"
+                    charType: document.getElementById("my-online-avatar").value || "sales",
+                    isCPU: false
                 }
             });
         });
@@ -2035,7 +2068,14 @@ function executeJoin(roomId, password) {
     };
 
     if (peer.open) connectToHost();
-    else peer.on('open', connectToHost);
+    else {
+        peer.on('open', connectToHost);
+        peer.on('error', (err) => {
+            if(err.type === 'peer-unavailable') return;
+            showToast("接続エラー: " + err.type);
+            console.error(err);
+        });
+    }
 }
 
 
@@ -2065,7 +2105,8 @@ window.updateMyLobbyInfo = function() {
     const user = {
         userId: myUserId,
         name: document.getElementById("my-online-name").value || "Player",
-        charType: document.getElementById("my-online-avatar").value || "athlete"
+        charType: document.getElementById("my-online-avatar").value || "athlete",
+        isCPU: false
     };
     
     if (isHost) {
@@ -2077,6 +2118,41 @@ window.updateMyLobbyInfo = function() {
         hostConnection.send({ type: 'lobby_change', user: user });
     }
 };
+
+// ==========================================
+// 追加: CPUのロビー管理機能
+// ==========================================
+window.addCpuPlayer = function() {
+    if (lobbyPlayers.length >= 4) {
+        showToast("部屋が満員です！");
+        return;
+    }
+    lobbyPlayers.push({
+        userId: "cpu-" + Math.random().toString(36).substring(2, 8),
+        name: "CPU" + (lobbyPlayers.length + 1),
+        charType: "athlete",
+        isCPU: true
+    });
+    broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId, roomName: hostRoomName });
+    updateLobbyUI(lobbyPlayers, myUserId);
+};
+
+window.updateCpuInfo = function(cpuId, newName, newCharType) {
+    const idx = lobbyPlayers.findIndex(p => p.userId === cpuId);
+    if (idx !== -1) {
+        lobbyPlayers[idx].name = newName || "CPU";
+        lobbyPlayers[idx].charType = newCharType;
+        broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId, roomName: hostRoomName });
+        updateLobbyUI(lobbyPlayers, myUserId);
+    }
+};
+
+window.removeCpu = function(cpuId) {
+    lobbyPlayers = lobbyPlayers.filter(p => p.userId !== cpuId);
+    broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId, roomName: hostRoomName });
+    updateLobbyUI(lobbyPlayers, myUserId);
+};
+
 
 function showLobbyUI() {
     hideAllOnlineUIs();
@@ -2106,11 +2182,29 @@ function updateLobbyUI(lobbyPlayersList, hostId) {
     lobbyPlayersList.forEach(p => {
         const isMe = p.userId === myUserId;
         const isHostPlayer = p.userId === hostId;
+        const isCPU = p.isCPU;
         const emoji = charEmoji[p.charType] || '🏃';
-        const badge = isHostPlayer ? '<span style="background:#e74c3c;color:white;padding:2px 5px;border-radius:3px;font-size:10px;margin-left:5px;">HOST</span>' : '';
-        list.innerHTML += `<div style="margin: 5px 0; font-size: 16px; font-weight: bold;">
-            ${emoji} ${p.name} ${isMe ? '(あなた)' : ''} ${badge}
-        </div>`;
+        const badge = isHostPlayer ? '<span style="background:#e74c3c;color:white;padding:2px 5px;border-radius:3px;font-size:10px;margin-left:5px;">HOST</span>' : (isCPU ? '<span style="background:#95a5a6;color:white;padding:2px 5px;border-radius:3px;font-size:10px;margin-left:5px;">CPU</span>' : '');
+        
+        if (isCPU && isHost) {
+            list.innerHTML += `<div style="margin: 5px 0; font-size: 14px; background: #4a3b32; padding: 10px; border-radius: 8px;">
+                <div style="font-weight: bold; margin-bottom: 5px;">${badge}</div>
+                <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap;">
+                    <input type="text" value="${p.name}" class="name-input" style="width:80px; padding:4px;" onchange="window.updateCpuInfo('${p.userId}', this.value, this.nextElementSibling.value)">
+                    <select onchange="window.updateCpuInfo('${p.userId}', this.previousElementSibling.value, this.value)" style="padding:4px; font-size:12px;">
+                        <option value="athlete" ${p.charType==='athlete'?'selected':''}>元アスリート</option>
+                        <option value="sales" ${p.charType==='sales'?'selected':''}>元営業マン</option>
+                        <option value="survivor" ${p.charType==='survivor'?'selected':''}>サバイバー</option>
+                        <option value="yankee" ${p.charType==='yankee'?'selected':''}>元ヤン</option>
+                    </select>
+                    <button onclick="window.removeCpu('${p.userId}')" style="background:#e74c3c; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">削除</button>
+                </div>
+            </div>`;
+        } else {
+            list.innerHTML += `<div style="margin: 5px 0; font-size: 16px; font-weight: bold;">
+                ${emoji} ${p.name} ${isMe ? '(あなた)' : ''} ${badge}
+            </div>`;
+        }
     });
     
     const me = lobbyPlayersList.find(p => p.userId === myUserId);
@@ -2143,9 +2237,9 @@ window.startOnlineGame = async function() {
     canPrice = 1; trashPrice = 2; isNight = false;
     destTile = pickDestTile();
     
-    // プレイヤー配列の生成 (全員人間=CPUフラグfalse)
+    // プレイヤー配列の生成 (CPUフラグを引き継ぐ)
     players = lobbyPlayers.map((lp, idx) => {
-        let p = createPlayer(idx, lp.name, false, lp.charType);
+        let p = createPlayer(idx, lp.name, lp.isCPU === true, lp.charType);
         p.userId = lp.userId; // 通信時の識別用IDを持たせる
         return p;
     });
