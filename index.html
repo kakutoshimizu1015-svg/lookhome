@@ -268,6 +268,44 @@
             .title-logo { font-size: 32px; }
             .title-sub { font-size: 16px; }
         }
+        
+        /* ========================================== */
+        /* 追加: レイアウト強制用のCSS                 */
+        /* ========================================== */
+        body.force-pc {
+            min-width: 1024px;
+        }
+        body.force-mobile { max-width: 480px; margin: 0 auto !important; padding: 5px; }
+        body.force-mobile :root { --tile-size:42px; }
+        body.force-mobile h1 { font-size:18px; margin:5px 0; }
+        body.force-mobile #setup-screen { padding:15px; margin-top:10px; }
+        body.force-mobile .setup-row { font-size:12px; gap:5px; }
+        body.force-mobile .name-input { width:70px; }
+        body.force-mobile .btn-large { width:100%; margin:5px 0; padding:12px; font-size:15px; }
+        body.force-mobile #top-bar { flex-direction:column; gap:10px; margin-bottom:10px; }
+        body.force-mobile #left-status-area { flex-direction:row; flex-wrap:wrap; justify-content:center; gap:10px; }
+        body.force-mobile #weather-panel { width:45%; }
+        body.force-mobile #portrait-active { width:100%; flex-direction:row; flex-wrap:wrap; justify-content:space-around; padding:10px; }
+        body.force-mobile #main-area { flex-direction:column; gap:10px; }
+        body.force-mobile #right-side-area { width:100%; flex-direction:row; flex-wrap:wrap; justify-content:space-between; }
+        body.force-mobile #action-panel { width:100%; display:grid; grid-template-columns:repeat(2,1fr); padding:10px; }
+        body.force-mobile #player-list-panel { width:100%; padding:10px; }
+        body.force-mobile .avatar-large { width:50px; height:50px; margin:0; border-width:2px; }
+        body.force-mobile .turn-text-clay { width:100%; font-size:14px; margin-bottom:5px; }
+        body.force-mobile .status-box { width:30%; font-size:10px; padding:4px; margin:0; }
+        body.force-mobile .tile { font-size:7px; }
+        body.force-mobile .tile-id-label { font-size:9px; top:2px; left:4px; }
+        body.force-mobile .player-token { width:16px; height:16px; border-width:2px; font-size:9px; }
+        body.force-mobile .truck-token { width:24px; height:24px; font-size:14px; }
+        body.force-mobile .npc-token { width:14px; height:14px; font-size:8px; }
+        body.force-mobile .btn-end-clay { grid-column:span 2; font-size:14px; padding:12px; }
+        body.force-mobile .card-btn-clay { min-width:100px; padding:6px; }
+        body.force-mobile #turn-banner-text { font-size:28px; padding:15px 20px; }
+        body.force-mobile #dice-overlay { width:85%; padding:20px; top:30%; }
+        body.force-mobile .dice { width:50px; height:50px; font-size:30px; }
+        body.force-mobile #branch-prompt { font-size:16px; padding:10px; top:12%; }
+        body.force-mobile #end-turn-prompt { font-size:18px; padding:10px; top:12%; }
+        body.force-mobile #settings-btn { width:35px; height:35px; font-size:16px; top:5px; right:5px; border-width:2px; }
     </style>
 </head>
 <body class="sunny">
@@ -309,9 +347,33 @@
         <div id="job-result-box" class="modal-box"><div id="job-result-icon" style="font-size:60px;"></div><h2 id="job-result-title" style="margin-top:10px;"></h2><p id="job-result-text" style="font-weight:bold;font-size:18px;"></p><p style="font-size:12px;color:#bdc3c7;margin-top:20px;">(タップして戻る)</p></div>
     </div>
     <div id="blood-overlay"><div style="font-size:120px;animation:blood-splash 0.5s forwards;">🩸</div><h1 id="blood-text" style="color:red;text-shadow:2px 2px 0px #fff,-2px -2px 0px #fff,2px -2px 0px #fff,-2px 2px 0px #fff;font-size:50px;margin-top:20px;text-align:center;"></h1></div>
+    
+    <!-- ========================================== -->
+    <!-- 変更: 設定モーダルに音量とレイアウト切替を追加 -->
+    <!-- ========================================== -->
     <div id="settings-modal-overlay" class="modal-overlay" onclick="if(event.target===this) toggleSettingsModal()">
-        <div class="modal-box"><h2 style="margin-top:0;">⚙️ 設定</h2><button class="btn-large btn-brown" style="width:100%;margin-top:15px;" onclick="promptReturnToTitle()">🏠 タイトルに戻る</button><button class="btn-large" style="width:100%;margin-top:10px;background:#95a5a6;border-color:#7f8c8d;" onclick="toggleSettingsModal()">✖ 閉じる</button></div>
+        <div class="modal-box">
+            <h2 style="margin-top:0;">⚙️ 設定</h2>
+            
+            <div style="margin: 15px 0; text-align: left; background: var(--clay-panel); color: #fdf5e6; padding: 10px; border-radius: 8px; border: var(--clay-border);">
+                <label style="font-weight: bold; display: block; margin-bottom: 5px;">🔊 音量: <span id="vol-disp">100%</span></label>
+                <input type="range" id="vol-slider" min="0" max="2" step="0.1" value="1" style="width: 100%;" onchange="updateVolume(this.value)">
+            </div>
+
+            <div style="margin: 15px 0; text-align: left; background: var(--clay-panel); color: #fdf5e6; padding: 10px; border-radius: 8px; border: var(--clay-border);">
+                <label style="font-weight: bold; display: block; margin-bottom: 5px;">📱 レイアウト:</label>
+                <select id="layout-select" style="width: 100%; padding: 5px; font-size: 14px;" onchange="changeLayout(this.value)">
+                    <option value="auto">自動 (レスポンシブ)</option>
+                    <option value="pc">PCレイアウト</option>
+                    <option value="mobile">スマホレイアウト</option>
+                </select>
+            </div>
+
+            <button class="btn-large btn-brown" style="width:100%;margin-top:15px;" onclick="promptReturnToTitle()">🏠 タイトルに戻る</button>
+            <button class="btn-large" style="width:100%;margin-top:10px;background:#95a5a6;border-color:#7f8c8d;" onclick="toggleSettingsModal()">✖ 閉じる</button>
+        </div>
     </div>
+
     <div id="minigame-overlay" class="modal-overlay" style="z-index:1000;">
         <div class="modal-box" style="background:#2c3e50;color:white;width:95%;max-width:450px;">
             <h2 id="mg-title">🎲 ミニゲーム</h2><div id="mg-timer-display">10</div><p id="mg-desc" style="font-size:13px;">勝てばカード確定！負けているほど逆転カードが出やすい！</p>
@@ -451,22 +513,47 @@
 <script>
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
+// ==========================================
+// 追加: 設定系（音量・レイアウト切替）
+// ==========================================
+let globalMasterVolume = 1.0;
+function updateVolume(val) {
+    globalMasterVolume = parseFloat(val);
+    document.getElementById("vol-disp").innerText = Math.round(globalMasterVolume * 100) + "%";
+}
+
+function changeLayout(mode) {
+    const metaViewport = document.querySelector('meta[name="viewport"]');
+    document.body.classList.remove('force-mobile', 'force-pc');
+    if (mode === 'pc') {
+        metaViewport.setAttribute('content', 'width=1200');
+        document.body.classList.add('force-pc');
+    } else if (mode === 'mobile') {
+        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+        document.body.classList.add('force-mobile');
+    } else {
+        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+    }
+}
+
 // ========== SOUND EFFECTS ==========
 const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
 function playSfx(type){
     try{
         const o=audioCtx.createOscillator(),g=audioCtx.createGain();
         o.connect(g);g.connect(audioCtx.destination);
-        g.gain.value=0.15;
-        if(type==='dice'){o.type='square';o.frequency.value=440;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.15);o.start();o.stop(audioCtx.currentTime+0.15);}
-        else if(type==='coin'){o.type='sine';o.frequency.value=880;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3);}
-        else if(type==='hit'){o.type='sawtooth';o.frequency.value=150;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.2);o.start();o.stop(audioCtx.currentTime+0.2);}
-        else if(type==='success'){o.type='sine';o.frequency.value=523;setTimeout(()=>{const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();o2.connect(g2);g2.connect(audioCtx.destination);g2.gain.value=0.15;o2.type='sine';o2.frequency.value=659;g2.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.3);o2.start();o2.stop(audioCtx.currentTime+0.3);},150);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.2);o.start();o.stop(audioCtx.currentTime+0.2);}
-        else if(type==='fail'){o.type='sawtooth';o.frequency.value=200;o.frequency.exponentialRampToValueAtTime(100,audioCtx.currentTime+0.4);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.4);o.start();o.stop(audioCtx.currentTime+0.4);}
-        else if(type==='move'){o.type='triangle';o.frequency.value=600;g.gain.value=0.08;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.1);o.start();o.stop(audioCtx.currentTime+0.1);}
-        else if(type==='death'){o.type='sawtooth';o.frequency.value=300;o.frequency.exponentialRampToValueAtTime(50,audioCtx.currentTime+0.8);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.8);o.start();o.stop(audioCtx.currentTime+0.8);}
-        else if(type==='win'){o.type='sine';o.frequency.value=523;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.5);o.start();o.stop(audioCtx.currentTime+0.5);}
-        else if(type==='card'){o.type='triangle';o.frequency.value=1047;g.gain.value=0.1;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.2);o.start();o.stop(audioCtx.currentTime+0.2);}
+        let baseGain = 0;
+        if(type==='dice'){o.type='square';o.frequency.value=440;baseGain=0.15;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.15);o.start();o.stop(audioCtx.currentTime+0.15);}
+        else if(type==='coin'){o.type='sine';o.frequency.value=880;baseGain=0.15;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3);}
+        else if(type==='hit'){o.type='sawtooth';o.frequency.value=150;baseGain=0.15;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.2);o.start();o.stop(audioCtx.currentTime+0.2);}
+        else if(type==='success'){o.type='sine';o.frequency.value=523;baseGain=0.15;setTimeout(()=>{const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();o2.connect(g2);g2.connect(audioCtx.destination);g2.gain.value=0.15 * globalMasterVolume;o2.type='sine';o2.frequency.value=659;g2.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.3);o2.start();o2.stop(audioCtx.currentTime+0.3);},150);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.2);o.start();o.stop(audioCtx.currentTime+0.2);}
+        else if(type==='fail'){o.type='sawtooth';o.frequency.value=200;baseGain=0.15;o.frequency.exponentialRampToValueAtTime(100,audioCtx.currentTime+0.4);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.4);o.start();o.stop(audioCtx.currentTime+0.4);}
+        else if(type==='move'){o.type='triangle';o.frequency.value=600;baseGain=0.08;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.1);o.start();o.stop(audioCtx.currentTime+0.1);}
+        else if(type==='death'){o.type='sawtooth';o.frequency.value=300;baseGain=0.15;o.frequency.exponentialRampToValueAtTime(50,audioCtx.currentTime+0.8);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.8);o.start();o.stop(audioCtx.currentTime+0.8);}
+        else if(type==='win'){o.type='sine';o.frequency.value=523;baseGain=0.15;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.5);o.start();o.stop(audioCtx.currentTime+0.5);}
+        else if(type==='card'){o.type='triangle';o.frequency.value=1047;baseGain=0.1;g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.2);o.start();o.stop(audioCtx.currentTime+0.2);}
+        
+        g.gain.value = baseGain * globalMasterVolume;
     }catch(e){}
 }
 
@@ -1011,6 +1098,15 @@ function updateUI(){
 // ========== ACTIONS ==========
 async function rollDice(){
     let p=players[turn];document.getElementById("btn-roll").disabled=true;toggleHighlight("btn-roll",false);
+    
+    // --- 【追加】サイコロ開始を相手に通知 ---
+    if(typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof myRoomId !== 'undefined' && myRoomId && !p.isCPU) {
+        let msg = { type: 'dice_start', name: p.name };
+        if(typeof isHost !== 'undefined' && isHost) { if(typeof broadcastNetworkData === 'function') broadcastNetworkData(msg); }
+        else if(typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) hostConnection.send(msg);
+    }
+    // ----------------------------------------
+
     let d1=Math.floor(Math.random()*6)+1,d2=Math.floor(Math.random()*6)+1;
     const overlay=document.getElementById("dice-overlay"),d1E=document.getElementById("dice-1"),d2E=document.getElementById("dice-2"),rE=document.getElementById("dice-result"),mE=document.getElementById("dice-message");
     overlay.style.display="flex";d1E.className="dice";d2E.className="dice";mE.innerText=`${p.name}がサイコロを振っています...`;rE.innerText="";
@@ -1025,7 +1121,18 @@ async function rollDice(){
     if(isZoro)txt+=" (🎲ゾロ目×2)";if(p.equip.bicycle)txt+=" (🚲+2)";
     if(p.penaltyAP>0)txt+=` (ペナ-${p.penaltyAP})`;if(p.bonusAP>0)txt+=` (ボーナス+${p.bonusAP})`;
     txt+=` = ${total}AP`;rE.innerHTML=txt;
-    playSfx('success');await sleep(1800);overlay.style.display="none";
+    playSfx('success');
+    
+    // --- 【追加】サイコロ結果を相手に通知 ---
+    if(typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof myRoomId !== 'undefined' && myRoomId && !p.isCPU) {
+        let msg = { type: 'dice_result', d1: d1, d2: d2, text: txt };
+        if(typeof isHost !== 'undefined' && isHost) { if(typeof broadcastNetworkData === 'function') broadcastNetworkData(msg); }
+        else if(typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) hostConnection.send(msg);
+    }
+    // ----------------------------------------
+
+    await sleep(1800);overlay.style.display="none";
+    
     p.ap+=total;diceRolled=true;p.bonusAP=0;p.penaltyAP=0;
     triggerAPPopup(p.id,total,"ダイスロール");log(`<span class="highlight">${p.name}</span>は${total}AP獲得！${isZoro?"(ゾロ目!)":""}`);
     // Territory income
@@ -1679,6 +1786,49 @@ function handleNetworkData(data, senderPeerId = null) {
                 }
             });
         }
+    }
+    // 【追加】相手がサイコロを振り始めた時の演出同期
+    else if (data.type === 'dice_start') {
+        if (isHost) {
+            Object.values(connections).forEach(conn => {
+                if (conn.peer !== senderPeerId && conn.open) conn.send(data);
+            });
+        }
+        window.netDiceOverlay = document.getElementById("dice-overlay");
+        window.netD1E = document.getElementById("dice-1");
+        window.netD2E = document.getElementById("dice-2");
+        document.getElementById("dice-message").innerText = `${data.name}がサイコロを振っています...`;
+        document.getElementById("dice-result").innerText = "";
+        window.netDiceOverlay.style.display = "flex";
+        window.netD1E.className = "dice";
+        window.netD2E.className = "dice";
+        if(window.netDiceInterval) clearInterval(window.netDiceInterval);
+        window.netDiceInterval = setInterval(()=>{
+            window.netD1E.innerText=Math.floor(Math.random()*6)+1;
+            window.netD2E.innerText=Math.floor(Math.random()*6)+1;
+            playSfx('dice');
+        },100);
+    }
+    // 【追加】サイコロの結果と演出の終了同期
+    else if (data.type === 'dice_result') {
+        if (isHost) {
+            Object.values(connections).forEach(conn => {
+                if (conn.peer !== senderPeerId && conn.open) conn.send(data);
+            });
+        }
+        if(window.netDiceInterval) clearInterval(window.netDiceInterval);
+        if(window.netD1E && window.netD2E) {
+            window.netD1E.className = "dice stopped";
+            window.netD2E.className = "dice stopped";
+            window.netD1E.innerText = data.d1;
+            window.netD2E.innerText = data.d2;
+        }
+        document.getElementById("dice-result").innerHTML = data.text;
+        playSfx('success');
+        
+        setTimeout(() => {
+            if(window.netDiceOverlay) window.netDiceOverlay.style.display = "none";
+        }, 1800);
     }
 }
 
