@@ -1595,7 +1595,7 @@ async function processCPUTurn(){
         <div id="online-menu">
             <button class="btn-large btn-blue" onclick="showCreateRoomUI()">🏠 部屋を作る（ホストになる）</button>
             <div style="margin: 15px 0; font-weight: bold; text-align:center;">または</div>
-            <button class="btn-large btn-brown" onclick="showJoinRoomUI()">🔍 部屋に参加する（ID入力）</button>
+            <button class="btn-large btn-brown" onclick="showJoinRoomUI()">🔍 部屋に参加する（合言葉入力）</button>
             <button class="btn-large" style="width:100%; margin-top:20px; background:#95a5a6; border-color:#7f8c8d;" id="online-close-btn">✖ 閉じる</button>
         </div>
 
@@ -1607,8 +1607,12 @@ async function processCPUTurn(){
                 <input type="text" id="host-room-name" style="width:100%; padding:8px; border-radius:5px; border:2px solid #8d6e63;" value="誰でも歓迎！">
             </div>
             <div style="margin-bottom:10px;">
-                <label style="font-weight:bold;">合言葉 (鍵): <span style="font-size:11px; font-weight:normal;">※空欄なら鍵なし</span></label><br>
-                <input type="text" id="host-room-pass" style="width:100%; padding:8px; border-radius:5px; border:2px solid #8d6e63;" placeholder="パスワードを入力">
+                <label style="font-weight:bold;">合言葉 (短いルームID):</label><br>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="host-room-pass" style="width:100%; padding:8px; border-radius:5px; border:2px solid #8d6e63;" placeholder="例: 1234">
+                    <button class="btn-clay" style="padding:5px 10px; white-space:nowrap;" onclick="document.getElementById('host-room-pass').value = Math.floor(1000 + Math.random() * 9000);">自動生成</button>
+                </div>
+                <p style="font-size:11px; margin:5px 0 0 0; color:#bdc3c7;">友達にこの合言葉を教えて参加してもらいます。</p>
             </div>
             <div style="display:flex; gap:10px; margin-top:15px;">
                 <button class="btn-large btn-blue" style="flex:1;" onclick="executeCreateRoom()">作成して待機</button>
@@ -1618,14 +1622,10 @@ async function processCPUTurn(){
 
         <!-- 部屋参加UI (ID手動入力) -->
         <div id="join-room-ui" style="display:none; text-align:left; background:rgba(0,0,0,0.1); padding:15px; border-radius:10px;">
-            <h3 style="margin-top:0; text-align:center;">🔍 ルームIDを入力して参加</h3>
+            <h3 style="margin-top:0; text-align:center;">🔍 合言葉を入力して参加</h3>
             <div style="margin-bottom:10px;">
-                <label style="font-weight:bold;">ホストから教えられたルームID:</label><br>
-                <input type="text" id="join-room-id-input" style="width:100%; padding:8px; border-radius:5px; border:2px solid #8d6e63;" placeholder="例: a1b2c3d4-...">
-            </div>
-            <div style="margin-bottom:10px;">
-                <label style="font-weight:bold;">合言葉 (鍵ありの場合):</label><br>
-                <input type="text" id="join-room-pass-input" style="width:100%; padding:8px; border-radius:5px; border:2px solid #8d6e63;" placeholder="パスワードを入力">
+                <label style="font-weight:bold;">ホストから教えられた合言葉:</label><br>
+                <input type="text" id="join-room-id-input" style="width:100%; padding:8px; border-radius:5px; border:2px solid #8d6e63;" placeholder="例: 1234">
             </div>
             <div style="display:flex; gap:10px; margin-top:15px;">
                 <button class="btn-large btn-brown" style="flex:1;" onclick="executeJoinByInputId()">参加する</button>
@@ -1952,6 +1952,11 @@ window.executeCreateRoom = function() {
     hostRoomName = document.getElementById("host-room-name").value.trim() || "誰でも歓迎！";
     hostPassword = document.getElementById("host-room-pass").value.trim();
     
+    if (!hostPassword) {
+        showToast("合言葉(短いルームID)を入力してください！");
+        return;
+    }
+    
     isHost = true;
     lobbyPlayers = [{
         userId: myUserId,
@@ -1964,20 +1969,21 @@ window.executeCreateRoom = function() {
     updateLobbyUI(lobbyPlayers, myUserId);
     showConnectingStatus("サーバーに接続中...", false);
     
-    tryCreateRoomProcess();
+    const targetPeerId = 'hmlss-' + hostPassword;
+    tryCreateRoomProcess(targetPeerId);
 };
 
-function tryCreateRoomProcess() {
+function tryCreateRoomProcess(targetId) {
     try {
         if (peer) { try { peer.destroy(); } catch(e) {} }
-        peer = new Peer(undefined, peerConfig); // 自動生成IDを使用
+        peer = new Peer(targetId, peerConfig); 
     } catch(e) {
         showConnectingStatus("⚠️ 初期化エラー: " + e.message, true);
         return;
     }
     
     peer.on('open', (id) => {
-        myRoomId = id; // PeerJSが生成したID
+        myRoomId = id;
         
         const idx = lobbyPlayers.findIndex(p => p.userId === myUserId);
         if (idx !== -1) {
@@ -1989,10 +1995,10 @@ function tryCreateRoomProcess() {
         showToast("✅ 部屋を作成しました！参加者を待っています...");
         updateLobbyUI(lobbyPlayers, myUserId);
         
-        // 画面にIDを表示
+        const displayId = id.replace('hmlss-', '');
         const nameDisplay = document.getElementById("lobby-room-name-display");
         if(nameDisplay) {
-             nameDisplay.innerHTML = `${hostRoomName} <br><div style="font-size:16px; margin-top:5px;"><span style="color:#fff; background:#e74c3c; padding:4px 8px; border-radius:6px; user-select:all; cursor:pointer;" onclick="copyRoomId('${id}')">ID: ${id} 📋コピー</span></div>`;
+             nameDisplay.innerHTML = `${hostRoomName} <br><div style="font-size:16px; margin-top:5px;"><span style="color:#fff; background:#e74c3c; padding:4px 8px; border-radius:6px; user-select:all; cursor:pointer;" onclick="copyRoomId('${displayId}')">合言葉: ${displayId} 📋コピー</span></div>`;
         }
     });
 
@@ -2012,18 +2018,23 @@ function tryCreateRoomProcess() {
     });
     
     peer.on('error', (err) => {
-        showConnectingStatus("⚠️ 通信エラー: " + err.type, true);
+        if (err.type === 'unavailable-id') {
+            showConnectingStatus("⚠️ その合言葉は現在他の人が使用中です。別の合言葉に変えてください。", true);
+            showToast("別の合言葉を入力して作り直してください。");
+        } else {
+            showConnectingStatus("⚠️ 通信エラー: " + err.type, true);
+        }
     });
 }
 
 // --- 部屋参加 (ゲスト・手動ID入力) ---
 window.executeJoinByInputId = function() {
-    const roomId = document.getElementById("join-room-id-input").value.trim();
-    const pass = document.getElementById("join-room-pass-input").value.trim();
-    if(!roomId) {
-        showToast("ルームIDを入力してください");
+    const pass = document.getElementById("join-room-id-input").value.trim();
+    if(!pass) {
+        showToast("合言葉を入力してください");
         return;
     }
+    const roomId = 'hmlss-' + pass;
     executeJoin(roomId, pass);
 };
 
