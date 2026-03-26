@@ -128,8 +128,20 @@
         #log span.system { color:#2980b9; }
         
         /* トークン類 */
-        .player-token { width:20px; height:20px; border-radius:5px; position:absolute; z-index:10; transition:all 0.3s; border-bottom:3px solid; box-shadow:0 4px 6px rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; font-size:11px; background:#8d7b68; }
-        .pos-0 { bottom:0; left:0; } .pos-1 { bottom:0; right:0; } .pos-2 { top:0; left:0; } .pos-3 { top:0; right:0; }
+        .player-token { width:28px; height:28px; border-radius:6px; position:absolute; z-index:10; transition:all 0.3s; border-bottom:3px solid; border:3px solid; box-shadow:0 4px 8px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; font-size:18px; background:rgba(0,0,0,0.7); backdrop-filter:blur(2px); }
+        .pos-0 { bottom:-4px; left:-4px; } .pos-1 { bottom:-4px; right:-4px; } .pos-2 { top:-4px; left:-4px; } .pos-3 { top:-4px; right:-4px; }
+        .pos-4 { bottom:10px; left:-4px; } .pos-5 { bottom:10px; right:-4px; } .pos-6 { top:10px; left:-4px; } .pos-7 { top:10px; right:-4px; }
+        /* アクティブプレイヤーの呼吸アニメーション */
+        @keyframes token-breathe {
+            0%   { transform: scale(1);    box-shadow: 0 4px 10px rgba(0,0,0,0.9), 0 0 14px var(--token-color, #fff), 0 0 28px var(--token-color, #fff); }
+            50%  { transform: scale(1.22); box-shadow: 0 6px 16px rgba(0,0,0,0.9), 0 0 28px var(--token-color, #fff), 0 0 52px var(--token-color, #fff); }
+            100% { transform: scale(1);    box-shadow: 0 4px 10px rgba(0,0,0,0.9), 0 0 14px var(--token-color, #fff), 0 0 28px var(--token-color, #fff); }
+        }
+        .token-active {
+            animation: token-breathe 1.2s ease-in-out infinite !important;
+            z-index: 15 !important;
+            border-width: 4px !important;
+        }
         .npc-token { width:16px; height:16px; border-radius:50%; position:absolute; z-index:6; display:flex; align-items:center; justify-content:center; font-size:10px; box-shadow:0 2px 4px rgba(0,0,0,0.8); border:2px solid white; transition:all 0.4s; }
         .npc-police { background-color:#2980b9; top:-2px; right:-2px; }
         .npc-uncle { background-color:#8d6e63; top:-2px; left:-2px; }
@@ -137,10 +149,25 @@
         .npc-yakuza { background-color:#2c3e50; bottom:-2px; right:-2px; }
         .npc-loanshark { background-color:#8e44ad; top:50%; left:-2px; transform:translateY(-50%); }
         .npc-friend { background-color:#27ae60; bottom:-2px; left:-2px; }
-        .truck-token { width:28px; height:28px; border-radius:8px; position:absolute; z-index:8; border:2px solid #fff; box-shadow:0 4px 8px rgba(0,0,0,0.8); transition:all 0.3s; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; justify-content:center; align-items:center; font-size:18px; background:#5c4a44; }
+        .truck-token { width:40px; height:40px; border-radius:8px; position:absolute; z-index:30; border:3px solid #ff2200; box-shadow:0 0 25px #ff2200, 0 0 50px rgba(255,30,0,0.7), 0 4px 8px rgba(0,0,0,0.9); transition:all 0.2s; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; justify-content:center; align-items:center; font-size:24px; background:radial-gradient(circle,#5a0000,#1a0000); animation:truck-idle 0.6s ease-in-out infinite alternate; }
+        @keyframes truck-idle { 0%{box-shadow:0 0 20px #ff2200, 0 0 40px rgba(255,30,0,0.6);} 100%{box-shadow:0 0 50px #ff0000, 0 0 100px rgba(255,0,0,0.8), 0 0 140px rgba(255,0,0,0.3);} }
         
         /* アニメーション・強調表示 */
-        .truck-highlight { opacity:1 !important; box-shadow:0 0 30px #e74c3c,inset 0 0 20px #e74c3c !important; border:3px solid #ff0000 !important; transform:scale(1.2); z-index:50; }
+        .truck-highlight { opacity:1 !important; box-shadow:0 0 60px #ff0000,0 0 120px #ff0000,0 0 200px rgba(255,0,0,0.5),inset 0 0 40px #ff2200 !important; border:4px solid #ff0000 !important; transform:scale(1.35) !important; animation:truck-pulse 0.2s ease-in-out infinite alternate !important; z-index:50; }
+        @keyframes truck-pulse { 0%{box-shadow:0 0 50px #ff2200,0 0 100px #ff0000,inset 0 0 30px #ff4400;transform:scale(1.3);} 100%{box-shadow:0 0 90px #ff0000,0 0 180px #ff0000,0 0 260px rgba(255,0,0,0.4),inset 0 0 60px #ff2200;transform:scale(1.38);} }
+        .truck-path-glow { box-shadow:0 0 18px rgba(255,40,0,0.7),inset 0 0 10px rgba(255,40,0,0.35) !important; border-color:rgba(255,70,0,0.8) !important; transition:box-shadow 0.3s; }
+        body.horror-mode { background-color: #000 !important; background-image: none !important; }
+        body.horror-mode #game-board-container { background:rgba(0,0,0,0.99) !important; border-color:#220000 !important; transition:all 0.25s; box-shadow:0 0 80px rgba(255,0,0,0.2) inset, 0 0 40px rgba(255,0,0,0.1) !important; }
+        /* filterをgame-boardではなく各タイルにかけることで収集車は影響を受けない */
+        body.horror-mode #game-board .tile { filter:brightness(0.45) saturate(0.3) !important; transition:filter 0.25s; }
+        body.horror-mode #game-board .tile.truck-highlight { filter:none !important; }
+        /* horror-mode中の収集車は最前面・最大輝度 */
+        body.horror-mode .truck-token {
+            box-shadow:0 0 60px #ff0000, 0 0 120px rgba(255,0,0,1), 0 0 200px rgba(255,0,0,0.6) !important;
+            z-index:200 !important;
+            filter:none !important;
+            border-color:#ff0000 !important;
+        }
         .police-highlight { opacity:1 !important; box-shadow:0 0 30px #3498db,inset 0 0 20px #3498db !important; border:3px solid #2980b9 !important; transform:scale(1.2); z-index:50; }
         @keyframes pulse-banner { 0%{opacity:0.9; box-shadow:0 0 10px rgba(241,196,15,0.5);} 50%{opacity:1; box-shadow:0 0 30px rgba(241,196,15,1);} 100%{opacity:0.9; box-shadow:0 0 10px rgba(241,196,15,0.5);} }
         .btn-end-highlight { background-color:#f1c40f !important; color:#c0392b !important; border-color:#e67e22 !important; box-shadow:0 0 20px #f1c40f !important; animation:shake-btn 0.5s infinite !important; transform:scale(1.05); }
@@ -190,8 +217,16 @@
         #settings-btn:active { transform:translate(2px,2px); box-shadow:none; }
         
         /* 夜の視界制限フォグ */
-        .night-fog { opacity: 0.13 !important; filter: brightness(0.15) !important; pointer-events: none; }
+        .night-fog { opacity: 0.08 !important; filter: brightness(0.1) !important; pointer-events: none; transition: opacity 0.4s, filter 0.4s; }
         .night-fog .player-token, .night-fog .npc-token, .night-fog .truck-token { display: none !important; }
+        .night-visible { box-shadow: 0 0 12px 4px rgba(255,220,50,0.55), inset 0 0 8px rgba(255,220,50,0.2) !important; border-color: rgba(255,220,50,0.7) !important; transition: box-shadow 0.3s; }
+        body.night #game-board-container { background: rgba(5,5,20,0.85) !important; }
+        body.night #game-board { background: linear-gradient(to right,#1a1428 0%,#1a1428 30%,#221830 30%,#221830 70%,#1a2035 70%,#1a2035 100%) !important; }
+
+        /* タイルツールチップ */
+        #tile-tooltip { position:fixed; z-index:9800; background:rgba(10,10,20,0.97); color:#fdf5e6; border:2px solid #f1c40f; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:bold; pointer-events:none; display:none; max-width:200px; box-shadow:0 4px 16px rgba(0,0,0,0.8); line-height:1.5; }
+        #tile-tooltip .tt-title { font-size:15px; color:#f1c40f; border-bottom:1px dashed #8d6e63; padding-bottom:4px; margin-bottom:4px; }
+        #tile-tooltip .tt-desc { font-size:12px; color:#bdc3c7; }
 
         /* その他の装飾・ユーティリティ */
         .hp-bar-outer { width:100%; height:8px; background:#333; border-radius:4px; overflow:hidden; margin-top:2px; }
@@ -506,6 +541,24 @@
         </div>
     </div>
     
+    <!-- 武器弧型攻撃UI（キャンバスはボード内、UIは画面下部に固定） -->
+    <div id="weapon-arc-overlay" style="display:none;">
+        <!-- canvasはボードエリア内に動的に挿入するためここには置かない -->
+        <div id="weapon-arc-ui" style="pointer-events:all;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;background:rgba(20,20,30,0.95);border:3px solid #e74c3c;border-radius:16px;padding:14px 24px;box-shadow:0 0 30px rgba(231,76,60,0.5);z-index:1500;cursor:move;user-select:none;">
+            <div style="display:flex;align-items:center;gap:8px;width:100%;">
+                <div id="weapon-arc-title" style="color:#e74c3c;font-size:16px;font-weight:bold;text-shadow:0 0 8px #e74c3c;flex:1;"></div>
+                <span style="color:#888;font-size:11px;">⠿ドラッグで移動</span>
+            </div>
+            <div style="color:#bdc3c7;font-size:12px;">← → スライダーまたは矢印キーで照準を回転</div>
+            <input type="range" id="weapon-arc-angle" min="0" max="359" value="90" style="width:200px;accent-color:#e74c3c;">
+            <div style="display:flex;gap:12px;">
+                <button id="weapon-arc-fire" class="btn-large" style="background:#e74c3c;border-color:#c0392b;min-width:90px;">💥 攻撃！</button>
+                <button class="btn-large" style="background:#7f8c8d;border-color:#2c3e50;" onclick="cancelWeaponArc()">✕ キャンセル</button>
+            </div>
+            <div id="weapon-arc-targets" style="font-size:13px;color:#f1c40f;min-height:18px;text-align:center;"></div>
+        </div>
+    </div>
+
     <div id="attack-overlay" class="modal-overlay" style="z-index:1003;">
         <div class="modal-box" style="background:#2c3e50;color:white;max-width:400px;">
             <h2 id="attack-title" style="color:#e74c3c;">⚔️ 攻撃対象を選択</h2>
@@ -524,6 +577,7 @@
     <div id="dice-overlay"><div id="dice-message">サイコロを振っています...</div><div class="dice-container"><div id="dice-1" class="dice">1</div><div id="dice-2" class="dice">1</div></div><div id="dice-result"></div></div>
     <div id="turn-banner-overlay"><div id="turn-banner-text"></div></div>
     <div id="event-popup-overlay"></div>
+    <div id="tile-tooltip"><div class="tt-title" id="tt-title"></div><div class="tt-desc" id="tt-desc"></div></div>
     <div id="round-summary-overlay"><h2>🌙 ラウンド終了レポート</h2><div id="round-summary-list"></div></div>
 
     <!-- ゲーム設定画面 -->
@@ -532,7 +586,7 @@
         
         <!-- オフライン用プレイヤー設定 -->
         <div class="setup-section" id="setup-offline-players">
-            <h3 style="margin-top:0;color:#f2c779;">🖥️ オフラインで遊ぶ (2〜4人)</h3>
+            <h3 style="margin-top:0;color:#f2c779;">🖥️ オフラインで遊ぶ (2〜8人)</h3>
             <div class="setup-row" style="color:#e74c3c;">🔴 <input type="text" id="p1-name" value="P1" class="name-input" maxlength="8">
                 <select id="p1-type"><option value="human">人間</option><option value="cpu">CPU</option></select>
                 <select id="p1-avatar"><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="survivor">サバイバー</option><option value="yankee">元ヤン</option></select>
@@ -557,13 +611,44 @@
                 <div id="p4-preview" class="avatar-preview" style="border-color:#f1c40f;">👊</div>
                 <div id="p4-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">同マス者から自動1P強奪</div>
             </div>
+            <div class="setup-row" style="color:#e67e22;">🟠 <input type="text" id="p5-name" value="P5" class="name-input" maxlength="8">
+                <select id="p5-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
+                <select id="p5-avatar"><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="survivor">サバイバー</option><option value="yankee">元ヤン</option></select>
+                <div id="p5-preview" class="avatar-preview" style="border-color:#e67e22;">🏃</div>
+                <div id="p5-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">移動常に1AP/雨ペナ無効</div>
+            </div>
+            <div class="setup-row" style="color:#9b59b6;">🟣 <input type="text" id="p6-name" value="P6" class="name-input" maxlength="8">
+                <select id="p6-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
+                <select id="p6-avatar"><option value="sales">元営業マン</option><option value="athlete">元アスリート</option><option value="survivor">サバイバー</option><option value="yankee">元ヤン</option></select>
+                <div id="p6-preview" class="avatar-preview" style="border-color:#9b59b6;">💼</div>
+                <div id="p6-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">バイト成功率70%</div>
+            </div>
+            <div class="setup-row" style="color:#1abc9c;">🩵 <input type="text" id="p7-name" value="P7" class="name-input" maxlength="8">
+                <select id="p7-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
+                <select id="p7-avatar"><option value="survivor">サバイバー</option><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="yankee">元ヤン</option></select>
+                <div id="p7-preview" class="avatar-preview" style="border-color:#1abc9c;">🌿</div>
+                <div id="p7-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ゴミ漁り失敗ペナ無効</div>
+            </div>
+            <div class="setup-row" style="color:#e91e8c;">🩷 <input type="text" id="p8-name" value="P8" class="name-input" maxlength="8">
+                <select id="p8-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
+                <select id="p8-avatar"><option value="yankee">元ヤン</option><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="survivor">サバイバー</option></select>
+                <div id="p8-preview" class="avatar-preview" style="border-color:#e91e8c;">👊</div>
+                <div id="p8-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">同マス者から自動1P強奪</div>
+            </div>
         </div>
 
         <!-- ゲーム共通設定 -->
         <div class="setup-section" id="setup-game-settings" style="background:#8d6e63;border-color:#4a3b32;">
             <h3 style="margin-top:0;color:#fdf5e6;">🗺️ ゲーム設定</h3>
             <div class="setup-row" style="color:#fdf5e6;">マップ: <select id="map-size"><option value="small">スモール(12マス)</option><option value="medium" selected>ミディアム(48マス)</option><option value="large">ラージ(75マス)</option></select></div>
-            <div class="setup-row" style="color:#fdf5e6;">ラウンド: <select id="max-rounds"><option value="10">10ラウンド</option><option value="20" selected>20ラウンド</option><option value="30">30ラウンド</option></select></div>
+            <div class="setup-row" style="color:#fdf5e6;">ラウンド: <select id="max-rounds"><option value="1">1ラウンド</option><option value="5">5ラウンド</option><option value="10">10ラウンド</option><option value="15">15ラウンド</option><option value="20" selected>20ラウンド</option><option value="30">30ラウンド</option></select></div>
+            <div class="setup-row" style="color:#f1c40f;">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="creative-mode" style="width:18px;height:18px;cursor:pointer;">
+                    🎨 クリエイティブモード
+                </label>
+                <span style="font-size:11px;color:#fdf5e6;margin-left:4px;">全カードを最初から所持</span>
+            </div>
             <button class="btn-large btn-brown" style="margin-top:15px;border-color:#2c1e16;" onclick="startOfflineGame()">🎲 ゲームを開始する</button>
         </div>
     </div>
@@ -594,6 +679,7 @@
                         <div class="status-box" style="width:48%;background:var(--clay-ap);">⚡ AP: <span id="ap-display">0</span></div>
                         <div class="status-box" style="width:48%;">💰 P: <span id="p-display">0</span></div>
                         <div class="status-box" style="width:48%;">🚩 領土: <span id="territory-display">0</span></div>
+                        <div class="status-box" style="width:48%;background:#4a3b32;">⚔️ <span id="kills-display">0</span>K / 💀<span id="deaths-display">0</span>D</div>
                         <div class="status-box" style="width:100%;background:#6d5c4e;">🥫<span id="can-display">0</span> 🗑️<span id="trash-display">0</span> 🎴<span id="hand-count-display">0</span>/<span id="max-hand-display">7</span></div>
                     </div>
                     <div style="width:100%;margin-top:5px;">
@@ -605,7 +691,13 @@
             <div id="hand-cards-area"><div id="card-panel-clay" class="panel"></div></div>
         </div>
         <div id="main-area">
-            <div id="board-area"><div id="game-board-container" class="panel"><div id="game-board"></div></div></div>
+            <div id="board-area" style="position:relative;">
+                <!-- マップ右上AP表示 -->
+                <div id="map-ap-hud" style="position:absolute;top:8px;right:8px;z-index:50;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);border:2px solid rgba(255,220,50,0.5);border-radius:10px;padding:6px 12px;color:#f1c40f;font-weight:bold;font-size:18px;text-shadow:0 0 8px #f1c40f;pointer-events:none;transition:all 0.3s;">
+                    ⚡ <span id="map-ap-display">0</span>
+                </div>
+                <div id="game-board-container" class="panel"><div id="game-board"></div></div>
+            </div>
             <div id="right-side-area">
                 <div id="action-panel" class="panel">
                     <button id="btn-roll" class="btn-clay" onclick="rollDice()">🎲 サイコロを振る</button>
@@ -617,8 +709,7 @@
                     <button id="btn-exchange" class="btn-clay" style="border-color:#d4a017;display:none;" onclick="actionExchange()">💱 換金 (0AP)</button>
                     <button id="btn-shop" class="btn-clay" style="border-color:#8e44ad;display:none;" onclick="openShop()">🛒 ショップ</button>
                     <button id="btn-manhole" class="btn-clay" style="border-color:#2c3e50;display:none;" onclick="actionManhole()">🕳️ ワープ (1AP)</button>
-                    <button id="btn-pickpocket" class="btn-clay" style="border-color:#e74c3c;display:none;" onclick="actionPickpocket()">🔪 スリ (3AP)</button>
-                    <button id="btn-steal-card" class="btn-clay" style="border-color:#e74c3c;display:none;" onclick="actionStealCard()">🃏 手札奪取 (2AP)</button>
+                    <button id="btn-punch" class="btn-clay" style="border-color:#e74c3c;display:none;" onclick="actionPunch()">👊 殴る (2AP)</button>
                     <div style="flex-grow:1;min-height:5px;"></div>
                     <button id="btn-end" class="btn btn-end-clay" onclick="endTurnClicked()">🛑 ターン終了</button>
                 </div>
@@ -694,9 +785,9 @@ const charInfo = {
     athlete: { name: '元アスリート', desc: '移動常に1AP/雨ペナ無効' },
     sales: { name: '元営業マン', desc: 'バイト成功率70%' },
     survivor: { name: 'サバイバー', desc: 'ゴミ漁り失敗ペナ無効' },
-    yankee: { name: '元ヤン', desc: '同マス者から自動1P強奪' }
+    yankee: { name: '元ヤン', desc: 'すれ違い時もカツアゲ/AP2で殴る(10ダメ)' }
 };
-const pIdColors = ["#e74c3c", "#3498db", "#2ecc71", "#f1c40f"];
+const pIdColors = ["#e74c3c", "#3498db", "#2ecc71", "#f1c40f", "#e67e22", "#9b59b6", "#1abc9c", "#e91e8c"];
 
 const deckData = [
     {id:0,name:"ステルス行動",icon:"🔵",desc:"次の敵回避",color:"#3498db",type:"action"},
@@ -729,6 +820,12 @@ const deckData = [
     {id:27,name:"段ボールの盾",icon:"🟢",desc:"ダメージ半減(1回)",color:"#2ecc71",type:"equip"},
     {id:28,name:"ヘルメット",icon:"🟢",desc:"ダメージ完全無効(1回)",color:"#2ecc71",type:"equip"},
     {id:29,name:"身代わり人形",icon:"🟢",desc:"NPC妨害1回無効",color:"#2ecc71",type:"equip"},
+    // 回復系カード
+    {id:30,name:"腐ったバーガー",icon:"🍔",desc:"HP+20回復(当たり外れあり)",color:"#27ae60",type:"heal",heal:20,risk:10},
+    {id:31,name:"落ちてたポテト",icon:"🍟",desc:"HP+15確定回復",color:"#27ae60",type:"heal",heal:15,risk:0},
+    {id:32,name:"拾ったホットドッグ",icon:"🌭",desc:"HP+30回復(食中毒50%)",color:"#e67e22",type:"heal",heal:30,risk:25},
+    {id:33,name:"謎のエネルギーバー",icon:"🍫",desc:"HP+10＆AP+3",color:"#27ae60",type:"heal",heal:10,risk:0,apBonus:3},
+    {id:34,name:"水道水",icon:"💧",desc:"HP+5確定回復",color:"#3498db",type:"heal",heal:5,risk:0},
 ];
 
 function genSmallMap(){return[
@@ -757,6 +854,8 @@ let canPickedThisTurn = 0;
 let territories = {};
 let gameOver = false;
 let cpuActing = false;
+let afkTimer = null;
+const AFK_TIMEOUT = 5 * 60 * 1000; // 5分操作なしで強制スキップ
 
 // NPC Positions
 let truckPos = 0, policePos = 0, unclePos = 0, animalPos = 0, yakuzaPos = 0, loansharkPos = 0, friendPos = 0;
@@ -800,6 +899,7 @@ window.extractGameState = function() {
             hand: [...p.hand], maxHand: p.maxHand, cans: p.cans, trash: p.trash,
             stealth: p.stealth, rainGear: p.rainGear, hasID: p.hasID,
             bonusAP: p.bonusAP, penaltyAP: p.penaltyAP, skipTurn: p.skipTurn, cannotMove: p.cannotMove,
+            deaths: p.deaths||0, kills: p.kills||0,
             color: p.color, charType: p.charType, userId: p.userId,
             equip: {...p.equip}
         })),
@@ -832,6 +932,7 @@ window.applyGameState = function(state) {
         p.stealth = sp.stealth; p.rainGear = sp.rainGear; p.hasID = sp.hasID;
         p.bonusAP = sp.bonusAP; p.penaltyAP = sp.penaltyAP;
         p.skipTurn = sp.skipTurn; p.cannotMove = sp.cannotMove;
+        p.deaths = sp.deaths||0; p.kills = sp.kills||0;
         p.userId = sp.userId;
         if (sp.equip) p.equip = {...sp.equip};
         return p;
@@ -872,7 +973,8 @@ function createPlayer(id, name, isCPU, charType) {
         id, name, isCPU, pos: 0, hp: 100, p: 0, ap: 0, hand: [], maxHand: 7,
         cans: 0, trash: 0, stealth: false, rainGear: false, hasID: false,
         bonusAP: 0, penaltyAP: 0, skipTurn: false, cannotMove: false,
-        color: pIdColors[id % 4], charType,
+        deaths: 0, kills: 0,
+        color: pIdColors[id % 8], charType,
         equip: { bicycle: false, shoes: false, cart: false, shield: false, helmet: false, doll: false, backpack: false }
     };
 }
@@ -921,14 +1023,44 @@ function dealDamage(target, dmg, source, attacker = null) {
     // 死亡判定
     if (target.hp <= 0) {
         target.hp = 0;
-        let lostP = Math.floor(target.p / 2);
+        target.deaths = (target.deaths || 0) + 1;
+        if (attacker) attacker.kills = (attacker.kills || 0) + 1;
+
+        // P没収（最大30P）
+        let lostP = Math.min(30, Math.max(0, Math.floor(target.p / 2)));
         target.p -= lostP;
+
+        // 装備をランダムで1つだけ落とす（全剥奪しない）
+        const equippedKeys = Object.keys(target.equip).filter(k => target.equip[k]);
+        let droppedEquip = null;
+        if (equippedKeys.length > 0) {
+            droppedEquip = equippedKeys[Math.floor(Math.random() * equippedKeys.length)];
+            target.equip[droppedEquip] = false;
+        }
+
+        // 缶とゴミをその場のマスにドロップ（フィールドアイテム）
+        const deathTile = mapData.find(t => t.id === target.pos);
+        if (deathTile && (target.cans > 0 || target.trash > 0)) {
+            deathTile.fieldCans  = (deathTile.fieldCans  || 0) + target.cans;
+            deathTile.fieldTrash = (deathTile.fieldTrash || 0) + target.trash;
+        }
+        const droppedCans  = target.cans;
+        const droppedTrash = target.trash;
+        target.cans  = 0;
+        target.trash = 0;
+
         target.pos = 0; // 病院へ
-        target.equip = { bicycle: false, shoes: false, cart: false, shield: false, helmet: false, doll: false, backpack: false };
-        target.ap = 0;
-        
-        log(`<span class="danger">☠️ ${target.name}が死亡！ ${lostP}P没収、装備全喪失、病院に搬送！</span>`);
-        triggerEventPopup(target.id, "☠️", "死亡...", `${lostP}P没収・装備全喪失・病院へ`, "damage");
+        target.ap  = 0;
+
+        const msgs = [
+            lostP > 0        ? `${lostP}P没収`             : '',
+            droppedEquip     ? `装備「${droppedEquip}」喪失` : '',
+            droppedCans  > 0 ? `缶×${droppedCans}ドロップ`  : '',
+            droppedTrash > 0 ? `ゴミ×${droppedTrash}ドロップ` : '',
+        ].filter(Boolean).join(' / ');
+
+        log(`<span class="danger">☠️ ${target.name}が死亡！${msgs}、病院に搬送！</span>`);
+        triggerEventPopup(target.id, "☠️", "死亡...", msgs || '病院へ搬送', "damage");
         playSfx('death');
         target.hp = 100; // 復活
     }
@@ -986,6 +1118,7 @@ function executeReturnToTitleBase() {
     isRainy = false; weatherState = "sunny"; roundCount = 0; constructionPos = -1; constructionTimer = 0; currentDisplayTurn = -1;
     mgActive = false; isBranchPicking = false; currentBranchOptions = [];
     clearInterval(mgTimer); if(slotAnimInterval) clearInterval(slotAnimInterval);
+    if (afkTimer) { clearTimeout(afkTimer); afkTimer = null; }
     
     document.getElementById("log").innerHTML = "";
     
@@ -1018,6 +1151,10 @@ function startOfflineGame() {
         { name: document.getElementById("p2-name").value || "P2", type: document.getElementById("p2-type").value, avatar: document.getElementById("p2-avatar").value },
         { name: document.getElementById("p3-name").value || "P3", type: document.getElementById("p3-type").value, avatar: document.getElementById("p3-avatar").value },
         { name: document.getElementById("p4-name").value || "P4", type: document.getElementById("p4-type").value, avatar: document.getElementById("p4-avatar").value },
+        { name: document.getElementById("p5-name").value || "P5", type: document.getElementById("p5-type").value, avatar: document.getElementById("p5-avatar").value },
+        { name: document.getElementById("p6-name").value || "P6", type: document.getElementById("p6-type").value, avatar: document.getElementById("p6-avatar").value },
+        { name: document.getElementById("p7-name").value || "P7", type: document.getElementById("p7-type").value, avatar: document.getElementById("p7-avatar").value },
+        { name: document.getElementById("p8-name").value || "P8", type: document.getElementById("p8-type").value, avatar: document.getElementById("p8-avatar").value },
     ];
     
     players = [];
@@ -1026,6 +1163,15 @@ function startOfflineGame() {
     });
     
     if (players.length < 2) { showToast("最低2人必要です！"); return; }
+    
+    // クリエイティブモード：全カードを配布
+    const isCreative = document.getElementById("creative-mode")?.checked;
+    if (isCreative) {
+        players.forEach(p => {
+            p.maxHand = 99;
+            deckData.forEach(card => p.hand.push(card.id));
+        });
+    }
     
     maxRounds = parseInt(document.getElementById("max-rounds").value);
     let size = document.getElementById("map-size").value;
@@ -1058,6 +1204,57 @@ function pickDestTile() {
 }
 
 // ========== BOARD RENDER ==========
+const tileTooltipData = {
+    center:    { title:"🏥 病院（スタート地点）", desc:"HPが0になると強制送還。P半減・装備全ロスト。" },
+    normal:    { title:"🛣️ 通常の道", desc:"特別な効果なし。移動の通過点。" },
+    can:       { title:"🥫 空き缶", desc:"1APで缶を拾う（1ターン3回まで）。雨の日は雨具が必要。" },
+    trash:     { title:"🗑️ ゴミ山", desc:"2APでゴミを漁る。失敗すると警察に補導されAP-2ペナルティ。" },
+    exchange:  { title:"💱 買取所", desc:"拾った缶・ゴミを現在相場でP換金（0AP）。" },
+    job:       { title:"💼 バイト", desc:"4APで挑戦。成功率50-70%で10P獲得。" },
+    shop:      { title:"🛒 ショップ", desc:"カードを購入（4-6P）または手持ちカードを2Pで売却できる。" },
+    event:     { title:"🎲 イベント", desc:"ミニゲームまたはストーリーイベントが発生！カード獲得のチャンス。" },
+    shelter:   { title:"🏕️ 避難所", desc:"止まるとステルス状態になり、次の敵を1回やり過ごせる。" },
+    manhole:   { title:"🕳️ マンホール", desc:"1APで別のマンホールへランダムワープ。" },
+    koban:     { title:"🚓 交番", desc:"職務質問でその場に足止め。このターンは移動不可。" },
+    slum:      { title:"🏚️ スラムエリア", desc:"缶・ゴミが多い。相場が低め。" },
+    commercial:{ title:"🏙️ 商業エリア", desc:"バイト・ショップが充実。中程度の相場。" },
+    luxury:    { title:"🏰 高級エリア", desc:"収入が高い。警察が多くパトロールする。" },
+};
+
+// ===== 自動スクロール =====
+function scrollToTile(tileId, smooth = true) {
+    const tileEl = document.getElementById(`tile-${tileId}`);
+    const container = document.getElementById('game-board-container');
+    if (!tileEl || !container) return;
+    const tileRect = tileEl.getBoundingClientRect();
+    const contRect = container.getBoundingClientRect();
+    // コンテナ内での相対位置を中央に合わせる
+    const scrollLeft = container.scrollLeft + (tileRect.left - contRect.left) - contRect.width / 2 + tileRect.width / 2;
+    const scrollTop  = container.scrollTop  + (tileRect.top  - contRect.top)  - contRect.height / 2 + tileRect.height / 2;
+    container.scrollTo({ left: Math.max(0, scrollLeft), top: Math.max(0, scrollTop), behavior: smooth ? 'smooth' : 'instant' });
+}
+
+function scrollToCurrentPlayer() {
+    if (!players || players.length === 0 || turn >= players.length) return;
+    scrollToTile(players[turn].pos);
+}
+
+// ポップアップが全て消えるまで待つ
+function waitForPopupsClear(maxWait = 3000) {
+    return new Promise(resolve => {
+        const start = Date.now();
+        const check = () => {
+            const container = document.getElementById('event-popup-overlay');
+            if (!container || container.children.length === 0 || Date.now() - start > maxWait) {
+                resolve();
+            } else {
+                setTimeout(check, 100);
+            }
+        };
+        check();
+    });
+}
+
 function initBoard() {
     const board = document.getElementById("game-board");
     board.innerHTML = "";
@@ -1079,6 +1276,27 @@ function initBoard() {
         div.id = `tile-${tile.id}`;
         div.style.gridColumn = tile.col;
         div.style.gridRow = tile.row;
+        // ツールチップ
+        const ttKey = tile.type in tileTooltipData ? tile.type : tile.area;
+        const ttData = tileTooltipData[ttKey];
+        if (ttData) {
+            const showTT = (e) => {
+                const tt = document.getElementById('tile-tooltip');
+                document.getElementById('tt-title').textContent = ttData.title;
+                document.getElementById('tt-desc').textContent = ttData.desc;
+                tt.style.display = 'block';
+                const x = (e.clientX || (e.touches && e.touches[0].clientX) || 0) + 14;
+                const y = (e.clientY || (e.touches && e.touches[0].clientY) || 0) - 10;
+                tt.style.left = Math.min(x, window.innerWidth - 220) + 'px';
+                tt.style.top = Math.max(y, 4) + 'px';
+            };
+            const hideTT = () => { document.getElementById('tile-tooltip').style.display = 'none'; };
+            div.addEventListener('mouseenter', showTT);
+            div.addEventListener('mousemove', showTT);
+            div.addEventListener('mouseleave', hideTT);
+            div.addEventListener('touchstart', showTT, { passive: true });
+            div.addEventListener('touchend', () => setTimeout(hideTT, 1800));
+        }
         board.appendChild(div);
     });
     updateTokens();
@@ -1090,9 +1308,20 @@ function updateTokens() {
     players.forEach(player => {
         if (player.hp <= 0) return;
         let token = document.createElement("div");
-        token.className = `player-token pos-${player.id % 4}`;
+        const isActive = (player.id === turn);
+        token.className = `player-token pos-${player.id % 4}${isActive ? ' token-active' : ''}`;
         token.style.borderColor = player.color;
-        token.innerText = charEmoji[player.charType] || '🏃';
+        token.style.setProperty('--token-color', player.color);
+        token.style.boxShadow = isActive
+            ? `0 4px 10px rgba(0,0,0,0.9), 0 0 18px ${player.color}`
+            : `0 4px 8px rgba(0,0,0,0.9), 0 0 12px ${player.color}88`;
+        // 大きな人型アイコン＋名前バッジ
+        token.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;line-height:1;">
+            <span style="font-size:18px;">${charEmoji[player.charType] || '🏃'}</span>
+            <span style="font-size:7px;font-weight:900;color:${player.color};text-shadow:0 0 4px rgba(0,0,0,1);white-space:nowrap;max-width:32px;overflow:hidden;text-overflow:ellipsis;">${player.name}</span>
+        </div>`;
+        token.style.width = '34px';
+        token.style.height = '34px';
         
         let tile = document.getElementById(`tile-${player.pos}`);
         if (tile) tile.appendChild(token);
@@ -1129,9 +1358,11 @@ function updateTokens() {
         let mark = document.getElementById(`owner-${tile.id}`);
         if (mark) {
             if (territories[tile.id] !== undefined) {
+                const owner = players[territories[tile.id]];
                 mark.style.display = "block";
-                mark.style.backgroundColor = players[territories[tile.id]].color;
-                mark.innerText = `P${territories[tile.id] + 1}`;
+                mark.style.backgroundColor = owner ? owner.color : '#888';
+                mark.innerHTML = `🚩`;
+                mark.style.fontSize = '10px';
             } else {
                 mark.style.display = "none";
             }
@@ -1147,10 +1378,10 @@ function updateTokens() {
 }
 
 function applyNightFog() {
-    // 全タイルのfog状態をリセット
+    // 全タイルのfog/visible状態をリセット
     mapData.forEach(tile => {
         const el = document.getElementById(`tile-${tile.id}`);
-        if (el) el.classList.remove('night-fog');
+        if (el) { el.classList.remove('night-fog'); el.classList.remove('night-visible'); }
     });
     if (!isNight || players.length === 0) return;
 
@@ -1201,14 +1432,29 @@ function applyNightFog() {
         }
     });
 
-    // 視界外タイルにfogクラスを付与（ただし分岐選択中は選択肢のマスは常に表示）
+    // 視界外タイルにfogクラス、視界内にvisibleグローを付与（ただし分岐選択中は選択肢のマスは常に表示）
     const branchVisible = new Set(typeof isBranchPicking !== 'undefined' && isBranchPicking ? currentBranchOptions : []);
     mapData.forEach(tile => {
+        const el = document.getElementById(`tile-${tile.id}`);
+        if (!el) return;
         if (!visibleTiles.has(tile.id) && !branchVisible.has(tile.id)) {
-            const el = document.getElementById(`tile-${tile.id}`);
-            if (el) el.classList.add('night-fog');
+            el.classList.add('night-fog');
+        } else {
+            el.classList.add('night-visible');
         }
     });
+
+    // マルチ時：視界外タイルの敵トークンを非表示
+    if (typeof isOnlineMode !== 'undefined' && isOnlineMode) {
+        document.querySelectorAll('.player-token').forEach(token => {
+            const parentTile = token.closest('.tile');
+            if (parentTile && parentTile.classList.contains('night-fog')) {
+                token.style.display = 'none';
+            } else {
+                token.style.display = '';
+            }
+        });
+    }
 }
 
 // ========== UI RENDERING ==========
@@ -1227,19 +1473,25 @@ function toggleHighlight(btnId, isOn) {
 }
 
 function showTurnBanner(player) {
-    const banner = document.getElementById("turn-banner-overlay");
-    const text = document.getElementById("turn-banner-text");
-    text.innerText = `${player.name} のターン`;
-    text.style.borderColor = player.color;
-    text.style.textShadow = `0 0 20px ${player.color}, 2px 2px 4px rgba(0,0,0,0.8)`;
-    
-    banner.style.display = "flex";
-    banner.animate([
-        {opacity: 0, transform: "scale(0.8)"},
-        {opacity: 1, transform: "scale(1)", offset: 0.1},
-        {opacity: 1, transform: "scale(1)", offset: 0.9},
-        {opacity: 0, transform: "scale(1.2)"}
-    ], { duration: 1500, fill: "forwards" });
+    // ポップアップが消えてからバナーを表示
+    waitForPopupsClear(2500).then(() => {
+        const banner = document.getElementById("turn-banner-overlay");
+        const text = document.getElementById("turn-banner-text");
+        text.innerText = `${player.name} のターン`;
+        text.style.borderColor = player.color;
+        text.style.textShadow = `0 0 20px ${player.color}, 2px 2px 4px rgba(0,0,0,0.8)`;
+        
+        banner.style.display = "flex";
+        banner.animate([
+            {opacity: 0, transform: "scale(0.8)"},
+            {opacity: 1, transform: "scale(1)", offset: 0.1},
+            {opacity: 1, transform: "scale(1)", offset: 0.9},
+            {opacity: 0, transform: "scale(1.2)"}
+        ], { duration: 1500, fill: "forwards" });
+        
+        // ターン開始時に自動スクロール
+        setTimeout(() => scrollToCurrentPlayer(), 300);
+    });
 }
 
 function triggerAPPopup(playerId, amount, reason = "", isRemote = false) {
@@ -1382,11 +1634,18 @@ async function showCardAcquisition(cardId) {
 }
 
 async function displayRoundSummary(digestList) {
+    // ポップアップが消えてからサマリー表示
+    await waitForPopupsClear(3000);
     setAnimating(true);
     const overlay = document.getElementById("round-summary-overlay");
     const listEl = document.getElementById("round-summary-list");
     listEl.innerHTML = "";
     overlay.style.display = "flex";
+    
+    // オンライン全員に配信
+    if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
+        broadcastNetworkData({ type: 'round_summary', items: digestList });
+    }
     
     for (let i = 0; i < digestList.length; i++) {
         let div = document.createElement("div");
@@ -1479,6 +1738,7 @@ function updateUI() {
     if (currentDisplayTurn !== turn) {
         currentDisplayTurn = turn;
         showTurnBanner(currentPlayer);
+        resetAfkTimer(); // 新しいターン開始時にAFKタイマーリセット
     }
 
     // 環境パネル更新
@@ -1528,6 +1788,15 @@ function updateUI() {
     else pDisplay.classList.remove("bankrupt");
     
     document.getElementById("ap-display").innerText = currentPlayer.ap;
+    const mapApEl = document.getElementById("map-ap-display");
+    if (mapApEl) {
+        mapApEl.innerText = currentPlayer.ap;
+        const hudEl = document.getElementById("map-ap-hud");
+        if (hudEl) {
+            hudEl.style.borderColor = currentPlayer.ap > 0 ? 'rgba(255,220,50,0.7)' : 'rgba(200,80,80,0.5)';
+            hudEl.style.color = currentPlayer.ap > 0 ? '#f1c40f' : '#e74c3c';
+        }
+    }
     document.getElementById("hp-display").innerText = currentPlayer.hp;
     
     const hpBar = document.getElementById("hp-bar");
@@ -1538,6 +1807,10 @@ function updateUI() {
                            
     let ownedCount = Object.values(territories).filter(ownerId => ownerId === currentPlayer.id).length;
     document.getElementById("territory-display").innerText = ownedCount;
+    const killsEl = document.getElementById("kills-display");
+    const deathsEl = document.getElementById("deaths-display");
+    if (killsEl) killsEl.innerText = currentPlayer.kills || 0;
+    if (deathsEl) deathsEl.innerText = currentPlayer.deaths || 0;
     document.getElementById("can-display").innerText = currentPlayer.cans;
     document.getElementById("trash-display").innerText = currentPlayer.trash;
     document.getElementById("hand-count-display").innerText = currentPlayer.hand.length;
@@ -1592,12 +1865,14 @@ function updateUI() {
     let tileType = currentTile.type;
     let isBlockedByAnimal = (currentPlayer.pos === animalPos);
     
+    // 占領AP計算: 自分の陣地でないマス=3AP、他人の陣地の上書き=6AP
+    const isEnemyTerritory = territories[currentPlayer.pos] !== undefined && territories[currentPlayer.pos] !== currentPlayer.id;
     let canOccupyLogic = ["normal","can","trash","job","exchange","shelter"].includes(tileType) && territories[currentPlayer.pos] !== currentPlayer.id && currentPlayer.pos !== unclePos;
+    const occupyCost = isEnemyTerritory ? 6 : 3;
+    let canOccupy = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= occupyCost && canOccupyLogic && !mgActive && !isBranchPicking;
     let trashCost = currentPlayer.equip.shoes ? 1 : 2;
-    
     let canCan = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= 1 && tileType === "can" && canPickedThisTurn < 3 && (!isRainy || currentPlayer.rainGear) && !isBlockedByAnimal && !mgActive && !isBranchPicking;
     let canTrash = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= trashCost && tileType === "trash" && (!isRainy || currentPlayer.rainGear) && !isBlockedByAnimal && !mgActive && !isBranchPicking;
-    let canOccupy = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= 3 && canOccupyLogic && !mgActive && !isBranchPicking;
     let canJob = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= 4 && tileType === "job" && !mgActive && !isBranchPicking;
     let canExchange = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && tileType === "exchange" && (currentPlayer.cans > 0 || currentPlayer.trash > 0) && !mgActive && !isBranchPicking;
     let canShopBtn = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && tileType === "shop" && !mgActive && !isBranchPicking;
@@ -1606,7 +1881,9 @@ function updateUI() {
     document.getElementById("btn-can").disabled = !canCan;
     document.getElementById("btn-trash").innerText = `🗑️ ゴミ漁り (${trashCost}AP)`;
     document.getElementById("btn-trash").disabled = !canTrash;
-    document.getElementById("btn-occupy").disabled = !canOccupy;
+    const occupyBtn = document.getElementById("btn-occupy");
+    occupyBtn.innerText = isEnemyTerritory ? `🚩 敵陣地奪取 (6AP)` : `🚩 陣地占領 (3AP)`;
+    occupyBtn.disabled = !canOccupy;
     document.getElementById("btn-job").disabled = !canJob;
     
     document.getElementById("btn-exchange").style.display = (tileType === "exchange") ? "block" : "none";
@@ -1623,10 +1900,19 @@ function updateUI() {
     let pvpDisplay = playersOnSameTile.length > 0 ? "block" : "none";
     let canPvP = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && playersOnSameTile.length > 0 && !mgActive && !isBranchPicking;
     
-    document.getElementById("btn-pickpocket").style.display = pvpDisplay;
-    document.getElementById("btn-pickpocket").disabled = !(canPvP && currentPlayer.ap >= 3);
-    document.getElementById("btn-steal-card").style.display = pvpDisplay;
-    document.getElementById("btn-steal-card").disabled = !(canPvP && currentPlayer.ap >= 2);
+    const punchBtn = document.getElementById("btn-punch");
+    if (punchBtn) {
+        punchBtn.style.display = pvpDisplay;
+        punchBtn.disabled = !(canPvP && currentPlayer.ap >= 2);
+        // 元ヤンは強調表示
+        if (currentPlayer.charType === "yankee") {
+            punchBtn.style.borderColor = '#e74c3c';
+            punchBtn.textContent = '👊 殴る [元ヤン] (2AP)';
+        } else {
+            punchBtn.style.borderColor = '#e74c3c';
+            punchBtn.textContent = '👊 殴る (2AP)';
+        }
+    }
 
     // ターン終了プロンプト
     const promptEl = document.getElementById("end-turn-prompt");
@@ -1691,7 +1977,7 @@ function updateUI() {
 // ========== ACTIONS ==========
 async function rollDice() {
     if (players.length === 0 || !players[turn]) return;
-    
+    resetAfkTimer(); // 操作があったのでAFKタイマーリセット
     let currentPlayer = players[turn];
     document.getElementById("btn-roll").disabled = true;
     toggleHighlight("btn-roll", false);
@@ -1832,8 +2118,15 @@ function actionMove() {
     }
 }
 
-function checkYankee(movedPlayer) {
-    let targets = players.filter(op => op.id !== movedPlayer.id && op.pos === movedPlayer.pos && op.p > 0 && op.hp > 0);
+// 元ヤン: 同マスでも隣接マスでもカツアゲ発動（すれ違い対応）
+function checkYankee(movedPlayer, prevPos) {
+    // 同じマス にいる相手 + 移動前マス にいた相手（すれ違い）
+    const sameTile = players.filter(op => op.id !== movedPlayer.id && op.pos === movedPlayer.pos && op.p > 0 && op.hp > 0);
+    const passingTile = prevPos !== undefined
+        ? players.filter(op => op.id !== movedPlayer.id && op.pos === prevPos && op.p > 0 && op.hp > 0)
+        : [];
+    const targets = [...new Set([...sameTile, ...passingTile])];
+
     targets.forEach(target => {
         if (movedPlayer.charType === "yankee" && target.p > 0) {
             target.p -= 1;
@@ -1852,16 +2145,50 @@ function checkYankee(movedPlayer) {
     });
 }
 
+// 元ヤン専用：殴るアクション（AP2で10ダメージ）
+function actionPunch() {
+    let currentPlayer = players[turn];
+    if (currentPlayer.ap < 2) { showToast("AP不足！"); return; }
+    let targets = players.filter(op => op.id !== currentPlayer.id && op.pos === currentPlayer.pos && op.hp > 0);
+    if (targets.length === 0) { showToast("同じマスに相手がいない！"); return; }
+    currentPlayer.ap -= 2;
+    // 複数いるならランダムで1人
+    let target = targets[Math.floor(Math.random() * targets.length)];
+    dealDamage(target, 10, "殴る", currentPlayer);
+    log(`👊 ${currentPlayer.name}が${target.name}を殴った！10ダメージ！`);
+    triggerEventPopup(currentPlayer.id, "👊", "殴る！", `${target.name}に10ダメージ`, "damage");
+    syncOnline();
+    updateUI();
+}
+
 function executeMove(targetTileId) {
     let currentPlayer = players[turn];
     let moveCost = (isRainy && !currentPlayer.rainGear && currentPlayer.charType !== "athlete") ? 2 : 1;
     
+    const prevPos = currentPlayer.pos;
     currentPlayer.ap -= moveCost;
     currentPlayer.pos = targetTileId;
     playSfx('move');
-    checkYankee(currentPlayer);
-    
-    let tileType = mapData.find(t => t.id === currentPlayer.pos).type;
+    checkYankee(currentPlayer, prevPos);
+
+    // フィールドドロップアイテム自動回収
+    const movedTile = mapData.find(t => t.id === targetTileId);
+    if (movedTile && (movedTile.fieldCans > 0 || movedTile.fieldTrash > 0)) {
+        if (movedTile.fieldCans > 0) {
+            currentPlayer.cans += movedTile.fieldCans;
+            log(`🥫 ${currentPlayer.name}がドロップアイテムを回収！缶×${movedTile.fieldCans}`);
+            triggerEventPopup(currentPlayer.id, "🥫", "ドロップ回収！", `缶×${movedTile.fieldCans}を拾った`, "good");
+            movedTile.fieldCans = 0;
+        }
+        if (movedTile.fieldTrash > 0) {
+            currentPlayer.trash += movedTile.fieldTrash;
+            log(`🗑️ ${currentPlayer.name}がドロップアイテムを回収！ゴミ×${movedTile.fieldTrash}`);
+            triggerEventPopup(currentPlayer.id, "🗑️", "ドロップ回収！", `ゴミ×${movedTile.fieldTrash}を拾った`, "good");
+            movedTile.fieldTrash = 0;
+        }
+    }
+
+    let tileType = movedTile ? movedTile.type : mapData.find(t => t.id === currentPlayer.pos).type;
     
     if (tileType === "koban") {
         log("🚓 交番！職務質問で足止め！");
@@ -2207,12 +2534,15 @@ function actionTrash() {
 
 function actionOccupy() {
     let currentPlayer = players[turn];
-    currentPlayer.ap -= 3;
+    const isEnemy = territories[currentPlayer.pos] !== undefined && territories[currentPlayer.pos] !== currentPlayer.id;
+    const cost = isEnemy ? 6 : 3;
+    currentPlayer.ap -= cost;
     territories[currentPlayer.pos] = currentPlayer.id;
     playSfx('success');
     const tileName = mapData.find(t => t.id === currentPlayer.pos).name;
-    log(`🚩 「${tileName}」を陣地化！`);
-    triggerEventPopup(currentPlayer.id, "🚩", "陣地占領！", `「${tileName}」を自分の陣地にした`, "good");
+    const msg = isEnemy ? `敵陣地「${tileName}」を奪取！` : `「${tileName}」を陣地化！`;
+    log(`🚩 ${msg}`);
+    triggerEventPopup(currentPlayer.id, "🚩", isEnemy ? "敵陣地奪取！" : "陣地占領！", msg, "good");
     syncOnline();
     updateUI();
 }
@@ -2322,8 +2652,8 @@ function openShop() {
     // ターンが変わったときだけ在庫を再生成
     if (shopStockTurn !== turn) {
         shopStock = [];
-        const pool = [0,1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,24,25,26,27,28,29];
-        for (let i = 0; i < 3; i++) {
+        const pool = [0,1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,24,25,26,27,28,29,30,31,32,33,34];
+        for (let i = 0; i < 6; i++) {
             shopStock.push(pool[Math.floor(Math.random() * pool.length)]);
         }
         shopStockTurn = turn;
@@ -2397,7 +2727,7 @@ function useCard(index, cardId) {
     log(`🎴 「${cardData.name}」を使用！`);
     playSfx('card');
     
-    // 武器カードの処理
+    // 武器カードの処理 → 弧型UIを使用
     if (cardData.type === 'weapon') {
         let targetsInRange = players.filter(op => op.id !== currentPlayer.id && op.hp > 0 && getDistance(currentPlayer.pos, op.pos) <= cardData.range);
         
@@ -2406,38 +2736,8 @@ function useCard(index, cardId) {
             syncOnline(); updateUI(); return;
         }
         
-        if (cardData.aoe) {
-            targetsInRange.forEach(target => { dealDamage(target, cardData.dmg, cardData.name, currentPlayer); });
-            log(`💥 ${cardData.name}で範囲攻撃！`);
-            triggerEventPopup(currentPlayer.id, cardData.icon, `${cardData.name}発動！`, `射程内全員に${cardData.dmg}ダメージ`, "damage");
-            syncOnline(); updateUI(); return;
-        }
-        
-        if (targetsInRange.length === 1) {
-            dealDamage(targetsInRange[0], cardData.dmg, cardData.name, currentPlayer);
-            triggerEventPopup(currentPlayer.id, cardData.icon, `${cardData.name}発動！`, `${targetsInRange[0].name}に${cardData.dmg}ダメージ`, "damage");
-            syncOnline(); updateUI(); return;
-        }
-        
-        pendingWeaponCard = cardData;
-        let targetListDiv = document.getElementById("attack-targets");
-        targetListDiv.innerHTML = "";
-        targetsInRange.forEach(target => {
-            let btn = document.createElement("button");
-            btn.className = "btn-large";
-            btn.style.width = "100%";
-            btn.style.background = target.color;
-            btn.innerText = `${target.name} (HP:${target.hp})`;
-            btn.onclick = () => {
-                document.getElementById("attack-overlay").style.display = "none";
-                dealDamage(target, cardData.dmg, cardData.name, currentPlayer);
-                triggerEventPopup(currentPlayer.id, cardData.icon, `${cardData.name}発動！`, `${target.name}に${cardData.dmg}ダメージ`, "damage");
-                syncOnline();
-                updateUI();
-            };
-            targetListDiv.appendChild(btn);
-        });
-        document.getElementById("attack-overlay").style.display = "flex";
+        // 弧型UIを表示して照準を決めてもらう
+        showWeaponArcUI(cardData, targetsInRange, currentPlayer);
         return;
     }
     
@@ -2528,7 +2828,28 @@ function useCard(index, cardId) {
         case 27: currentPlayer.equip.shield = true; log(`🛡️ 段ボールの盾装備！ダメージ半減！`); triggerEventPopup(currentPlayer.id, "🛡️", "段ボールの盾装備！", "次のダメージを半減", "card"); break;
         case 28: currentPlayer.equip.helmet = true; log(`🪖 ヘルメット装備！ダメージ1回無効！`); triggerEventPopup(currentPlayer.id, "🪖", "ヘルメット装備！", "次のダメージを完全無効", "card"); break;
         case 29: currentPlayer.equip.doll = true; log(`🎎 身代わり人形装備！NPC妨害1回無効！`); triggerEventPopup(currentPlayer.id, "🎎", "身代わり人形装備！", "NPC妨害を1回無効化", "card"); break;
-    }
+        // 回復カード
+        default:
+            if (cardData && cardData.type === 'heal') {
+                if (cardData.risk > 0 && Math.random() < 0.5) {
+                    // 食中毒リスク
+                    const dmg = cardData.risk;
+                    currentPlayer.hp = Math.max(1, currentPlayer.hp - dmg);
+                    log(`🤢 ${cardData.name}...食中毒！${dmg}ダメージ！`);
+                    triggerEventPopup(currentPlayer.id, "🤢", `${cardData.name}`, `食中毒！-${dmg}HP`, "bad");
+                } else {
+                    const healed = Math.min(cardData.heal, 100 - currentPlayer.hp);
+                    currentPlayer.hp = Math.min(100, currentPlayer.hp + cardData.heal);
+                    log(`💊 ${cardData.name}でHP+${healed}回復！`);
+                    triggerEventPopup(currentPlayer.id, cardData.icon, `${cardData.name}`, `HP+${healed}回復！`, "good");
+                }
+                if (cardData.apBonus) {
+                    currentPlayer.ap += cardData.apBonus;
+                    log(`⚡ さらにAP+${cardData.apBonus}！`);
+                }
+            }
+            break;
+    } // switch(cardId) ここまで
     
     syncOnline();
     updateUI();
@@ -2538,8 +2859,304 @@ function closeAttackOverlay() {
     document.getElementById("attack-overlay").style.display = "none";
 }
 
+// ===== 武器弧型UIシステム（ボード内canvas・スクロール追従）=====
+let weaponArcData = null;
+let weaponArcCanvas = null;
+let weaponArcAnimId = null;
+
+function getArcCoords(tileEl) {
+    // ボードコンテナ内の座標を返す（スクロール込み）
+    const container = document.getElementById('game-board-container');
+    const board = document.getElementById('game-board');
+    if (!container || !board || !tileEl) return null;
+    const contRect = container.getBoundingClientRect();
+    const tileRect = tileEl.getBoundingClientRect();
+    return {
+        x: tileRect.left - contRect.left + container.scrollLeft + tileRect.width / 2,
+        y: tileRect.top  - contRect.top  + container.scrollTop  + tileRect.height / 2,
+    };
+}
+
+function showWeaponArcUI(cardData, targetsInRange, attacker) {
+    weaponArcData = { cardData, targets: targetsInRange, attacker };
+
+    // canvas をボードコンテナに挿入（サイズはスクロール領域全体）
+    const container = document.getElementById('game-board-container');
+    const board = document.getElementById('game-board');
+    if (weaponArcCanvas) weaponArcCanvas.remove();
+    weaponArcCanvas = document.createElement('canvas');
+    weaponArcCanvas.id = 'weapon-arc-canvas';
+    weaponArcCanvas.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:500;';
+    weaponArcCanvas.width  = board.scrollWidth;
+    weaponArcCanvas.height = board.scrollHeight;
+    container.style.position = 'relative';
+    container.appendChild(weaponArcCanvas);
+
+    const overlay = document.getElementById('weapon-arc-overlay');
+    overlay.style.display = 'block';
+    document.getElementById('weapon-arc-title').textContent = `⚔️ ${cardData.name}（射程${cardData.range}マス）`;
+
+    const slider = document.getElementById('weapon-arc-angle');
+    slider.value = 90;
+
+    const drawAndUpdate = () => {
+        drawWeaponArc(cardData, parseInt(slider.value));
+        updateArcTargets(parseInt(slider.value), cardData, targetsInRange);
+    };
+    slider.oninput = drawAndUpdate;
+
+    // スクロール時も再描画
+    container.addEventListener('scroll', drawAndUpdate);
+    weaponArcData._scrollHandler = drawAndUpdate;
+    weaponArcData._container = container;
+
+    drawAndUpdate();
+
+    document.getElementById('weapon-arc-fire').onclick = () => fireWeaponArc(parseInt(slider.value));
+
+    document.onkeydown = (e) => {
+        if (!weaponArcData) return;
+        if (e.key === 'ArrowLeft')  { slider.value = (parseInt(slider.value) - 5 + 360) % 360; drawAndUpdate(); }
+        if (e.key === 'ArrowRight') { slider.value = (parseInt(slider.value) + 5) % 360; drawAndUpdate(); }
+        if (e.key === 'Enter')  fireWeaponArc(parseInt(slider.value));
+        if (e.key === 'Escape') cancelWeaponArc();
+    };
+
+    // UIパネルをドラッグ可能に
+    makeDraggable(document.getElementById('weapon-arc-ui'));
+}
+
+function makeDraggable(el) {
+    let ox = 0, oy = 0, startX = 0, startY = 0;
+    el.style.cursor = 'move';
+    const onDown = (e) => {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+        startX = (e.touches ? e.touches[0].clientX : e.clientX);
+        startY = (e.touches ? e.touches[0].clientY : e.clientY);
+        ox = el.offsetLeft; oy = el.offsetTop;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onUp);
+    };
+    const onMove = (e) => {
+        const cx = (e.touches ? e.touches[0].clientX : e.clientX);
+        const cy = (e.touches ? e.touches[0].clientY : e.clientY);
+        const nx = Math.max(0, Math.min(window.innerWidth  - el.offsetWidth,  ox + cx - startX));
+        const ny = Math.max(0, Math.min(window.innerHeight - el.offsetHeight, oy + cy - startY));
+        el.style.left = nx + 'px'; el.style.top = ny + 'px';
+        el.style.bottom = 'auto'; el.style.transform = 'none';
+        if (e.preventDefault) e.preventDefault();
+    };
+    const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onUp);
+    };
+    el.addEventListener('mousedown', onDown);
+    el.addEventListener('touchstart', onDown, { passive: false });
+}
+
+function drawWeaponArc(cardData, angleDeg) {
+    const canvas = weaponArcCanvas;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const cp = players[turn];
+    const tileEl = document.getElementById(`tile-${cp.pos}`);
+    const pos = getArcCoords(tileEl);
+    if (!pos) return;
+    const { x: cx, y: cy } = pos;
+
+    const tileSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tile-size')) || 50;
+    const arcRadius = tileSize * (cardData.range + 0.8);
+    const angleRad = (angleDeg - 90) * Math.PI / 180;
+    const spreadRad = 75 * Math.PI / 180;
+
+    // 弧グラデーション
+    const grad = ctx.createRadialGradient(cx, cy, tileSize * 0.25, cx, cy, arcRadius);
+    grad.addColorStop(0,   'rgba(231,76,60,0.7)');
+    grad.addColorStop(0.65,'rgba(231,76,60,0.38)');
+    grad.addColorStop(1,   'rgba(231,76,60,0.04)');
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, arcRadius, angleRad - spreadRad, angleRad + spreadRad);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // 弧の縁線
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, arcRadius, angleRad - spreadRad, angleRad + spreadRad);
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,80,50,0.95)';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // 照準線
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(angleRad) * arcRadius, cy + Math.sin(angleRad) * arcRadius);
+    ctx.strokeStyle = 'rgba(255,255,80,0.85)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 中心点
+    ctx.beginPath();
+    ctx.arc(cx, cy, 9, 0, Math.PI * 2);
+    ctx.fillStyle = '#e74c3c';
+    ctx.fill();
+
+    // ターゲットハイライト
+    weaponArcData.targets.forEach(target => {
+        const tEl = document.getElementById(`tile-${target.pos}`);
+        const tPos = getArcCoords(tEl);
+        if (!tPos) return;
+        const { x: tx, y: ty } = tPos;
+        const dx = tx - cx, dy = ty - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const tAngle = Math.atan2(dy, dx);
+        let diff = tAngle - angleRad;
+        while (diff > Math.PI) diff -= 2*Math.PI;
+        while (diff < -Math.PI) diff += 2*Math.PI;
+        const inArc = Math.abs(diff) <= spreadRad && dist <= arcRadius + tileSize;
+
+        ctx.beginPath();
+        ctx.arc(tx, ty, 22, 0, Math.PI * 2);
+        ctx.fillStyle = inArc ? 'rgba(231,76,60,0.55)' : 'rgba(52,152,219,0.2)';
+        ctx.fill();
+        ctx.strokeStyle = inArc ? '#ff3300' : '#3498db';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.fillStyle = inArc ? '#ff3300' : '#3498db';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(target.name, tx, ty - 28);
+    });
+}
+
+function updateArcTargets(angleDeg, cardData, targetsInRange) {
+    const cp = players[turn];
+    const tileEl = document.getElementById(`tile-${cp.pos}`);
+    const pos = getArcCoords(tileEl);
+    if (!pos) return;
+    const { x: cx, y: cy } = pos;
+    const tileSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tile-size')) || 50;
+    const arcRadius = tileSize * (cardData.range + 0.8);
+    const angleRad = (angleDeg - 90) * Math.PI / 180;
+    const spreadRad = 75 * Math.PI / 180;
+
+    const inRange = targetsInRange.filter(target => {
+        const tEl = document.getElementById(`tile-${target.pos}`);
+        const tPos = getArcCoords(tEl);
+        if (!tPos) return false;
+        const dx = tPos.x - cx, dy = tPos.y - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const tAngle = Math.atan2(dy, dx);
+        let diff = tAngle - angleRad;
+        while (diff > Math.PI) diff -= 2*Math.PI;
+        while (diff < -Math.PI) diff += 2*Math.PI;
+        return Math.abs(diff) <= spreadRad && dist <= arcRadius + tileSize;
+    });
+
+    document.getElementById('weapon-arc-targets').textContent = inRange.length > 0
+        ? `🎯 射程内: ${inRange.map(t => t.name).join(', ')}`
+        : '射程内に対象なし';
+}
+
+function fireWeaponArc(angleDeg) {
+    if (!weaponArcData) return;
+    const { cardData, targets, attacker } = weaponArcData;
+    const tileEl = document.getElementById(`tile-${attacker.pos}`);
+    const pos = getArcCoords(tileEl);
+    if (!pos) { cancelWeaponArc(); return; }
+    const { x: cx, y: cy } = pos;
+    const tileSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tile-size')) || 50;
+    const arcRadius = tileSize * (cardData.range + 0.8);
+    const angleRad = (angleDeg - 90) * Math.PI / 180;
+    const spreadRad = 75 * Math.PI / 180;
+
+    const hit = targets.filter(target => {
+        const tEl = document.getElementById(`tile-${target.pos}`);
+        const tPos = getArcCoords(tEl);
+        if (!tPos) return false;
+        const dx = tPos.x - cx, dy = tPos.y - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const tAngle = Math.atan2(dy, dx);
+        let diff = tAngle - angleRad;
+        while (diff > Math.PI) diff -= 2*Math.PI;
+        while (diff < -Math.PI) diff += 2*Math.PI;
+        return Math.abs(diff) <= spreadRad && dist <= arcRadius + tileSize;
+    });
+
+    cancelWeaponArc();
+
+    if (hit.length === 0) {
+        log(`⚔️ ${cardData.name}発射！外れ...射程内に敵なし。`);
+    } else if (cardData.aoe) {
+        hit.forEach(t => dealDamage(t, cardData.dmg, cardData.name, attacker));
+        log(`💥 ${cardData.name}！${hit.map(t=>t.name).join('と')}に命中！`);
+        triggerEventPopup(attacker.id, cardData.icon, `${cardData.name}発動！`, `${hit.length}人に${cardData.dmg}ダメージ`, "damage");
+    } else {
+        dealDamage(hit[0], cardData.dmg, cardData.name, attacker);
+        log(`💥 ${cardData.name}！${hit[0].name}に命中！`);
+        triggerEventPopup(attacker.id, cardData.icon, `${cardData.name}発動！`, `${hit[0].name}に${cardData.dmg}ダメージ`, "damage");
+    }
+    syncOnline(); updateUI();
+}
+
+function cancelWeaponArc() {
+    if (weaponArcData && weaponArcData._container && weaponArcData._scrollHandler) {
+        weaponArcData._container.removeEventListener('scroll', weaponArcData._scrollHandler);
+    }
+    weaponArcData = null;
+    document.getElementById('weapon-arc-overlay').style.display = 'none';
+    document.onkeydown = null;
+    if (weaponArcCanvas) { weaponArcCanvas.remove(); weaponArcCanvas = null; }
+    // UIパネルを初期位置に戻す
+    const ui = document.getElementById('weapon-arc-ui');
+    if (ui) { ui.style.left = ''; ui.style.top = ''; ui.style.bottom = '20px'; ui.style.transform = 'translateX(-50%)'; }
+}
+
 // ========== TURN END & ROUND ==========
+function resetAfkTimer() {
+    if (afkTimer) clearTimeout(afkTimer);
+    if (gameOver || players.length === 0) return;
+    const cp = players[turn];
+    if (!cp || cp.isCPU) return; // CPUターンはAFK不要
+    afkTimer = setTimeout(() => {
+        if (gameOver || players.length === 0) return;
+        const p = players[turn];
+        if (!p || p.isCPU) return;
+        log(`<span class="system">⏰ ${p.name}が5分間操作なし → ターンを強制スキップします</span>`);
+        triggerEventPopup(p.id, "⏰", "操作タイムアウト", "ターンを強制スキップ", "bad");
+        endTurnLogic();
+    }, AFK_TIMEOUT);
+}
+
 function endTurnClicked() {
+    const currentPlayer = players[turn];
+    // 手札あふれ確認ダイアログ
+    if (currentPlayer && currentPlayer.hand.length > currentPlayer.maxHand) {
+        const over = currentPlayer.hand.length - currentPlayer.maxHand;
+        if (confirm(`手札が上限を${over}枚超えています。\nランダムに${over}枚捨てますか？`)) {
+            // ランダムに超過分を捨てる
+            for (let i = 0; i < over; i++) {
+                const idx = Math.floor(Math.random() * currentPlayer.hand.length);
+                currentPlayer.hand.splice(idx, 1);
+            }
+            log(`🗑️ 手札超過のため${over}枚ランダムに捨てました`);
+        } else {
+            return; // キャンセル時は何もしない
+        }
+    }
+    if (afkTimer) clearTimeout(afkTimer);
     document.getElementById("btn-end").disabled = true;
     endTurnLogic();
 }
@@ -2648,12 +3265,22 @@ async function processRoundEvents() {
 
     let truckRoll = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
     let truckMoveData = getDestRandom(truckPos, truckRoll);
+    const truckPathTiles = [];
     
     for (let stepId of truckMoveData.hitList) {
         truckPos = stepId;
         updateTokens();
+        scrollToTile(stepId); // 収集車に自動スクロール
         let targetElement = document.getElementById(`tile-${stepId}`);
-        if (targetElement) targetElement.classList.add('truck-highlight');
+        if (targetElement) {
+            targetElement.classList.add('truck-highlight');
+            truckPathTiles.push(stepId);
+            // 残光（少し遅れて薄く光る）
+            truckPathTiles.slice(0, -1).forEach(pid => {
+                const pe = document.getElementById(`tile-${pid}`);
+                if (pe) { pe.classList.remove('truck-highlight'); pe.classList.add('truck-path-glow'); }
+            });
+        }
         if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
             broadcastNetworkData({ type: 'truck_step', tileId: stepId });
         }
@@ -2668,6 +3295,12 @@ async function processRoundEvents() {
         }
         if (targetElement) targetElement.classList.remove('truck-highlight');
     }
+    // 残光をフェードアウト
+    await sleep(400);
+    truckPathTiles.forEach(pid => {
+        const pe = document.getElementById(`tile-${pid}`);
+        if (pe) pe.classList.remove('truck-path-glow');
+    });
     
     // 収集車によるダメージ判定
     players.forEach(p => {
@@ -2693,14 +3326,21 @@ async function processRoundEvents() {
     // 警察パトロール（偶数ラウンドのみ）
     if (roundCount % 2 === 0) {
         log(`<span class="system" style="color:#2980b9;">🚓 警察パトロール！</span>`);
+        if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
+            broadcastNetworkData({ type: 'police_patrol_start' });
+        }
         let policeRoll = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
         let policeMoveData = getDestRandom(policePos, policeRoll);
         
         for (let stepId of policeMoveData.hitList) {
             policePos = stepId;
             updateTokens();
+            scrollToTile(stepId); // 警察に自動スクロール
             let targetElement = document.getElementById(`tile-${stepId}`);
             if (targetElement) targetElement.classList.add('police-highlight');
+            if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
+                broadcastNetworkData({ type: 'police_step', tileId: stepId });
+            }
             await sleep(200);
             if (players.length === 0) return;
             if (targetElement) targetElement.classList.remove('police-highlight');
@@ -2725,6 +3365,9 @@ async function processRoundEvents() {
                 }
             }
         });
+        if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
+            broadcastNetworkData({ type: 'police_patrol_end' });
+        }
     }
     
     if (destTile < 0) destTile = pickDestTile();
@@ -2742,15 +3385,19 @@ function endGame() {
             terrValue += (area === "slum" ? 3 : area === "commercial" ? 6 : 10);
         });
         let resourceValue = p.cans * canPrice + p.trash * trashPrice;
-        let totalScore = p.p + terrValue + resourceValue;
+        // スコア計算：P×2.0（最大比重）+ 領土 + 資源 + キル×3 - デス×8
+        const scaledP     = Math.round(p.p * 2.0);       // Pは2倍換算で最大比重
+        const killBonus   = (p.kills  || 0) * 3;         // キル1回 +3
+        const deathPenalty= (p.deaths || 0) * 8;         // デス1回 -8（大きめペナルティ）
+        const totalScore  = scaledP + terrValue + resourceValue + killBonus - deathPenalty;
         
-        return { name: p.name, color: p.color, p: p.p, terrValue, resourceValue, totalScore, emoji: charEmoji[p.charType] };
+        return { name: p.name, color: p.color, p: p.p, scaledP, terrValue, resourceValue, killBonus, deathPenalty, totalScore, emoji: charEmoji[p.charType], deaths: p.deaths||0, kills: p.kills||0 };
     }).sort((a, b) => b.totalScore - a.totalScore);
     
     let rankHTML = results.map((r, i) => {
         let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '4️⃣';
         let fontSize = i === 0 ? 22 : 16;
-        return `<div style="margin:8px 0;font-size:${fontSize}px;">${rankIcon} <span style="color:${r.color};">${r.emoji}${r.name}</span>: <b>${r.totalScore}P</b> (💰${r.p} 🚩${r.terrValue} 📦${r.resourceValue})</div>`;
+        return `<div style="margin:8px 0;font-size:${fontSize}px;">${rankIcon} <span style="color:${r.color};">${r.emoji}${r.name}</span>: <b>${r.totalScore}pt</b> <span style="font-size:11px;color:#bdc3c7;">(💰${r.p}P×2=<b style="color:#f1c40f;">${r.scaledP}</b> 🚩${r.terrValue} ⚔️${r.kills}K<span style="color:#2ecc71;">+${r.killBonus}</span> 💀${r.deaths}D<span style="color:#e74c3c;">-${r.deathPenalty}</span>)</span></div>`;
     }).join('');
     
     document.getElementById("win-title").innerText = `${results[0].emoji} ${results[0].name} 優勝！`;
@@ -2835,9 +3482,11 @@ async function processCPUTurn() {
             actionExchange();
             acted = true;
         }
-        // バフ・アイテムカード使用
-        else if (!acted && cpuPlayer.hand.length > 0 && cpuPlayer.ap >= 2 && Math.random() > 0.7) {
-            let nonWeaponIndex = cpuPlayer.hand.findIndex(cardId => deckData[cardId].type !== 'weapon');
+        // バフ・アイテム・回復カード使用（積極的に）
+        else if (!acted && cpuPlayer.hand.length > 0 && cpuPlayer.ap >= 2 && Math.random() > 0.4) {
+            // HPが低いときは回復カード優先
+            const healIdx = cpuPlayer.hp < 60 ? cpuPlayer.hand.findIndex(cid => deckData[cid] && deckData[cid].type === 'heal') : -1;
+            const nonWeaponIndex = healIdx >= 0 ? healIdx : cpuPlayer.hand.findIndex(cardId => deckData[cardId] && deckData[cardId].type !== 'weapon');
             if (nonWeaponIndex >= 0) {
                 useCard(nonWeaponIndex, cpuPlayer.hand[nonWeaponIndex]);
                 acted = true;
@@ -2863,9 +3512,41 @@ async function processCPUTurn() {
             actionTrash();
             acted = true;
         }
-        // ショップ (CPUはスキップ)
-        else if (!acted && currentTile.type === "shop" && cpuPlayer.p >= 5 && Math.random() > 0.5) {
-            // Do nothing
+        // ショップでCPUが買い物
+        else if (!acted && currentTile.type === "shop" && cpuPlayer.p >= 4 && cpuPlayer.hand.length < cpuPlayer.maxHand && Math.random() > 0.3) {
+            // ショップ在庫を生成（CPUターン用）
+            if (shopStockTurn !== turn) {
+                shopStock = [];
+                const pool = [0,1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,24,25,26,27,28,29,30,31,32,33,34];
+                for (let i = 0; i < 6; i++) shopStock.push(pool[Math.floor(Math.random() * pool.length)]);
+                shopStockTurn = turn;
+            }
+            const wantHeal = cpuPlayer.hp < 60;
+            // HP低い時は回復カード優先、それ以外はランダム
+            let sortedStock = [...shopStock].sort((a, b) => {
+                const da = deckData[a], db = deckData[b];
+                if (wantHeal) {
+                    if (da?.type === 'heal' && db?.type !== 'heal') return -1;
+                    if (db?.type === 'heal' && da?.type !== 'heal') return 1;
+                }
+                return 0;
+            });
+            const affordable = sortedStock.filter(cardId => {
+                const cd = deckData[cardId];
+                if (!cd) return false;
+                const price = cd.type === 'weapon' ? Math.max(5, cd.dmg / 5) : cd.type === 'equip' ? 6 : 4;
+                return cpuPlayer.p >= price;
+            });
+            if (affordable.length > 0) {
+                const cardId = affordable[Math.floor(Math.random() * Math.min(3, affordable.length))];
+                const cd = deckData[cardId];
+                const price = cd.type === 'weapon' ? Math.max(5, cd.dmg / 5) : cd.type === 'equip' ? 6 : 4;
+                cpuPlayer.p -= price;
+                cpuPlayer.hand.push(cardId);
+                log(`🛒 ${cpuPlayer.name}が「${cd.name}」を購入！`);
+                triggerEventPopup(cpuPlayer.id, cd.icon, `「${cd.name}」購入！`, `-${price}P`, "card");
+                acted = true;
+            }
         }
         // 移動
         else if (!acted && canMove) {
@@ -3001,7 +3682,10 @@ async function processCPUTurn() {
                         <div>
                             <label style="font-weight:bold; font-size:13px;">🔄 ラウンド:</label><br>
                             <select id="online-max-rounds" style="padding:5px; width:100%; margin-top:3px;">
+                                <option value="1">1ラウンド</option>
+                                <option value="5">5ラウンド</option>
                                 <option value="10">10ラウンド</option>
+                                <option value="15">15ラウンド</option>
                                 <option value="20" selected>20ラウンド</option>
                                 <option value="30">30ラウンド</option>
                             </select>
@@ -3386,7 +4070,42 @@ function handleNetworkData(data, senderPeerId = null, conn = null) {
     else if (data.type === 'truck_end') {
         if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
         document.body.classList.remove('horror-mode');
-        document.querySelectorAll('.truck-highlight').forEach(el => el.classList.remove('truck-highlight'));
+        document.querySelectorAll('.truck-highlight, .truck-path-glow').forEach(el => { el.classList.remove('truck-highlight'); el.classList.remove('truck-path-glow'); });
+    }
+    else if (data.type === 'police_patrol_start') {
+        if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
+        log(`<span class="system" style="color:#2980b9;">🚓 警察パトロール！</span>`);
+    }
+    else if (data.type === 'police_step') {
+        if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
+        document.querySelectorAll('.police-highlight').forEach(el => el.classList.remove('police-highlight'));
+        policePos = data.tileId;
+        updateTokens();
+        const pe = document.getElementById(`tile-${data.tileId}`);
+        if (pe) { pe.classList.add('police-highlight'); setTimeout(() => pe.classList.remove('police-highlight'), 180); }
+    }
+    else if (data.type === 'police_patrol_end') {
+        if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
+        document.querySelectorAll('.police-highlight').forEach(el => el.classList.remove('police-highlight'));
+    }
+    else if (data.type === 'round_summary') {
+        if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
+        if (!isHost) {
+            // ゲスト側でもサマリーを表示
+            const overlay = document.getElementById("round-summary-overlay");
+            const listEl = document.getElementById("round-summary-list");
+            listEl.innerHTML = "";
+            overlay.style.display = "flex";
+            data.items.forEach((item, i) => {
+                setTimeout(() => {
+                    let div = document.createElement("div");
+                    div.className = "summary-item";
+                    div.innerHTML = item;
+                    listEl.appendChild(div);
+                }, i * 400);
+            });
+            setTimeout(() => { overlay.style.display = "none"; }, data.items.length * 400 + 2500);
+        }
     }
 } // handleNetworkData ここまで
 
@@ -3465,6 +4184,17 @@ function tryCreateRoomProcess(targetId) {
         conn.on('data', (data) => { handleNetworkData(data, conn.peer, conn); });
         conn.on('close', () => {
             delete connections[conn.peer];
+            // ゲーム中なら切断プレイヤーをCPUに切り替え
+            if (isOnlineMode && players.length > 0) {
+                const disconnectedPlayer = players.find(p => p.userId === conn.peer);
+                if (disconnectedPlayer && !disconnectedPlayer.isCPU) {
+                    disconnectedPlayer.isCPU = true;
+                    log(`<span class="system">📡 ${disconnectedPlayer.name}が切断されました。CPU操作に切り替えます。</span>`);
+                    triggerEventPopup(disconnectedPlayer.id, "📡", "切断", `${disconnectedPlayer.name}がCPU操作に`, "neutral");
+                    syncOnline();
+                    updateUI();
+                }
+            }
             lobbyPlayers = lobbyPlayers.filter(p => p.userId !== conn.peer);
             broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId, roomName: hostRoomName });
             updateLobbyUI(lobbyPlayers, myUserId);
