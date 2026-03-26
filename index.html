@@ -993,8 +993,9 @@ function renderHand(p,notMyTurn,isMyChar){
 
 function selectBranch(optId){isBranchPicking=false;currentBranchOptions=[];document.getElementById("branch-prompt").style.display="none";executeMove(optId);}
 
+// オリジナルのupdateUI
 function updateUI(){
-    if(gameOver)return;
+    if(gameOver || players.length === 0 || !players[turn]) return;
     const p=players[turn];
     let isMyChar=!p.isCPU;
     let notMyTurn=!isMyChar||p.isCPU||cpuActing||p.skipTurn;
@@ -1097,6 +1098,7 @@ function updateUI(){
 
 // ========== ACTIONS ==========
 async function rollDice(){
+    if(players.length === 0 || !players[turn]) return;
     let p=players[turn];document.getElementById("btn-roll").disabled=true;toggleHighlight("btn-roll",false);
     
     // --- 【追加】サイコロ開始を相手に通知 ---
@@ -1112,6 +1114,8 @@ async function rollDice(){
     overlay.style.display="flex";d1E.className="dice";d2E.className="dice";mE.innerText=`${p.name}がサイコロを振っています...`;rE.innerText="";
     let ri=setInterval(()=>{d1E.innerText=Math.floor(Math.random()*6)+1;d2E.innerText=Math.floor(Math.random()*6)+1;playSfx('dice');},100);
     await sleep(1000);clearInterval(ri);
+    if(players.length === 0 || !players[turn]) return;
+    
     d1E.className="dice stopped";d2E.className="dice stopped";d1E.innerText=d1;d2E.innerText=d2;
     let total=d1+d2-p.penaltyAP+p.bonusAP;let isZoro=(d1===d2);
     if(isZoro)total=(d1+d2)*2-p.penaltyAP+p.bonusAP;
@@ -1132,6 +1136,7 @@ async function rollDice(){
     // ----------------------------------------
 
     await sleep(1800);overlay.style.display="none";
+    if(players.length === 0 || !players[turn]) return;
     
     p.ap+=total;diceRolled=true;p.bonusAP=0;p.penaltyAP=0;
     triggerAPPopup(p.id,total,"ダイスロール");log(`<span class="highlight">${p.name}</span>は${total}AP獲得！${isZoro?"(ゾロ目!)":""}`);
@@ -1380,8 +1385,10 @@ function closeAttackOverlay(){document.getElementById("attack-overlay").style.di
 // ========== TURN END & ROUND ==========
 function endTurnClicked(){document.getElementById("btn-end").disabled=true;endTurnLogic();}
 async function endTurnLogic(){
+    if(players.length === 0 || !players[turn]) return;
     let p=players[turn];p.ap=0;diceRolled=false;canPickedThisTurn=0;p.cannotMove=false;
     if(turn===players.length-1)await processRoundEvents();
+    if(players.length === 0) return;
     turn=(turn+1)%players.length;cpuActing=false;updateUI();
 }
 
@@ -1423,12 +1430,19 @@ async function processRoundEvents(){
     friendPos=mapData[Math.floor(Math.random()*mapData.length)].id;
     players.forEach(p=>p.stealth=false);
     await displayRoundSummary(digest);
+    if(players.length === 0) return;
+    
     // Truck
     log(`<span class="system" style="color:#c0392b;">🛻 ごみ収集車！</span>`);
     document.body.classList.add('horror-mode');
     let tRoll=Math.floor(Math.random()*6)+1+Math.floor(Math.random()*6)+1;
     let tm=getDestRandom(truckPos,tRoll);
-    for(let sid of tm.hitList){truckPos=sid;updateTokens();let el=document.getElementById(`tile-${sid}`);if(el)el.classList.add('truck-highlight');await sleep(300);if(el)el.classList.remove('truck-highlight');}
+    for(let sid of tm.hitList){
+        truckPos=sid;updateTokens();let el=document.getElementById(`tile-${sid}`);if(el)el.classList.add('truck-highlight');
+        await sleep(300);
+        if(players.length === 0) { document.body.classList.remove('horror-mode'); return; }
+        if(el)el.classList.remove('truck-highlight');
+    }
     players.forEach(p=>{
         if(p.hp>0&&(tm.hitList.includes(p.pos)||truckPos===p.pos)){
             if(p.equip.doll){p.equip.doll=false;log(`🎎 ${p.name}:身代わり人形が守った！`);}
@@ -1442,7 +1456,12 @@ async function processRoundEvents(){
         log(`<span class="system" style="color:#2980b9;">🚓 警察パトロール！</span>`);
         let pR=Math.floor(Math.random()*6)+1+Math.floor(Math.random()*6)+1+Math.floor(Math.random()*6)+1;
         let pm=getDestRandom(policePos,pR);
-        for(let sid of pm.hitList){policePos=sid;updateTokens();let el=document.getElementById(`tile-${sid}`);if(el)el.classList.add('police-highlight');await sleep(200);if(el)el.classList.remove('police-highlight');}
+        for(let sid of pm.hitList){
+            policePos=sid;updateTokens();let el=document.getElementById(`tile-${sid}`);if(el)el.classList.add('police-highlight');
+            await sleep(200);
+            if(players.length === 0) return;
+            if(el)el.classList.remove('police-highlight');
+        }
         players.forEach(p=>{
             if(p.hp>0&&(pm.hitList.includes(p.pos)||policePos===p.pos)){
                 if(p.equip.doll){p.equip.doll=false;log(`🎎 ${p.name}:身代わり人形が守った！`);}
@@ -1477,12 +1496,15 @@ function endGame(){
 
 // ========== CPU ==========
 async function processCPUTurn(){
+    if(players.length === 0 || !players[turn]) return;
     let p=players[turn];await sleep(1500);
-    while(p.hand.length>p.maxHand){discardCard(0);await sleep(300);}
-    if(mgActive){await sleep(1000);processMiniGameResult(Math.random()>0.6,"CPU判定");await sleep(500);}
-    if(!diceRolled){await rollDice();await sleep(500);}
+    if(players.length === 0 || turn !== p.id) return;
+    while(p.hand.length>p.maxHand){discardCard(0);await sleep(300); if(players.length===0)return;}
+    if(mgActive){await sleep(1000); if(players.length===0)return; processMiniGameResult(Math.random()>0.6,"CPU判定");await sleep(500); if(players.length===0)return;}
+    if(!diceRolled){await rollDice();await sleep(500); if(players.length===0)return;}
     let maxLoops=30;
     while(p.ap>0&&!gameOver&&turn===p.id&&!p.skipTurn&&!mgActive&&p.hand.length<=p.maxHand&&!p.cannotMove&&maxLoops-->0){
+        if(players.length === 0) return;
         let ct=mapData.find(t=>t.id===p.pos),vn=ct.next.filter(id=>id!==constructionPos);
         let mCost=isRainy&&!p.rainGear&&p.charType!=="athlete"?2:1;
         let canMv=p.ap>=mCost&&vn.length>0;
@@ -1506,10 +1528,10 @@ async function processCPUTurn(){
         else if(!acted&&ct.type==="trash"&&p.ap>=(p.equip.shoes?1:2)&&(!isRainy||p.rainGear)&&p.pos!==animalPos&&Math.random()>0.4){actionTrash();acted=true;}
         else if(!acted&&ct.type==="shop"&&p.p>=5&&Math.random()>0.5){/* skip shop for cpu */}
         else if(!acted&&canMv){executeMove(vn[Math.floor(Math.random()*vn.length)]);acted=true;}
-        if(mgActive){await sleep(1000);processMiniGameResult(Math.random()>0.6,"CPU判定");acted=true;}
+        if(mgActive){await sleep(1000); if(players.length===0)return; processMiniGameResult(Math.random()>0.6,"CPU判定");acted=true;}
         if(!acted)break;await sleep(600);
     }
-    if(!gameOver&&turn===p.id){await sleep(300);endTurnLogic();}
+    if(!gameOver&&turn===p.id){await sleep(300); if(players.length>0) endTurnLogic();}
 }
 
 // Avatar preview update
@@ -1598,6 +1620,8 @@ let lobbyPlayers = [];
 
 const _originalUpdateUI = updateUI;
 updateUI = function() {
+    if (players.length === 0 || typeof players[turn] === 'undefined') return;
+    
     if (isOnlineMode) {
         // オンライン時は全員をCPUではない（人間）として扱う
         players.forEach(p => p.isCPU = false); 
@@ -1712,6 +1736,7 @@ window.applyGameState = function(state) {
         l.scrollTop = l.scrollHeight;
     }
     
+    if (players.length === 0) return;
     isSyncing = true;
     updateUI(); 
     isSyncing = false;
