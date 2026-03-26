@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>脱・ホームレス：サバイバルシティ（超完全版）</title>
+    <!-- PeerJS: サーバー不要のP2P通信ライブラリ -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         :root {
             --clay-bg: #87CEEB;
@@ -211,8 +213,81 @@
             #settings-btn { width:35px; height:35px; font-size:16px; top:5px; right:5px; border-width:2px; }
         }
     </style>
+    
+    <!-- ========================================== -->
+    <!-- タイトル画面・モード選択画面用の追加スタイル -->
+    <!-- ========================================== -->
+    <style>
+        #title-screen-overlay, #mode-select-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--clay-bg);
+            z-index: 20000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s;
+        }
+        .title-logo {
+            font-size: 48px;
+            color: #fdf5e6;
+            text-shadow: 4px 4px 0px rgba(0,0,0,0.4), 2px 2px 10px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            text-align: center;
+            line-height: 1.2;
+            animation: float-anim 3s infinite ease-in-out;
+        }
+        @keyframes float-anim {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .title-sub {
+            font-size: 20px;
+            color: #c0392b;
+            font-weight: bold;
+            text-shadow: 2px 2px 0px #fff;
+            margin-bottom: 40px;
+        }
+        .blink-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3e2723;
+            animation: blink-anim 1.5s infinite;
+            cursor: pointer;
+            padding: 20px;
+        }
+        @keyframes blink-anim {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        @media (max-width:768px) {
+            .title-logo { font-size: 32px; }
+            .title-sub { font-size: 16px; }
+        }
+    </style>
 </head>
 <body class="sunny">
+
+    <!-- ========================================== -->
+    <!-- タイトル画面・モード選択画面のUI -->
+    <!-- ========================================== -->
+    <div id="title-screen-overlay" onclick="window.goToModeSelect()">
+        <div style="font-size: 80px; margin-bottom: 20px;">🏠</div>
+        <div class="title-logo">脱・ホームレス<br>サバイバルシティ</div>
+        <div class="title-sub">〜The Ultimate Edition〜</div>
+        <div class="blink-text">画面をタップしてスタート</div>
+    </div>
+
+    <div id="mode-select-overlay" style="display: none;">
+        <h2 style="font-size: 32px; color: #fdf5e6; text-shadow: var(--clay-shadow-out); margin-bottom: 30px;">モード選択</h2>
+        <button class="btn-large btn-brown" style="font-size: 24px; padding: 20px 40px; width: 80%; max-width: 400px; margin-bottom: 20px;" onclick="window.startOfflineMode()">🎮 オフラインで遊ぶ<br><span style="font-size:14px;font-weight:normal;">(1台の端末で2〜4人)</span></button>
+        <button class="btn-large btn-blue" style="font-size: 24px; padding: 20px 40px; width: 80%; max-width: 400px; margin-bottom: 20px;" onclick="window.startOnlineModeMenu()">🌐 オンラインで遊ぶ<br><span style="font-size:14px;font-weight:normal;">(離れた友達と通信プレイ)</span></button>
+    </div>
+
     <div id="toast-message"></div>
     <div id="confirm-modal-overlay" class="modal-overlay" onclick="if(event.target===this) closeConfirmModal()">
         <div class="modal-box"><h3 style="color:var(--clay-text);margin-top:0;">⚠️ 確認</h3><p style="font-weight:bold;">現在のゲームは破棄されます。<br>タイトルに戻りますか？</p><div style="display:flex;gap:10px;justify-content:center;margin-top:20px;"><button class="btn-large btn-brown" style="flex:1;" onclick="executeReturnToTitle()">はい</button><button class="btn-large" style="flex:1;background:#95a5a6;border-color:#7f8c8d;" onclick="closeConfirmModal()">いいえ</button></div></div>
@@ -647,7 +722,9 @@ function showToast(msg){const t=document.getElementById("toast-message");t.inner
 function toggleSettingsModal(){const o=document.getElementById('settings-modal-overlay');o.style.display=o.style.display==='flex'?'none':'flex';}
 function promptReturnToTitle(){document.getElementById('confirm-modal-overlay').style.display='flex';}
 function closeConfirmModal(){document.getElementById('confirm-modal-overlay').style.display='none';}
-function executeReturnToTitle(){
+
+// 既存のexecuteReturnToTitleの元の処理
+function executeReturnToTitleBase(){
     closeConfirmModal();gameOver=false;players=[];turn=0;diceRolled=false;canPickedThisTurn=0;territories={};cpuActing=false;
     isRainy=false;weatherState="sunny";roundCount=0;constructionPos=-1;constructionTimer=0;currentDisplayTurn=-1;
     mgActive=false;isBranchPicking=false;currentBranchOptions=[];clearInterval(mgTimer);if(slotAnimInterval)clearInterval(slotAnimInterval);
@@ -1336,6 +1413,558 @@ document.querySelectorAll('[id$="-avatar"]').forEach(sel=>{
         if(prev)prev.innerText=charEmoji[this.value]||'🏃';
     });
 });
+</script>
+
+<!-- ========================================== -->
+<!-- オンラインマルチプレイ用の追加機能・UI -->
+<!-- （PeerJSによるサーバーレス・フルP2P通信） -->
+<!-- ========================================== -->
+<style>
+    #online-menu button { width: 100%; margin: 10px 0; }
+    #online-lobby { text-align: center; }
+    #lobby-players-list div { background: var(--clay-panel); color: #fdf5e6; border: var(--clay-border); padding: 8px; margin: 5px 0; border-radius: 8px; box-shadow: var(--clay-shadow-out); font-weight: bold; }
+</style>
+
+<div id="online-lobby-modal" class="modal-overlay" style="z-index: 2000;">
+    <div class="modal-box" style="max-width: 500px;">
+        <h2 style="margin-top:0;">🌐 オンラインマルチプレイ</h2>
+        <!-- 部屋選択メニュー -->
+        <div id="online-menu">
+            <button class="btn-large btn-blue" onclick="window.createRoom()">🏠 部屋を作る（ホストになる）</button>
+            <div style="margin: 20px 0; font-weight: bold;">または</div>
+            <input type="text" id="room-id-input" placeholder="合言葉(4桁)" maxlength="4" style="font-size: 24px; width: 150px; text-align: center; text-transform: uppercase; margin-bottom: 10px; font-weight: bold;">
+            <button class="btn-large btn-brown" onclick="window.joinRoom()">👉 部屋に入る</button>
+            <button class="btn-large" style="width:100%; margin-top:20px; background:#95a5a6; border-color:#7f8c8d;" id="online-close-btn">✖ 閉じる</button>
+        </div>
+        
+        <!-- ロビー画面 -->
+        <div id="online-lobby" style="display: none;">
+            <h3>合言葉: <span id="lobby-room-id" style="color: #f1c40f; font-size: 32px; letter-spacing: 5px; background: #333; padding: 5px 15px; border-radius: 8px;"></span></h3>
+            <div id="lobby-players-list" style="text-align: left; background: rgba(0,0,0,0.1); padding: 10px; border-radius: 10px; min-height: 100px;">
+                <!-- プレイヤーリスト表示 -->
+            </div>
+            
+            <div style="margin-top: 15px; border-top: 2px dashed #8d6e63; padding-top: 15px;">
+                <h4 style="margin: 0 0 10px 0;">自分のキャラクター設定</h4>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <input type="text" id="my-online-name" class="name-input" maxlength="8" placeholder="名前" onchange="window.updateMyLobbyInfo()">
+                    <select id="my-online-avatar" onchange="window.updateMyLobbyInfo()">
+                        <option value="athlete">元アスリート</option>
+                        <option value="sales">元営業マン</option>
+                        <option value="survivor">サバイバー</option>
+                        <option value="yankee">元ヤン</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="host-settings" style="display: none; margin-top: 15px; background: #5c4a44; padding: 10px; border-radius: 10px; color: white;">
+                マップ: <select id="online-map-size"><option value="small">スモール</option><option value="medium" selected>ミディアム</option><option value="large">ラージ</option></select>
+                ラウンド: <select id="online-max-rounds"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option></select>
+                <br>
+                <button class="btn-large" style="background: #2ecc71; border-color: #27ae60; width: 100%; margin-top: 15px;" onclick="window.startOnlineGame()">🎮 ゲーム開始！</button>
+            </div>
+            <p id="waiting-host-msg" style="display:none; color: #e74c3c; font-weight: bold; font-size: 18px; margin-top: 15px; animation: pulse-dest 1s infinite alternate;">ホストの開始を待っています...</p>
+            <button class="btn-large" style="background: #95a5a6; border-color: #7f8c8d; margin-top: 20px; width: 100%;" onclick="window.leaveRoom()">退室する</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==========================================
+// PeerJS (WebRTC) による完全P2P同期システム
+// データベース(Firestore)や自前サーバーを一切使用しません
+// ==========================================
+
+let peer = null;
+let connections = {}; // ホストが保持する全クライアントとの接続
+let hostConnection = null; // ゲストが保持するホストとの接続
+
+let myUserId = Math.random().toString(36).substring(2, 10);
+let myRoomId = null;
+let isHost = false;
+let isOnlineMode = false;
+let isSyncing = false; // 無限ループ防止用
+let previousTurnUserId = null; // ターンが切り替わったことを検知する用フラグ
+let lobbyPlayers = [];
+
+// --- 既存関数のオーバーライドとフック ---
+
+const _originalUpdateUI = updateUI;
+updateUI = function() {
+    if (isOnlineMode) {
+        // オンライン時は全員をCPUではない（人間）として扱う
+        players.forEach(p => p.isCPU = false); 
+    }
+    
+    _originalUpdateUI(); // 元のUI更新処理を実行
+    
+    if (isOnlineMode) {
+        const p = players[turn];
+        let isMyChar = p && p.userId === myUserId;
+        
+        // 自分のターンでない場合、操作系のUIを強制的に無効化する
+        if (!isMyChar) {
+            document.querySelectorAll("#action-panel button").forEach(b => {
+                b.disabled = true;
+                b.classList.remove("btn-end-highlight", "btn-active-highlight");
+            });
+            document.querySelectorAll(".card-mini-btn").forEach(b => {
+                b.disabled = true;
+                b.classList.remove("btn-active-highlight");
+            });
+            document.getElementById("branch-prompt").style.display = "none";
+            document.getElementById("end-turn-prompt").style.display = "none";
+            document.querySelectorAll(".tile-highlight-branch").forEach(el=>{
+                el.classList.remove("tile-highlight-branch");
+                el.onclick = null;
+            });
+        }
+        
+        // 「自分が操作を行って状態が変わった時」に加え、
+        // 「直前まで自分のターンで、ターンが相手に切り替わった瞬間」にも送信する
+        let justFinishedMyTurn = (previousTurnUserId === myUserId && !isMyChar);
+        if (!isSyncing && (isMyChar || justFinishedMyTurn) && myRoomId) {
+            sendGameStateToNetwork();
+        }
+        
+        // 直前のターンプレイヤーIDを更新して記憶しておく
+        if (p) {
+            previousTurnUserId = p.userId;
+        }
+    }
+};
+
+// --- 状態の抽出と反映 ---
+
+window.extractGameState = function() {
+    return {
+        players: players,
+        turn: turn,
+        diceRolled: diceRolled,
+        canPickedThisTurn: canPickedThisTurn,
+        territories: territories,
+        gameOver: gameOver,
+        truckPos: truckPos,
+        policePos: policePos,
+        unclePos: unclePos,
+        animalPos: animalPos,
+        yakuzaPos: yakuzaPos,
+        loansharkPos: loansharkPos,
+        friendPos: friendPos,
+        isRainy: isRainy,
+        constructionPos: constructionPos,
+        constructionTimer: constructionTimer,
+        weatherState: weatherState,
+        roundCount: roundCount,
+        maxRounds: maxRounds,
+        isNight: isNight,
+        canPrice: canPrice,
+        trashPrice: trashPrice,
+        destTile: destTile,
+        mgActive: mgActive,
+        isBranchPicking: isBranchPicking,
+        currentBranchOptions: currentBranchOptions,
+        mapData: mapData, // タイル状態の同期用
+        logHTML: document.getElementById("log").innerHTML
+    };
+};
+
+window.applyGameState = function(state) {
+    players = state.players || players;
+    turn = state.turn !== undefined ? state.turn : turn;
+    diceRolled = state.diceRolled !== undefined ? state.diceRolled : diceRolled;
+    canPickedThisTurn = state.canPickedThisTurn !== undefined ? state.canPickedThisTurn : canPickedThisTurn;
+    territories = state.territories || territories;
+    gameOver = state.gameOver !== undefined ? state.gameOver : gameOver;
+    truckPos = state.truckPos !== undefined ? state.truckPos : truckPos;
+    policePos = state.policePos !== undefined ? state.policePos : policePos;
+    unclePos = state.unclePos !== undefined ? state.unclePos : unclePos;
+    animalPos = state.animalPos !== undefined ? state.animalPos : animalPos;
+    yakuzaPos = state.yakuzaPos !== undefined ? state.yakuzaPos : yakuzaPos;
+    loansharkPos = state.loansharkPos !== undefined ? state.loansharkPos : loansharkPos;
+    friendPos = state.friendPos !== undefined ? state.friendPos : friendPos;
+    isRainy = state.isRainy !== undefined ? state.isRainy : isRainy;
+    constructionPos = state.constructionPos !== undefined ? state.constructionPos : constructionPos;
+    constructionTimer = state.constructionTimer !== undefined ? state.constructionTimer : constructionTimer;
+    weatherState = state.weatherState || weatherState;
+    roundCount = state.roundCount !== undefined ? state.roundCount : roundCount;
+    maxRounds = state.maxRounds !== undefined ? state.maxRounds : maxRounds;
+    isNight = state.isNight !== undefined ? state.isNight : isNight;
+    canPrice = state.canPrice !== undefined ? state.canPrice : canPrice;
+    trashPrice = state.trashPrice !== undefined ? state.trashPrice : trashPrice;
+    destTile = state.destTile !== undefined ? state.destTile : destTile;
+    mgActive = state.mgActive !== undefined ? state.mgActive : mgActive;
+    isBranchPicking = state.isBranchPicking !== undefined ? state.isBranchPicking : isBranchPicking;
+    currentBranchOptions = state.currentBranchOptions || currentBranchOptions;
+    mapData = state.mapData || mapData;
+    
+    // 他人のログも同期させる
+    if (state.logHTML !== undefined && state.logHTML !== document.getElementById("log").innerHTML) {
+        document.getElementById("log").innerHTML = state.logHTML;
+        const l = document.getElementById("log");
+        l.scrollTop = l.scrollHeight;
+    }
+    
+    isSyncing = true;
+    updateUI(); 
+    isSyncing = false;
+};
+
+// --- P2P通信ロジック ---
+
+function broadcastNetworkData(data) {
+    if (isHost) {
+        Object.values(connections).forEach(conn => {
+            if(conn.open) conn.send(data);
+        });
+    }
+}
+
+function sendGameStateToNetwork() {
+    const state = window.extractGameState();
+    const data = { type: 'state_update', state: state, lastUpdater: myUserId };
+    
+    if (isHost) {
+        broadcastNetworkData(data);
+    } else if (hostConnection && hostConnection.open) {
+        hostConnection.send(data);
+    }
+}
+
+function handleNetworkData(data, senderPeerId = null) {
+    if (data.type === 'join' && isHost) {
+        if (lobbyPlayers.length >= 4) return; // 満員
+        if (!lobbyPlayers.find(p => p.userId === data.user.userId)) {
+            lobbyPlayers.push(data.user);
+            broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId });
+            updateLobbyUI(lobbyPlayers, myUserId);
+        }
+    } 
+    else if (data.type === 'lobby_change' && isHost) {
+        const idx = lobbyPlayers.findIndex(p => p.userId === data.user.userId);
+        if (idx !== -1) {
+            lobbyPlayers[idx] = data.user;
+            broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId });
+            updateLobbyUI(lobbyPlayers, myUserId);
+        }
+    }
+    else if (data.type === 'lobby_update') {
+        lobbyPlayers = data.players;
+        updateLobbyUI(data.players, data.hostId);
+    }
+    else if (data.type === 'game_start') {
+        if (!isHost) {
+            isOnlineMode = true;
+            document.getElementById("online-lobby-modal").style.display = "none";
+            document.getElementById("setup-screen").style.display = "none";
+            document.getElementById("main-title").style.display = "none";
+            document.getElementById("game-screen").style.display = "flex";
+            
+            window.applyGameState(data.state);
+            initBoard();
+            log("🌐 オンライン対戦スタート！");
+        }
+    }
+    else if (data.type === 'state_update') {
+        // 他人が操作した最新状態を反映
+        if (data.lastUpdater !== myUserId) {
+            window.applyGameState(data.state);
+        }
+        
+        // ホストなら、送信元以外の全員へ状態をリレー（転送）する
+        if (isHost) {
+            Object.values(connections).forEach(conn => {
+                if (conn.peer !== senderPeerId && conn.open) {
+                    conn.send(data);
+                }
+            });
+        }
+    }
+}
+
+// --- ロビー機能 ---
+
+window.createRoom = function() {
+    const roomId = Math.random().toString(36).substring(2, 6).toUpperCase();
+    myRoomId = roomId;
+    isHost = true;
+    
+    showToast("部屋を作成中...");
+    
+    // PeerJSの初期化（ホストはroomIdを自らのIDとして使用）
+    peer = new Peer(roomId);
+    
+    peer.on('open', (id) => {
+        lobbyPlayers = [{
+            userId: myUserId,
+            name: document.getElementById("my-online-name").value || "Player",
+            charType: document.getElementById("my-online-avatar").value || "athlete"
+        }];
+        showLobbyUI(roomId);
+        updateLobbyUI(lobbyPlayers, myUserId);
+    });
+
+    peer.on('connection', (conn) => {
+        connections[conn.peer] = conn;
+        
+        conn.on('data', (data) => {
+            handleNetworkData(data, conn.peer);
+        });
+        
+        conn.on('close', () => {
+            delete connections[conn.peer];
+            lobbyPlayers = lobbyPlayers.filter(p => p.userId !== conn.peer);
+            broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId });
+            updateLobbyUI(lobbyPlayers, myUserId);
+        });
+    });
+    
+    peer.on('error', (err) => {
+        if(err.type === 'unavailable-id'){
+            showToast("部屋の作成に失敗しました（ID衝突）。もう一度お試しください。");
+            peer.destroy();
+        } else {
+            showToast("通信エラー: " + err.type);
+        }
+        console.error(err);
+    });
+};
+
+window.joinRoom = function() {
+    const roomId = document.getElementById("room-id-input").value.toUpperCase();
+    if (!roomId || roomId.length !== 4) return showToast("4桁の合言葉を入力してください");
+    
+    myRoomId = roomId;
+    isHost = false;
+    
+    showToast("部屋に接続中...");
+    peer = new Peer(myUserId);
+    
+    peer.on('open', (id) => {
+        hostConnection = peer.connect(roomId, { reliable: true });
+        
+        hostConnection.on('open', () => {
+            showLobbyUI(roomId);
+            // 自分の情報をホストに送る
+            hostConnection.send({
+                type: 'join',
+                user: {
+                    userId: myUserId,
+                    name: document.getElementById("my-online-name").value || "Player",
+                    charType: document.getElementById("my-online-avatar").value || "sales"
+                }
+            });
+        });
+        
+        hostConnection.on('data', (data) => {
+            handleNetworkData(data);
+        });
+        
+        hostConnection.on('close', () => {
+            showToast("ホストとの接続が切れました。退室します。");
+            window.leaveRoom();
+        });
+    });
+    
+    peer.on('error', (err) => {
+        showToast("接続エラー: " + err.type);
+        console.error(err);
+    });
+};
+
+window.leaveRoom = function() {
+    const wasPlaying = isOnlineMode;
+    if (peer) {
+        peer.destroy();
+        peer = null;
+    }
+    connections = {};
+    hostConnection = null;
+    myRoomId = null;
+    isOnlineMode = false;
+    isHost = false;
+    lobbyPlayers = [];
+    document.getElementById("online-lobby-modal").style.display = "none";
+    
+    // もしゲーム中ではなくロビーで退室した場合はモード選択画面に戻す
+    if (!wasPlaying) {
+        document.getElementById('main-title').style.display = 'none';
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('mode-select-overlay').style.display = 'flex';
+    }
+};
+
+window.updateMyLobbyInfo = function() {
+    const user = {
+        userId: myUserId,
+        name: document.getElementById("my-online-name").value || "Player",
+        charType: document.getElementById("my-online-avatar").value || "athlete"
+    };
+    
+    if (isHost) {
+        const idx = lobbyPlayers.findIndex(p => p.userId === myUserId);
+        if (idx !== -1) lobbyPlayers[idx] = user;
+        broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId });
+        updateLobbyUI(lobbyPlayers, myUserId);
+    } else if (hostConnection && hostConnection.open) {
+        hostConnection.send({ type: 'lobby_change', user: user });
+    }
+};
+
+function showLobbyUI(roomId) {
+    document.getElementById("online-menu").style.display = "none";
+    document.getElementById("online-lobby").style.display = "block";
+    document.getElementById("lobby-room-id").innerText = roomId;
+    
+    const myInfo = { name: "Player" + Math.floor(Math.random()*100), charType: "athlete" };
+    document.getElementById("my-online-name").value = myInfo.name;
+    document.getElementById("my-online-avatar").value = myInfo.charType;
+    window.updateMyLobbyInfo();
+    
+    if (isHost) {
+        document.getElementById("host-settings").style.display = "block";
+        document.getElementById("waiting-host-msg").style.display = "none";
+    } else {
+        document.getElementById("host-settings").style.display = "none";
+        document.getElementById("waiting-host-msg").style.display = "block";
+    }
+}
+
+function updateLobbyUI(lobbyPlayersList, hostId) {
+    const list = document.getElementById("lobby-players-list");
+    list.innerHTML = "";
+    lobbyPlayersList.forEach(p => {
+        const isMe = p.userId === myUserId;
+        const isHostPlayer = p.userId === hostId;
+        const emoji = charEmoji[p.charType] || '🏃';
+        const badge = isHostPlayer ? '<span style="background:#e74c3c;color:white;padding:2px 5px;border-radius:3px;font-size:10px;margin-left:5px;">HOST</span>' : '';
+        list.innerHTML += `<div style="margin: 5px 0; font-size: 16px; font-weight: bold;">
+            ${emoji} ${p.name} ${isMe ? '(あなた)' : ''} ${badge}
+        </div>`;
+    });
+    
+    const me = lobbyPlayersList.find(p => p.userId === myUserId);
+    if(me) {
+        document.getElementById("my-online-name").value = me.name;
+        document.getElementById("my-online-avatar").value = me.charType;
+    }
+}
+
+window.startOnlineGame = async function() {
+    if (!isHost || !myRoomId) return;
+    if (lobbyPlayers.length < 2) {
+        showToast("最低2人必要です！"); return;
+    }
+    
+    // 設定の反映とゲームの初期状態構築
+    const mapSizeStr = document.getElementById("online-map-size").value;
+    maxRounds = parseInt(document.getElementById("online-max-rounds").value);
+    if (mapSizeStr === "small") mapData = genSmallMap();
+    else if (mapSizeStr === "medium") mapData = genMediumMap();
+    else mapData = genLargeMap();
+    
+    truckPos = Math.floor(mapData.length * 0.1);
+    unclePos = Math.floor(mapData.length * 0.2);
+    animalPos = Math.floor(mapData.length * 0.3);
+    policePos = Math.floor(mapData.length * 0.8);
+    yakuzaPos = Math.floor(mapData.length * 0.5);
+    loansharkPos = Math.floor(mapData.length * 0.6);
+    friendPos = Math.floor(mapData.length * 0.15);
+    canPrice = 1; trashPrice = 2; isNight = false;
+    destTile = pickDestTile();
+    
+    // プレイヤー配列の生成 (全員人間=CPUフラグfalse)
+    players = lobbyPlayers.map((lp, idx) => {
+        let p = createPlayer(idx, lp.name, false, lp.charType);
+        p.userId = lp.userId; // 通信時の識別用IDを持たせる
+        return p;
+    });
+    turn = 0;
+    
+    isOnlineMode = true;
+    const initialState = window.extractGameState();
+    
+    // 全クライアントに開始を通知
+    broadcastNetworkData({ 
+        type: 'game_start', 
+        state: initialState 
+    });
+    
+    document.getElementById("online-lobby-modal").style.display = "none";
+    document.getElementById("setup-screen").style.display = "none";
+    document.getElementById("main-title").style.display = "none";
+    document.getElementById("game-screen").style.display = "flex";
+    initBoard();
+    updateUI();
+    log("🌐 オンライン対戦スタート！(ホスト)");
+};
+
+// ==========================================
+// 追加: タイトル・モード選択の制御ロジック
+// ==========================================
+
+// 初期状態の表示設定
+document.getElementById('main-title').style.display = 'none';
+document.getElementById('setup-screen').style.display = 'none';
+
+window.executeReturnToTitle = function() {
+    executeReturnToTitleBase(); // 既存のゲーム初期化処理（これでsetup-screenがblockにされる）
+    
+    // モード選択ではなく最初のタイトル画面に戻るように強制上書き
+    document.getElementById('main-title').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('mode-select-overlay').style.display = 'none';
+    document.getElementById('title-screen-overlay').style.display = 'flex';
+};
+
+window.goToModeSelect = function() {
+    document.getElementById('title-screen-overlay').style.display = 'none';
+    document.getElementById('mode-select-overlay').style.display = 'flex';
+};
+
+window.startOfflineMode = function() {
+    document.getElementById('mode-select-overlay').style.display = 'none';
+    document.getElementById('main-title').style.display = 'block';
+    document.getElementById('setup-screen').style.display = 'block';
+    
+    // オンライン用のセクションは隠す
+    const setupSections = document.querySelectorAll('#setup-screen .setup-section');
+    if(setupSections.length >= 3) {
+        setupSections[0].style.display = 'block';
+        setupSections[1].style.display = 'block';
+        setupSections[2].style.display = 'none';
+    }
+};
+
+window.startOnlineModeMenu = function() {
+    document.getElementById('mode-select-overlay').style.display = 'none';
+    // 背景の寂しさをなくすため、メインタイトルとセットアップ画面の枠だけ出しておく
+    document.getElementById('main-title').style.display = 'block';
+    document.getElementById('setup-screen').style.display = 'block';
+    
+    // オフライン用セクションを隠して、オンライン用だけ表示
+    const setupSections = document.querySelectorAll('#setup-screen .setup-section');
+    if(setupSections.length >= 3) {
+        setupSections[0].style.display = 'none';
+        setupSections[1].style.display = 'none';
+        setupSections[2].style.display = 'block';
+    }
+    
+    // ロビーモーダルを表示
+    document.getElementById('online-lobby-modal').style.display = 'flex';
+    document.getElementById('online-menu').style.display = 'block';
+    document.getElementById('online-lobby').style.display = 'none';
+};
+
+// オンラインメニューの閉じるボタンの動作を上書き
+document.getElementById("online-close-btn").onclick = function() {
+    document.getElementById('online-lobby-modal').style.display = 'none';
+    // 閉じたらモード選択画面へ戻る
+    document.getElementById('main-title').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('mode-select-overlay').style.display = 'flex';
+};
+
 </script>
 </body>
 </html>
