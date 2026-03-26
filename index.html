@@ -3236,6 +3236,29 @@ window.startOnlineGame = async function() {
 document.getElementById('main-title').style.display = 'none';
 document.getElementById('setup-screen').style.display = 'none';
 
+window.executeReturnToTitle = function() {
+    if (isOnlineMode || myRoomId) {
+        if (peer) {
+            try { peer.destroy(); } catch(e) {}
+            peer = null;
+        }
+        connections = {};
+        hostConnection = null;
+        myRoomId = null;
+        isOnlineMode = false;
+        isHost = false;
+        lobbyPlayers = [];
+    }
+    
+    executeReturnToTitleBase();
+    
+    document.getElementById('main-title').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('mode-select-overlay').style.display = 'none';
+    document.getElementById('online-lobby-modal').style.display = 'none';
+    document.getElementById('title-screen-overlay').style.display = 'flex';
+};
+
 window.goToModeSelect = function() {
     document.getElementById('title-screen-overlay').style.display = 'none';
     document.getElementById('mode-select-overlay').style.display = 'flex';
