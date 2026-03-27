@@ -85,6 +85,14 @@
         #main-area { display:flex; width:100%; gap:15px; }
         #board-area { flex-grow:1; overflow-x:auto; min-width:0; }
         #game-board-container { width:100%; overflow-x:auto; padding-bottom:10px; }
+        /* ズームコントロール */
+        #zoom-controls { position:absolute; top:8px; left:8px; z-index:55; display:flex; flex-direction:column; gap:4px; }
+        .zoom-btn { width:32px; height:32px; border-radius:8px; border:2px solid #8d6e63; background:rgba(62,47,42,0.88); color:#fdf5e6; font-size:16px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); transition:background 0.15s, transform 0.1s; box-shadow:2px 2px 4px rgba(0,0,0,0.5); }
+        .zoom-btn:hover { background:rgba(224,122,95,0.9); }
+        .zoom-btn:active { transform:scale(0.92); }
+        #game-board-wrapper { overflow:hidden; width:100%; max-height:calc(100vh - 280px); cursor:grab; user-select:none; }
+        #game-board-wrapper.dragging { cursor:grabbing; }
+        #game-board-inner { transform-origin: top left; transition: transform 0.12s ease; display:inline-block; }
         #game-board { display:grid; gap:4px; padding:15px; border-radius:15px; border:var(--clay-border); box-shadow:var(--clay-shadow-out); background:linear-gradient(to right,#4a3b32 0%,#4a3b32 30%,#8d6e63 30%,#8d6e63 70%,#aab7b8 70%,#aab7b8 100%); transition:background 0.5s; width:max-content; margin:0 auto; }
         .tile { border-radius:50%; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:8px; font-weight:bold; position:relative; color:#fdf5e6; text-shadow:1px 1px 2px rgba(0,0,0,0.8); border:2px dashed #4a362a; box-shadow:inset 2px 2px 4px rgba(0,0,0,0.4),2px 2px 4px rgba(0,0,0,0.5); transition:all 0.3s; width:var(--tile-size); height:var(--tile-size); }
         .tile-id-label { position:absolute; top:4px; left:8px; font-size:10px; font-weight:900; color:rgba(255,255,255,0.8); text-shadow:1px 1px 1px #000; z-index:4; }
@@ -120,6 +128,7 @@
         .player-list-header { margin:0 0 8px 0; font-size:13px; border-bottom:2px dashed #8d7b68; padding-bottom:5px; text-align:center; }
         #all-players-list { display:flex; flex-direction:column; gap:5px; }
         .mini-player-clay { background:#4a3b32; border:2px solid; border-radius:8px; padding:5px; display:flex; align-items:center; gap:8px; color:white; box-shadow:2px 2px 4px rgba(0,0,0,0.4); transition:all 0.2s; }
+        .mini-player-clay:hover { background:#5c4a44; box-shadow:0 0 10px rgba(241,196,15,0.45), 2px 2px 4px rgba(0,0,0,0.4); transform:translateX(2px); }
         .avatar-small-clay { width:28px; height:28px; border-radius:6px; border:2px solid; flex-shrink:0; display:flex; justify-content:center; align-items:center; font-size:16px; background:#8d7b68; }
         
         #log-area { width:100%; margin-top:10px; }
@@ -191,13 +200,13 @@
         #turn-banner-text { font-size:50px; font-weight:bold; padding:20px 50px; color:#fff; background:rgba(44,62,80,0.95); border-radius:20px; border:8px solid; text-align:center; }
         
         /* ポップアップ関連 */
-        #event-popup-overlay { position:fixed; top:48%; left:50%; transform:translate(-50%,-50%); z-index:9500; pointer-events:none; display:flex; flex-direction:column; align-items:center; gap:8px; }
-        .event-popup { background:rgba(12,12,22,0.97); padding:14px 30px; border-radius:18px; border:3px solid; text-align:center; font-weight:bold; color:white; animation:event-popup-anim 2.8s forwards; opacity:0; box-shadow:0 8px 32px rgba(0,0,0,0.9); min-width:200px; max-width:320px; font-family:'Hiragino Maru Gothic ProN','Meiryo',sans-serif; }
-        .event-popup.damage { background:rgba(40,5,5,0.97); }
-        .event-popup.good   { background:rgba(5,35,15,0.97); }
-        .event-popup.bad    { background:rgba(40,20,0,0.97); }
-        .event-popup.card   { background:rgba(25,5,40,0.97); }
-        @keyframes event-popup-anim { 0%{opacity:0;transform:scale(0.55) translateY(18px);} 13%{opacity:1;transform:scale(1.07) translateY(0);} 22%{transform:scale(1);} 74%{opacity:1;transform:scale(1) translateY(-12px);} 100%{opacity:0;transform:scale(0.88) translateY(-36px);} }
+        #event-popup-overlay { position:fixed; top:auto; bottom:18%; left:50%; transform:translateX(-50%); z-index:9500; pointer-events:none; display:flex; flex-direction:column; align-items:center; gap:5px; }
+        .event-popup { background:rgba(12,12,22,0.62); padding:7px 18px; border-radius:12px; border:2px solid; text-align:center; font-weight:bold; color:white; animation:event-popup-anim 2.8s forwards; opacity:0; box-shadow:0 4px 16px rgba(0,0,0,0.5); min-width:140px; max-width:240px; font-family:'Hiragino Maru Gothic ProN','Meiryo',sans-serif; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+        .event-popup.damage { background:rgba(40,5,5,0.62); }
+        .event-popup.good   { background:rgba(5,35,15,0.62); }
+        .event-popup.bad    { background:rgba(40,20,0,0.62); }
+        .event-popup.card   { background:rgba(25,5,40,0.62); }
+        @keyframes event-popup-anim { 0%{opacity:0;transform:scale(0.6) translateY(10px);} 13%{opacity:1;transform:scale(1.04) translateY(0);} 22%{transform:scale(1);} 74%{opacity:0.9;transform:scale(1) translateY(-8px);} 100%{opacity:0;transform:scale(0.9) translateY(-24px);} }
         
         #dice-overlay { position:fixed; top:25%; left:50%; transform:translate(-50%,-50%); background:rgba(62,47,42,0.95); color:#fdf5e6; padding:20px 40px; border-radius:20px; border:6px solid #e07a5f; z-index:200; display:none; flex-direction:column; align-items:center; box-shadow:0 0 40px rgba(0,0,0,0.8); text-align:center; }
         .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1001; display:none; justify-content:center; align-items:center; }
@@ -352,117 +361,173 @@
 
     <!-- 遊び方・ルール モーダル -->
     <div id="rules-modal-overlay" class="modal-overlay" onclick="if(event.target===this) toggleRulesModal()">
-        <div class="modal-box" style="max-width: 600px; width: 95%; background: #fdf5e6; color: #3e2723;">
+        <div class="modal-box" style="max-width: 660px; width: 95%; background: #fdf5e6; color: #3e2723;">
             <h2 style="margin-top:0; text-align: center; color: #c0392b;">📖 遊び方・ルール</h2>
             <div class="rules-content" style="max-height: 70vh;">
+
+                <!-- 目的 -->
                 <div class="rules-section">
                     <h3>🏆 ゲームの目的</h3>
-                    <p>指定のラウンド数終了時に、最も多くの<b>資産（P: ポイント）</b>を持っていたプレイヤーが優勝！<br>
-                    資産＝「所持P ＋ 陣地の価値 ＋ 缶・ゴミの価値」の合計です。</p>
+                    <p>指定のラウンド数終了時に、最も多くの<b>総合スコア</b>を獲得したプレイヤーが優勝！<br>
+                    スコア ＝ <b>所持P × 2</b> ＋ 陣地の価値 ＋ 資源価値 ＋ キル×3 − デス×8</p>
                 </div>
+
+                <!-- ターンの流れ -->
                 <div class="rules-section">
                     <h3>🎮 ターンの流れ</h3>
                     <ul>
-                        <li><b>① サイコロ:</b> 出た目の分「<b>AP(行動力)</b>」を獲得。</li>
-                        <li><b>② 移動:</b> 1マス進むのに <b>1AP</b> 消費(雨の日は2AP)。</li>
-                        <li><b>③ アクション:</b> 止まったマスでAPを消費して行動。</li>
-                        <li><b>④ ターン終了:</b> APが切れるか、やることが無くなったら「ターン終了」。</li>
+                        <li><b>① サイコロ:</b> 出た目の合計分 <b>AP(行動力)</b> を獲得。ゾロ目は2倍！</li>
+                        <li><b>② 移動 & アクション:</b> APを消費して移動・缶拾い・バイトなど好きに行動。</li>
+                        <li><b>③ カード使用:</b> 手札のカードを <b>2AP</b> で使用可能（自分のターン中なら何枚でも）。</li>
+                        <li><b>④ ターン終了:</b> APが切れたら「ターン終了」ボタンを押す。APは翌ターンに持ち越せません。</li>
                     </ul>
                 </div>
+
+                <!-- ステータス -->
                 <div class="rules-section">
                     <h3>📊 ステータス</h3>
                     <ul>
-                        <li><span class="rule-icon">⚡</span><b>AP:</b> 行動力。移動やアクションに必要。ターン終了で0に。</li>
-                        <li><span class="rule-icon">❤️</span><b>HP:</b> 体力。0になると病院送りになり、<b>所持Pが半減＆装備全ロスト</b>。</li>
-                        <li><span class="rule-icon">💰</span><b>P:</b> お金。アイテムの購入などに使用。</li>
-                    </ul>
-                </div>
-                
-                <div class="rules-section" style="border-color: #2ecc71; background: #f0fff4;">
-                    <h3 style="color: #27ae60;">🎭 キャラクター固有能力</h3>
-                    <ul>
-                        <li><span class="rule-icon">🏃</span><b>元アスリート:</b> 移動コストが常に1AP。雨の日のペナルティ(移動2AP)を受けません。</li>
-                        <li><span class="rule-icon">💼</span><b>元営業マン:</b> 話術を活かし、バイトの成功率が通常の50%から<b>70%</b>にアップします。</li>
-                        <li><span class="rule-icon">🌿</span><b>サバイバー:</b> 危機察知能力が高く、ゴミ漁りでハズレを引いても警察に見つかるペナルティを無効化します。</li>
-                        <li><span class="rule-icon">👊</span><b>元ヤン:</b> 他のプレイヤーと同じマスに止まると、自動的に相手から1Pをカツアゲ(強奪)します。</li>
+                        <li><span class="rule-icon">⚡</span><b>AP:</b> 行動力。移動・アクション・カード使用に消費。ターン終了で0になる。</li>
+                        <li><span class="rule-icon">❤️</span><b>HP:</b> 体力。0になると病院送り → 所持Pが最大30P没収、装備1つランダム喪失、缶・ゴミをその場にドロップ。復活後HP100で再開。</li>
+                        <li><span class="rule-icon">💰</span><b>P:</b> お金。陣地化・カード購入などに使用。スコアの最大比重。</li>
+                        <li><span class="rule-icon">🚩</span><b>陣地:</b> 占領したマスから毎ターンのダイスロール時に収入。3ラウンドに1回、維持費（1P/マス）が徴収される。</li>
                     </ul>
                 </div>
 
+                <!-- キャラクター -->
+                <div class="rules-section" style="border-color: #2ecc71; background: #f0fff4;">
+                    <h3 style="color: #27ae60;">🎭 キャラクター一覧（全9種）</h3>
+                    <p style="font-size:12px;color:#555;margin-bottom:8px;">各キャラは <b>パッシブ（自動発動）</b> と <b>アクションスキル（AP消費）</b> を1つずつ持ちます。<br>キャラアイコンをクリックすると詳細を確認できます。</p>
+                    <ul style="font-size:13px; line-height:1.7;">
+                        <li><span class="rule-icon">🏃</span><b>元アスリート —【健脚】</b>移動常に1AP・雨無効 ／ <b>【疾風ダッシュ】</b>3AP: ピッタリ3マス先へ跳躍（交番・罠を飛び越え可）</li>
+                        <li><span class="rule-icon">💼</span><b>元営業マン —【コミュ力】</b>バイト成功率70%・ショップ1P割引 ／ <b>【訪問販売】</b>2AP: 手札1枚を同マスの相手に強制購入させ3P徴収</li>
+                        <li><span class="rule-icon">🌿</span><b>サバイバー —【危機察知】</b>ゴミ漁り失敗の警察ペナ無効 ／ <b>【野宿】</b>2AP: その場でHP+15回復</li>
+                        <li><span class="rule-icon">👊</span><b>元ヤン —【威圧】</b>同マス/すれ違いで自動1Pカツアゲ ／ <b>【殴る】</b>2AP: 同マス相手に10ダメージ</li>
+                        <li><span class="rule-icon">💻</span><b>元ハッカー —【クラウドストレージ】</b>手札上限+2（デフォルト9枚）／ <b>【遠隔ハッキング】</b>3AP: どこからでもショップ在庫を強制入替え＆1枚購入</li>
+                        <li><span class="rule-icon">🎸</span><b>ストリートミュージシャン —【投げ銭】</b>他者が同マスに来るたび銀行から+2P ／ <b>【路上ライブ】</b>4AP: 周囲2マス以内の全員を強制引き寄せ</li>
+                        <li><span class="rule-icon">🩺</span><b>闇医者 —【自己治癒】</b>ターン開始時に自動HP+5 ／ <b>【闇診療】</b>2AP: 同マスの相手HP+30の代わりに5P強制徴収</li>
+                        <li><span class="rule-icon">🎲</span><b>ギャンブラー —【アドレナリン】</b>ゾロ目でAP倍＋HP+10回復 ／ <b>【イカサマ勝負】</b>2AP: 同マスの相手と1d6対決・勝者が5P奪取（同点は仕掛け側の負け）</li>
+                        <li><span class="rule-icon">🕵️</span><b>元探偵 —【張り込み】</b>自分の陣地に相手が止まると手札1枚没収 ／ <b>【情報操作】</b>3AP: NPC1体を任意のマスへ強制移動</li>
+                    </ul>
+                </div>
+
+                <!-- マスの種類 -->
                 <div class="rules-section">
                     <h3>🗺️ マスの種類と効果</h3>
                     <ul style="font-size:13px; line-height:1.6;">
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🏥</span> <b>病院(開始地点):</b> HPが0になるとここへ搬送され、所持Pが半減します。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🛣️</span> <b>通常の道:</b> 特別な効果はありません。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🥫</span> <b>空き缶:</b> 1APで缶を拾います(1ターン3回まで)。※雨の日は「雨具」が必要。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🗑️</span> <b>ゴミ山:</b> 2APでゴミを漁ります。ハズレだと警察に見つかり次回AP-2！</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">💱</span> <b>買取所:</b> 拾った空き缶とゴミを、現在の相場でPに換金します(0AP)。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">💼</span> <b>バイト:</b> 4APで挑戦。確率で成功すると10P獲得！</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🛒</span> <b>ショップ:</b> アイテムカードの購入や、手札の売却(2P)ができます。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🎲</span> <b>イベント:</b> ミニゲームやストーリーが発生！Pやカードを獲得するチャンス。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🏕️</span> <b>避難所:</b> 止まると「ステルス」状態になり、次の敵を1回やり過ごせます。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🕳️</span> <b>マンホール:</b> 1APで、別のマンホールマスへランダムにワープします。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🚓</span> <b>交番:</b> 職務質問で足止めされ、そのターンはそれ以上移動できなくなります。</li>
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🎯</span> <b>目的地(的):</b> 到達すると多額のボーナスPを獲得！的は別の場所へ移動します。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🏥</span><b>病院(開始地点):</b> HPが0になるとここへ搬送され、P没収・装備喪失・資源ドロップが発生する。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🛣️</span><b>通常の道:</b> 特別な効果なし。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🥫</span><b>空き缶:</b> 1APで缶を拾う（1ターン3回まで）。雨の日は雨具が必要。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🗑️</span><b>ゴミ山:</b> 2APでゴミを漁る。失敗すると次回AP-2ペナルティ。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">💱</span><b>買取所:</b> 缶・ゴミを現在の相場でP換金（0AP）。相場はラウンドごとに変動。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">💼</span><b>バイト:</b> 4APで挑戦。成功率50%（営業マンは70%）で10P獲得。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🛒</span><b>ショップ:</b> カード購入（毎ターン在庫が刷新）や手札の売却（2P）ができる。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🎲</span><b>イベント:</b> ミニゲームかストーリーイベントが発生。カード獲得のチャンス。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🏕️</span><b>避難所:</b> 止まると「ステルス」状態になり、次の敵を1回やり過ごせる。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🕳️</span><b>マンホール:</b> 1APで別のマンホールへランダムワープ。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🚓</span><b>交番:</b> 職務質問で足止め、そのターンは移動不可。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🎯</span><b>目的地(的):</b> 到達するとボーナスP（ラウンド×2+5P）獲得。的は別の場所へ移動。</li>
                         <hr style="border:0; border-top:1px dashed #ccc; margin:8px 0;">
-                        <li><span class="rule-icon" style="display:inline-block; width:18px; text-align:center;">🚩</span> <b>陣地占領:</b> 病院・イベント・ショップ・交番・マンホール【以外】のマスは、3APを消費して「自分の陣地」にできます。陣地からは毎ターン収入が入ります！</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🚩</span><b>陣地占領（3P / 敵陣地5P）:</b> マスを自分の陣地にすると毎ターン収入（スラム1P・商業2P・高級3P）。敵の陣地は距離が遠いほど安く奪取できる（空き巣割引）。</li>
                     </ul>
                 </div>
-                
+
+                <!-- NPC -->
                 <div class="rules-section" style="border-color: #e74c3c;">
                     <h3 style="color: #e74c3c;">⚠️ NPC（敵）と危険なイベント</h3>
-                    <p style="font-size:13px; margin-bottom:8px;">マップ上のNPCと同じマスに止まるか、ラウンド終了時のイベントで被害を受けます。「身代わり人形」を装備していると1回だけ無効化できます。</p>
+                    <p style="font-size:12px; color:#555; margin-bottom:8px;">「身代わり人形」を装備していると1回だけ無効化可能。探偵の【情報操作】でNPCを移動させることもできます。</p>
                     <ul style="font-size:13px;">
-                        <li><span class="rule-icon">🚓</span><b>警察:</b> 補導されると次回AP-2（身分証・ステルス等で回避可）※偶数ラウンドはパトロールでマップを動きます。</li>
-                        <li><span class="rule-icon">😎</span><b>ヤクザ:</b> 30ダメージを受け、手札からカードをランダムに1枚奪われます。</li>
-                        <li><span class="rule-icon">💀</span><b>闇金:</b> 強制的に所持金から10Pを没収されます。</li>
-                        <li><span class="rule-icon">🧓</span><b>厄介なおじさん:</b> 絡まれてターンが強制終了し、カードを1枚失います。</li>
-                        <li><span class="rule-icon">🤝</span><b>仲間のホームレス:</b> （※例外）出会うと空き缶を1つ分けてくれる有益なNPCです。</li>
-                        <li><span class="rule-icon">🛻</span><b>ごみ収集車(毎ラウンド終了時):</b> ランダムにマップを暴走！轢かれると<b>80の大ダメージ</b>（一定確率でギリギリ回避）。</li>
+                        <li><span class="rule-icon">🚓</span><b>警察:</b> 補導されると次回AP-2（身分証・ステルス・サバイバーで回避可）。偶数ラウンド終了時にパトロール巡回あり。</li>
+                        <li><span class="rule-icon">😎</span><b>ヤクザ:</b> 30ダメージ＋手札1枚ランダム強奪。</li>
+                        <li><span class="rule-icon">💀</span><b>闇金:</b> 所持金から最大10P没収。</li>
+                        <li><span class="rule-icon">🧓</span><b>厄介なおじさん:</b> 絡まれてターン強制終了＋カード1枚喪失。</li>
+                        <li><span class="rule-icon">🐀</span><b>野良動物:</b> 同マスにいる間、缶拾い・ゴミ漁りが不可能になる。</li>
+                        <li><span class="rule-icon">🤝</span><b>仲間のホームレス:</b> 出会うと空き缶を1つもらえる有益なNPC。</li>
+                        <li><span class="rule-icon">🛻</span><b>ごみ収集車（毎ラウンド末）:</b> マップを暴走。轢かれると<b>80の大ダメージ</b>（70%の確率で命中）。次のラウンド開始前に「予兆」として危険エリアが予告される。</li>
                     </ul>
                 </div>
 
+                <!-- 全カード -->
                 <div class="rules-section" style="border-color: #8e44ad; background: #fffaf0;">
                     <h3 style="color: #8e44ad;">🃏 全カード一覧と効果</h3>
-                    <p style="font-size:12px; color:#555; margin-bottom:10px;">カードは自分のターンに2APで使用可能。手札上限は7枚（リュック装備で+2）です。</p>
-                    
-                    <h4 style="margin:8px 0 4px 0; font-size:14px; color:#2ecc71; border-bottom:1px solid #ccc;">【バフ・回復系】</h4>
+                    <p style="font-size:12px; color:#555; margin-bottom:10px;">カードはターン中に <b>2AP</b> で使用可能。手札上限は <b>7枚</b>（リュック+2、ハッカー+2）。ショップで購入またはイベントマスで獲得できます。</p>
+
+                    <h4 style="margin:8px 0 4px 0; font-size:14px; color:#2ecc71; border-bottom:1px solid #ccc;">【バフ・収入系】</h4>
                     <ul style="font-size:12px; margin-top:0;">
-                        <li><b>支援面談:</b> +5P＆次回AP+2</li>
-                        <li><b>炊き出し / 野良猫の導き:</b> +3P確定 / +2P確定</li>
-                        <li><b>今日の運勢 / 密かなバイト:</b> 50%でPが増えるか減る(ギャンブル)</li>
+                        <li><b>支援面談:</b> +5P ＆ 次回ターンAP+2</li>
+                        <li><b>炊き出し:</b> +3P確定</li>
+                        <li><b>野良猫の導き:</b> +2P確定</li>
+                        <li><b>今日の運勢:</b> 50%で+3P / -3P（ギャンブル）</li>
+                        <li><b>密かなバイト:</b> 50%で+6P / -3P（高リスク）</li>
                         <li><b>宝くじ当選:</b> 10%で+15Pの大当たり</li>
-                        <li><b>エナジードリンク / スケボー:</b> 即座にAP+5 / 次のターンのダイス結果に+5AP</li>
+                        <li><b>エナジードリンク:</b> 即座にAP+5</li>
+                        <li><b>スケボー:</b> 次回ダイスロールの結果にAP+5ボーナス</li>
                     </ul>
 
-                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#3498db; border-bottom:1px solid #ccc;">【装備品 (永続・使い切り)】</h4>
+                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#3498db; border-bottom:1px solid #ccc;">【装備品（永続 or 使い切り）】</h4>
                     <ul style="font-size:12px; margin-top:0;">
-                        <li><b>ボロボロの自転車:</b> 毎ターン獲得AP+2</li>
-                        <li><b>安全靴:</b> ゴミ漁りの消費APが1になる</li>
-                        <li><b>大きなリヤカー:</b> 自分の陣地からの収入が2倍になる</li>
-                        <li><b>リュック:</b> 手札の上限が2枚増える</li>
-                        <li><b>雨具ゲット:</b> 雨の日の移動・漁り不可ペナルティを無効化</li>
-                        <li><b>段ボールの盾 / ヘルメット:</b> 次に受けるダメージを半減 / 完全無効化(1回で消費)</li>
-                        <li><b>身代わり人形:</b> NPCや収集車などの妨害を1回だけ無効化(消費)</li>
+                        <li><b>ボロボロの自転車:</b> 毎ターン獲得AP+2（永続）</li>
+                        <li><b>安全靴:</b> ゴミ漁りのAPコストが1に（永続）</li>
+                        <li><b>大きなリヤカー:</b> 陣地収入が2倍に（永続）</li>
+                        <li><b>リュック:</b> 手札上限+2（永続）</li>
+                        <li><b>雨具ゲット:</b> 雨の日のペナルティを無効化（永続）</li>
+                        <li><b>段ボールの盾:</b> 次のダメージを半減（1回で消費）</li>
+                        <li><b>ヘルメット:</b> 次のダメージを完全無効化（1回で消費）</li>
+                        <li><b>身代わり人形:</b> NPC・収集車などの妨害を1回無効（1回で消費）</li>
+                    </ul>
+
+                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#27ae60; border-bottom:1px solid #ccc;">【回復系】</h4>
+                    <ul style="font-size:12px; margin-top:0;">
+                        <li><b>腐ったバーガー:</b> HP+20回復（50%で食中毒10ダメージのリスクあり）</li>
+                        <li><b>落ちてたポテト:</b> HP+15確定回復</li>
+                        <li><b>拾ったホットドッグ:</b> HP+30回復（50%で食中毒25ダメージのリスクあり）</li>
+                        <li><b>謎のエネルギーバー:</b> HP+10 ＆ AP+3</li>
+                        <li><b>水道水:</b> HP+5確定回復</li>
                     </ul>
 
                     <h4 style="margin:12px 0 4px 0; font-size:14px; color:#e74c3c; border-bottom:1px solid #ccc;">【攻撃・妨害系】</h4>
                     <ul style="font-size:12px; margin-top:0;">
                         <li><b>ステルス行動:</b> 次に遭遇する敵・NPCを回避</li>
-                        <li><b>身分証明書:</b> +1Pし、次に警察に捕まるのを防ぐ</li>
-                        <li><b>通報:</b> 他のプレイヤー1人に次回AP-2のペナルティ</li>
+                        <li><b>身分証明書:</b> +1P ＆ 次の警察を回避</li>
+                        <li><b>通報:</b> 他のプレイヤー1人に次回AP-2</li>
                         <li><b>缶泥棒:</b> 他人から最大2Pを奪う</li>
-                        <li><b>領土挑戦状:</b> サイコロで4以上が出れば他人の陣地を乗っ取る</li>
-                        <li><b>レンガ / バット / 釘バット:</b> 射程1〜2の他人に10〜30のダメージ</li>
-                        <li><b>拳銃 / パンチングマシン:</b> 40 / 80(同マスのみ)の大ダメージ</li>
-                        <li><b>ショットガン / レーザー銃:</b> 射程内の【全員】に50 / 100の超ダメージ</li>
+                        <li><b>領土挑戦状:</b> サイコロ4以上で他人の陣地を乗っ取る</li>
+                        <li><b>レンガ(射程2):</b> 10ダメージ</li>
+                        <li><b>バット(射程1):</b> 20ダメージ</li>
+                        <li><b>釘バット(射程1):</b> 30ダメージ</li>
+                        <li><b>拳銃(射程3):</b> 40ダメージ</li>
+                        <li><b>ショットガン(射程2・広域):</b> 射程内の全員に50ダメージ</li>
+                        <li><b>パンチングマシン(同マスのみ):</b> 80ダメージ</li>
+                        <li><b>レーザー銃(射程5・広域):</b> 射程内の全員に100ダメージ</li>
                     </ul>
 
-                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#8e44ad; border-bottom:1px solid #ccc;">【強力な全体効果 (逆転用)】</h4>
+                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#8e44ad; border-bottom:1px solid #ccc;">【強力な全体効果（逆転用）】</h4>
                     <ul style="font-size:12px; margin-top:0;">
                         <li><b>大暴落:</b> 全員の所持Pが半分になる</li>
-                        <li><b>下剋上:</b> 1位のプレイヤーと自分の所持Pをそっくり入れ替える！</li>
+                        <li><b>下剋上:</b> 1位プレイヤーと自分の所持Pをそっくり入れ替える</li>
+                    </ul>
+
+                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#16a085; border-bottom:1px solid #ccc;">【リアクション系（相手の効果を無効・反射）】</h4>
+                    <ul style="font-size:12px; margin-top:0;">
+                        <li><b>弁護士の盾:</b> 次に受ける攻撃・カツアゲを完全無効化（1回）</li>
+                        <li><b>裏取引:</b> 次の「下剋上」「大暴落」を使った相手に反射（1回）</li>
+                        <li><b>反撃の一撃:</b> 次にダメージを受けた時、同量を相手に返す（1回）</li>
                     </ul>
                 </div>
+
+                <!-- 天候・昼夜 -->
+                <div class="rules-section" style="border-color: #3498db; background: #f0f8ff;">
+                    <h3 style="color: #2980b9;">🌤️ 天候・昼夜・特殊イベント</h3>
+                    <ul style="font-size:13px;">
+                        <li><span class="rule-icon">🌧️</span><b>雨:</b> 移動コスト2AP・缶拾い/ゴミ漁り不可（雨具・元アスリートで無効）。</li>
+                        <li><span class="rule-icon">🌙</span><b>夜:</b> 視界が自分の前後3マスに制限される。ゴミ漁りにボーナスあり。</li>
+                        <li><span class="rule-icon">🚧</span><b>道路工事:</b> 一定確率で発生。そのマスは2ラウンド通行不可になる。</li>
+                        <li><span class="rule-icon">📈</span><b>相場変動:</b> 缶とゴミの換金相場がラウンドごとにランダムに変わる。</li>
+                        <li><span class="rule-icon">🎯</span><b>目的地ボーナス:</b> 的のマスに止まるとボーナスP獲得。的は移動後に別の場所へ。</li>
+                        <li><span class="rule-icon">🛻</span><b>収集車の予兆:</b> 次ラウンド開始前に「どのエリアが危険か」が告知される。</li>
+                    </ul>
+                </div>
+
             </div>
             <button class="btn-large" style="width:100%; margin-top:10px; background:#95a5a6; border-color:#7f8c8d;" onclick="toggleRulesModal()">✖ 閉じる</button>
         </div>
@@ -734,7 +799,19 @@
                 <div id="map-ap-hud" style="position:absolute;top:8px;right:8px;z-index:50;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);border:2px solid rgba(255,220,50,0.5);border-radius:10px;padding:6px 12px;color:#f1c40f;font-weight:bold;font-size:18px;text-shadow:0 0 8px #f1c40f;pointer-events:none;transition:all 0.3s;">
                     ⚡ <span id="map-ap-display">0</span>
                 </div>
-                <div id="game-board-container" class="panel"><div id="game-board"></div></div>
+                <!-- ズームボタン -->
+                <div id="zoom-controls">
+                    <button class="zoom-btn" onclick="mapZoom(0.2)" title="ズームイン">＋</button>
+                    <button class="zoom-btn" onclick="mapZoom(-0.2)" title="ズームアウト">－</button>
+                    <button class="zoom-btn" onclick="mapZoomReset()" title="リセット" style="font-size:12px;">⟳</button>
+                </div>
+                <div id="game-board-container" class="panel">
+                    <div id="game-board-wrapper">
+                        <div id="game-board-inner">
+                            <div id="game-board"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="right-side-area">
                 <div id="action-panel" class="panel">
@@ -770,6 +847,137 @@
 
 <script>
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ========== マップズーム・ドラッグ ==========
+let mapScale = 1.0;
+let mapOffsetX = 0;
+let mapOffsetY = 0;
+
+function applyMapTransform(smooth) {
+    const inner = document.getElementById('game-board-inner');
+    if (!inner) return;
+    inner.style.transition = smooth ? 'transform 0.12s ease' : 'none';
+    inner.style.transform = `translate(${mapOffsetX}px, ${mapOffsetY}px) scale(${mapScale})`;
+}
+
+// ズームボタン用（中央基準）
+function mapZoom(delta) {
+    const wrapper = document.getElementById('game-board-wrapper');
+    if (!wrapper) return;
+    const cx = wrapper.clientWidth / 2;
+    const cy = wrapper.clientHeight / 2;
+    _zoomAt(cx, cy, delta);
+}
+
+// 任意の点を基準にズーム
+function _zoomAt(px, py, delta) {
+    const newScale = Math.min(3.0, Math.max(0.25, mapScale + delta));
+    const ratio = newScale / mapScale;
+    mapOffsetX = px - ratio * (px - mapOffsetX);
+    mapOffsetY = py - ratio * (py - mapOffsetY);
+    mapScale = newScale;
+    applyMapTransform(true);
+}
+
+function mapZoomReset() {
+    mapScale = 1.0;
+    mapOffsetX = 0;
+    mapOffsetY = 0;
+    applyMapTransform(true);
+}
+
+// ドラッグ・ホイール初期化（ゲーム開始後に呼ぶ）
+function initMapInteraction() {
+    const wrapper = document.getElementById('game-board-wrapper');
+    if (!wrapper || wrapper._mapInteractionInit) return;
+    wrapper._mapInteractionInit = true;
+
+    // ---- ホイールでズーム ----
+    wrapper.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const rect = wrapper.getBoundingClientRect();
+        const px = e.clientX - rect.left;
+        const py = e.clientY - rect.top;
+        const delta = e.deltaY < 0 ? 0.15 : -0.15;
+        _zoomAt(px, py, delta);
+    }, { passive: false });
+
+    // ---- 左クリックドラッグで視点移動 ----
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let offsetAtDragStart = { x: 0, y: 0 };
+
+    wrapper.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;          // 左クリックのみ
+        // タイルのクリックイベントを妨げないよう tile 以外でのみドラッグ開始
+        // ただし、タイルでもドラッグ距離があれば移動として扱う
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        offsetAtDragStart = { x: mapOffsetX, y: mapOffsetY };
+        wrapper.classList.add('dragging');
+        const inner = document.getElementById('game-board-inner');
+        if (inner) inner.style.transition = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        mapOffsetX = offsetAtDragStart.x + dx;
+        mapOffsetY = offsetAtDragStart.y + dy;
+        applyMapTransform(false);
+    });
+
+    document.addEventListener('mouseup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        wrapper.classList.remove('dragging');
+        const inner = document.getElementById('game-board-inner');
+        if (inner) inner.style.transition = 'transform 0.12s ease';
+        // 5px未満の動きはクリックとして通す
+        const moved = Math.abs(e.clientX - dragStartX) + Math.abs(e.clientY - dragStartY);
+        if (moved > 5) e.stopPropagation();
+    });
+
+    // ---- タッチ対応（ピンチズーム＋1本指ドラッグ） ----
+    let lastTouches = null;
+    wrapper.addEventListener('touchstart', (e) => {
+        lastTouches = e.touches;
+    }, { passive: true });
+
+    wrapper.addEventListener('touchmove', (e) => {
+        if (!lastTouches) return;
+        if (e.touches.length === 1 && lastTouches.length === 1) {
+            // 1本指ドラッグ
+            const dx = e.touches[0].clientX - lastTouches[0].clientX;
+            const dy = e.touches[0].clientY - lastTouches[0].clientY;
+            mapOffsetX += dx;
+            mapOffsetY += dy;
+            applyMapTransform(false);
+            e.preventDefault();
+        } else if (e.touches.length === 2 && lastTouches.length === 2) {
+            // ピンチズーム
+            const prevDist = Math.hypot(
+                lastTouches[0].clientX - lastTouches[1].clientX,
+                lastTouches[0].clientY - lastTouches[1].clientY
+            );
+            const newDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            const rect = wrapper.getBoundingClientRect();
+            const cx = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
+            const cy = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
+            _zoomAt(cx, cy, (newDist - prevDist) * 0.005);
+            e.preventDefault();
+        }
+        lastTouches = e.touches;
+    }, { passive: false });
+
+    wrapper.addEventListener('touchend', () => { lastTouches = null; }, { passive: true });
+}
 
 // ==========================================
 // グローバルステート・同期キュー
@@ -955,7 +1163,7 @@ window.extractGameState = function() {
             hand: [...p.hand], maxHand: p.maxHand, cans: p.cans, trash: p.trash,
             stealth: p.stealth, rainGear: p.rainGear, hasID: p.hasID,
             bonusAP: p.bonusAP, penaltyAP: p.penaltyAP, skipTurn: p.skipTurn, cannotMove: p.cannotMove,
-            deaths: p.deaths||0, kills: p.kills||0,
+            deaths: p.deaths||0, kills: p.kills||0, respawnShield: p.respawnShield||0,
             color: p.color, charType: p.charType, userId: p.userId,
             equip: {...p.equip}
         })),
@@ -989,6 +1197,7 @@ window.applyGameState = function(state) {
         p.bonusAP = sp.bonusAP; p.penaltyAP = sp.penaltyAP;
         p.skipTurn = sp.skipTurn; p.cannotMove = sp.cannotMove;
         p.deaths = sp.deaths||0; p.kills = sp.kills||0;
+        p.respawnShield = sp.respawnShield||0;
         p.userId = sp.userId;
         if (sp.equip) p.equip = {...sp.equip};
         return p;
@@ -1032,6 +1241,7 @@ function createPlayer(id, name, isCPU, charType) {
         bonusAP: 0, penaltyAP: 0, skipTurn: false, cannotMove: false,
         deaths: 0, kills: 0,
         reaction: null,
+        respawnShield: 0, // 復活後の無敵ターン数（0で無効）
         color: pIdColors[id % 8], charType,
         equip: { bicycle: false, shoes: false, cart: false, shield: false, helmet: false, doll: false, backpack: false }
     };
@@ -1039,6 +1249,12 @@ function createPlayer(id, name, isCPU, charType) {
 
 // ========== DAMAGE SYSTEM ==========
 function dealDamage(target, dmg, source, attacker = null) {
+    // 復活無敵中はすべてのダメージを無効
+    if (target.respawnShield > 0) {
+        log(`🛡️ ${target.name}は復活無敵中！ダメージ無効（残${target.respawnShield}ターン）`);
+        triggerEventPopup(target.id, "🛡️", "復活無敵！", `ダメージ無効 残${target.respawnShield}ターン`, "good");
+        return 0;
+    }
     // リアクション: block（無効化）
     if (target.reaction === 'block') {
         target.reaction = null;
@@ -1127,6 +1343,7 @@ function dealDamage(target, dmg, source, attacker = null) {
 
         target.pos = 0; // 病院へ
         target.ap  = 0;
+        target.respawnShield = 2; // 復活後2ターン無敵
 
         const msgs = [
             lostP > 0        ? `${lostP}P没収`             : '',
@@ -1283,8 +1500,10 @@ function startOfflineGame() {
     if (size === "small") mapData = genSmallMap();
     else if (size === "medium") mapData = genMediumMap();
     else mapData = genLargeMap();
-    
-    truckPos = Math.floor(mapData.length * 0.1);
+
+    // 収集車を商業・高級エリア寄りから開始（スラム偏りを防ぐ）
+    const _nonSlum = mapData.filter(t => t.area !== 'slum' && t.type !== 'center');
+    truckPos = _nonSlum.length > 0 ? _nonSlum[Math.floor(_nonSlum.length * 0.3)].id : Math.floor(mapData.length * 0.4);
     unclePos = Math.floor(mapData.length * 0.2);
     animalPos = Math.floor(mapData.length * 0.3);
     policePos = Math.floor(mapData.length * 0.8);
@@ -1325,17 +1544,25 @@ const tileTooltipData = {
     luxury:    { title:"🏰 高級エリア", desc:"収入が高い。警察が多くパトロールする。" },
 };
 
-// ===== 自動スクロール =====
+// ===== 自動スクロール（オフセット移動版） =====
 function scrollToTile(tileId, smooth = true) {
     const tileEl = document.getElementById(`tile-${tileId}`);
-    const container = document.getElementById('game-board-container');
-    if (!tileEl || !container) return;
-    const tileRect = tileEl.getBoundingClientRect();
-    const contRect = container.getBoundingClientRect();
-    // コンテナ内での相対位置を中央に合わせる
-    const scrollLeft = container.scrollLeft + (tileRect.left - contRect.left) - contRect.width / 2 + tileRect.width / 2;
-    const scrollTop  = container.scrollTop  + (tileRect.top  - contRect.top)  - contRect.height / 2 + tileRect.height / 2;
-    container.scrollTo({ left: Math.max(0, scrollLeft), top: Math.max(0, scrollTop), behavior: smooth ? 'smooth' : 'instant' });
+    const wrapper = document.getElementById('game-board-wrapper');
+    const inner   = document.getElementById('game-board-inner');
+    if (!tileEl || !wrapper || !inner) return;
+
+    // inner 内でのタイルの位置（スケール前）
+    const innerRect = inner.getBoundingClientRect();
+    const tileRect  = tileEl.getBoundingClientRect();
+    const tileCxInner = (tileRect.left - innerRect.left) / mapScale + tileRect.width  / mapScale / 2;
+    const tileCyInner = (tileRect.top  - innerRect.top)  / mapScale + tileRect.height / mapScale / 2;
+
+    // ラッパー中央にタイルが来るようオフセット調整
+    const wCx = wrapper.clientWidth  / 2;
+    const wCy = wrapper.clientHeight / 2;
+    mapOffsetX = wCx - tileCxInner * mapScale;
+    mapOffsetY = wCy - tileCyInner * mapScale;
+    applyMapTransform(smooth);
 }
 
 function scrollToCurrentPlayer() {
@@ -1426,6 +1653,7 @@ function initBoard() {
         board.appendChild(div);
     });
     updateTokens();
+    initMapInteraction(); // ドラッグ・ホイールズームを有効化
 }
 
 function updateTokens() {
@@ -1738,8 +1966,8 @@ function triggerEventPopup(playerId, icon, title, detail = "", type = "neutral",
     const popup = document.createElement("div");
     popup.className = `event-popup ${type}`;
     popup.style.borderColor = borderColor;
-    popup.style.boxShadow = `0 8px 32px rgba(0,0,0,0.9), 0 0 22px ${borderColor}66`;
-    popup.innerHTML = `<div style="font-size:36px;line-height:1.1">${icon}</div>${player ? `<div style="color:${player.color};font-size:13px;font-weight:bold;margin:3px 0">${player.name}</div>` : ''}<div style="font-size:18px;margin:4px 0;line-height:1.3">${title}</div>${detail ? `<div style="font-size:12px;color:#bdc3c7;margin-top:5px">${detail}</div>` : ''}`;
+    popup.style.boxShadow = `0 4px 16px rgba(0,0,0,0.5), 0 0 12px ${borderColor}44`;
+    popup.innerHTML = `<div style="font-size:24px;line-height:1.1">${icon}</div>${player ? `<div style="color:${player.color};font-size:11px;font-weight:bold;margin:2px 0">${player.name}</div>` : ''}<div style="font-size:13px;margin:2px 0;line-height:1.3">${title}</div>${detail ? `<div style="font-size:10px;color:#bdc3c7;margin-top:3px">${detail}</div>` : ''}`;
     container.appendChild(popup);
     setTimeout(() => { if (popup.parentNode) popup.remove(); }, 2800);
 }
@@ -1801,8 +2029,15 @@ function showMgResult(isWin, msg, cardId) {
     overlay.style.display = "flex";
 }
 
+let pendingMgPopup = null; // イベント結果タブを閉じた後に表示するポップアップ
+
 function closeMgResult() {
     document.getElementById("mg-result-overlay").style.display = "none";
+    // ポップアップをここで表示（タブと重ならないよう遅延）
+    if (pendingMgPopup) {
+        const p = pendingMgPopup; pendingMgPopup = null;
+        setTimeout(() => triggerEventPopup(p.id, p.icon, p.title, p.detail, p.type), 150);
+    }
     if (pendingCardId !== -1) {
         showCardAcquisition(pendingCardId);
         pendingCardId = -1;
@@ -2050,7 +2285,7 @@ function updateUI() {
         div.innerHTML = `
             <div class="avatar-small-clay" style="border-color:${otherPlayer.color};">${charEmoji[otherPlayer.charType]}</div>
             <div style="font-size:10px;font-weight:bold;line-height:1.3;overflow:hidden;">
-                <div style="color:${otherPlayer.color};white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${otherPlayer.name}${cpuTag}</div>
+                <div style="color:${otherPlayer.color};white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${otherPlayer.name}${cpuTag}${otherPlayer.respawnShield > 0 ? ` <span style="color:#f1c40f;">🛡️${otherPlayer.respawnShield}</span>` : ''}</div>
                 <div style="color:#fdf5e6;">❤️${otherPlayer.hp} 💰${pointsFormat} 🎴${otherPlayer.hand.length}</div>
             </div>`;
         listContainer.appendChild(div);
@@ -2624,7 +2859,18 @@ function executeMove(targetTileId) {
     }
 
     let tileType = movedTile ? movedTile.type : mapData.find(t => t.id === currentPlayer.pos).type;
-    
+
+    // 病院マスに止まったら無料回復
+    if (tileType === "center") {
+        const healed = Math.min(30, 100 - currentPlayer.hp);
+        if (healed > 0) {
+            currentPlayer.hp = Math.min(100, currentPlayer.hp + 30);
+            log(`🏥 ${currentPlayer.name}が病院に立ち寄り！HP+${healed}無料回復！`);
+            triggerEventPopup(currentPlayer.id, "🏥", "病院で無料回復！", `HP+${healed}回復`, "good");
+            playSfx('success');
+        }
+    }
+
     if (tileType === "koban") {
         log("🚓 交番！職務質問で足止め！");
         triggerEventPopup(currentPlayer.id, "🚓", "交番！職務質問！", "このターンは移動できない", "bad");
@@ -2632,7 +2878,7 @@ function executeMove(targetTileId) {
     }
     
     // 警察NPCマス
-    if (currentPlayer.pos === policePos) {
+    if (currentPlayer.pos === policePos && currentPlayer.respawnShield <= 0) {
         if (currentPlayer.equip.doll) {
             currentPlayer.equip.doll = false;
             log(`🎎 身代わり人形が警察を防いだ！`);
@@ -2668,14 +2914,14 @@ function executeMove(targetTileId) {
     }
     
     // その他のNPCイベント
-    if (currentPlayer.pos === unclePos) {
+    if (currentPlayer.pos === unclePos && currentPlayer.respawnShield <= 0) {
         log(`<span class="danger">🧓 厄介なおじさん！カード1枚破棄＆ターン終了！</span>`);
         if (currentPlayer.hand.length > 0) currentPlayer.hand.pop();
         currentPlayer.ap = 0;
         triggerEventPopup(currentPlayer.id, "🧓", "厄介なおじさん！", "カード1枚破棄＆ターン終了", "bad");
         syncOnline(); updateUI(); return;
     }
-    if (currentPlayer.pos === yakuzaPos) {
+    if (currentPlayer.pos === yakuzaPos && currentPlayer.respawnShield <= 0) {
         if (currentPlayer.equip.doll) {
             currentPlayer.equip.doll = false;
             log(`🎎 身代わり人形がヤクザを防いだ！`);
@@ -2689,7 +2935,7 @@ function executeMove(targetTileId) {
             }
         }
     }
-    if (currentPlayer.pos === loansharkPos) {
+    if (currentPlayer.pos === loansharkPos && currentPlayer.respawnShield <= 0) {
         if (currentPlayer.equip.doll) {
             currentPlayer.equip.doll = false;
             log(`🎎 身代わり人形が闇金を防いだ！`);
@@ -2859,14 +3105,15 @@ async function processMiniGameResult(isWin, msg) {
         }
         currentPlayer.hand.push(acquiredCardId);
         let cardName = acquiredCardId >= 0 ? deckData[acquiredCardId].name : "";
-        triggerEventPopup(currentPlayer.id, "🎲", `ミニゲーム成功！`, `${msg}　カード「${cardName}」獲得！`, "good");
+        // イベント結果タブが閉じた後にポップアップ表示するため pendingPopup に保持
         if (typeof isOnlineMode !== 'undefined' && isOnlineMode) {
             const _cm = { type: 'card_acquisition', cardId: acquiredCardId };
             if (typeof isHost !== 'undefined' && isHost) broadcastNetworkData(_cm);
             else if (typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) hostConnection.send(_cm);
         }
+        pendingMgPopup = { id: currentPlayer.id, icon: "🎲", title: `ミニゲーム成功！`, detail: `${msg}　カード「${cardName}」獲得！`, type: "good" };
     } else {
-        triggerEventPopup(currentPlayer.id, "🎲", `ミニゲーム失敗...`, msg, "bad");
+        pendingMgPopup = { id: currentPlayer.id, icon: "🎲", title: `ミニゲーム失敗...`, detail: msg, type: "bad" };
     }
     
     showMgResult(isWin, msg, acquiredCardId);
@@ -3359,23 +3606,21 @@ let weaponArcCanvas = null;
 let weaponArcAnimId = null;
 
 function getArcCoords(tileEl) {
-    // ボードコンテナ内の座標を返す（スクロール込み）
-    const container = document.getElementById('game-board-container');
-    const board = document.getElementById('game-board');
-    if (!container || !board || !tileEl) return null;
-    const contRect = container.getBoundingClientRect();
+    const wrapper = document.getElementById('game-board-wrapper');
+    if (!wrapper || !tileEl) return null;
+    const wrapRect = wrapper.getBoundingClientRect();
     const tileRect = tileEl.getBoundingClientRect();
     return {
-        x: tileRect.left - contRect.left + container.scrollLeft + tileRect.width / 2,
-        y: tileRect.top  - contRect.top  + container.scrollTop  + tileRect.height / 2,
+        x: (tileRect.left - wrapRect.left + wrapper.scrollLeft + tileRect.width  / 2) / mapScale,
+        y: (tileRect.top  - wrapRect.top  + wrapper.scrollTop  + tileRect.height / 2) / mapScale,
     };
 }
 
 function showWeaponArcUI(cardData, targetsInRange, attacker) {
     weaponArcData = { cardData, targets: targetsInRange, attacker };
 
-    // canvas をボードコンテナに挿入（サイズはスクロール領域全体）
-    const container = document.getElementById('game-board-container');
+    // canvas を game-board-inner に挿入（ズーム前のサイズ基準）
+    const container = document.getElementById('game-board-inner');
     const board = document.getElementById('game-board');
     if (weaponArcCanvas) weaponArcCanvas.remove();
     weaponArcCanvas = document.createElement('canvas');
@@ -3399,10 +3644,11 @@ function showWeaponArcUI(cardData, targetsInRange, attacker) {
     };
     slider.oninput = drawAndUpdate;
 
-    // スクロール時も再描画
-    container.addEventListener('scroll', drawAndUpdate);
+    // スクロール時も再描画（wrapperがスクロール担当）
+    const _wrapper = document.getElementById('game-board-wrapper');
+    if (_wrapper) _wrapper.addEventListener('scroll', drawAndUpdate);
     weaponArcData._scrollHandler = drawAndUpdate;
-    weaponArcData._container = container;
+    weaponArcData._container = _wrapper;
 
     drawAndUpdate();
 
@@ -3712,6 +3958,14 @@ async function endTurnLogic() {
     currentPlayer.cannotMove = false;
     currentPlayer.skipTurn = false;
     
+    // 復活無敵カウントダウン
+    if (currentPlayer.respawnShield > 0) {
+        currentPlayer.respawnShield--;
+        if (currentPlayer.respawnShield === 0) {
+            log(`🛡️ ${currentPlayer.name}の復活無敵が終了`);
+        }
+    }
+    
     if (turn === players.length - 1) {
         await processRoundEvents();
     }
@@ -3734,7 +3988,14 @@ function getDestRandom(start, steps) {
         let validNextTiles = tile.next.filter(id => id !== constructionPos);
         if (validNextTiles.length === 0) break;
         
-        current = validNextTiles[Math.floor(Math.random() * validNextTiles.length)];
+        // スラムエリアへの偏りを減らす：非スラムタイルに重みを付ける
+        const weighted = [];
+        validNextTiles.forEach(id => {
+            const t = mapData.find(x => x.id === id);
+            const w = (t && t.area !== 'slum') ? 3 : 1; // 商業・高級エリアは3倍の確率
+            for (let j = 0; j < w; j++) weighted.push(id);
+        });
+        current = weighted[Math.floor(Math.random() * weighted.length)];
         hitList.push(current);
     }
     return { finalPos: current, hitList: hitList };
@@ -4062,13 +4323,8 @@ async function processCPUTurn() {
             }
         }
         
-        // スリ
-        if (!acted && otherPlayersOnTile.length > 0 && cpuPlayer.ap >= 3 && Math.random() > 0.6) {
-            actionPickpocket();
-            acted = true;
-        }
         // 換金
-        else if (!acted && currentTile.type === "exchange" && (cpuPlayer.cans > 0 || cpuPlayer.trash > 0)) {
+        if (!acted && currentTile.type === "exchange" && (cpuPlayer.cans > 0 || cpuPlayer.trash > 0)) {
             actionExchange();
             acted = true;
         }
@@ -4082,10 +4338,14 @@ async function processCPUTurn() {
                 acted = true;
             }
         }
-        // 陣地占領
-        else if (!acted && cpuPlayer.ap >= 3 && ["normal", "can", "trash", "job", "exchange", "shelter"].includes(currentTile.type) && territories[cpuPlayer.pos] !== cpuPlayer.id && cpuPlayer.pos !== unclePos && Math.random() > 0.4) {
-            actionOccupy();
-            acted = true;
+        // 陣地占領（APではなくPを使用。P残高チェック必須）
+        else if (!acted && ["normal", "can", "trash", "job", "exchange", "shelter"].includes(currentTile.type) && territories[cpuPlayer.pos] !== cpuPlayer.id && cpuPlayer.pos !== unclePos && Math.random() > 0.4) {
+            const isEnemyT = territories[cpuPlayer.pos] !== undefined && territories[cpuPlayer.pos] !== cpuPlayer.id;
+            const neededP = isEnemyT ? 5 : 3;
+            if (cpuPlayer.p >= neededP) {
+                actionOccupy();
+                acted = true;
+            }
         }
         // バイト
         else if (!acted && currentTile.type === "job" && cpuPlayer.ap >= 4 && Math.random() > 0.3) {
@@ -5118,8 +5378,10 @@ window.startOnlineGame = async function() {
     if (mapSizeStr === "small") mapData = genSmallMap();
     else if (mapSizeStr === "medium") mapData = genMediumMap();
     else mapData = genLargeMap();
-    
-    truckPos = Math.floor(mapData.length * 0.1);
+
+    // 収集車を商業・高級エリア寄りから開始（スラム偏りを防ぐ）
+    const _nonSlum2 = mapData.filter(t => t.area !== 'slum' && t.type !== 'center');
+    truckPos = _nonSlum2.length > 0 ? _nonSlum2[Math.floor(_nonSlum2.length * 0.3)].id : Math.floor(mapData.length * 0.4);
     unclePos = Math.floor(mapData.length * 0.2);
     animalPos = Math.floor(mapData.length * 0.3);
     policePos = Math.floor(mapData.length * 0.8);
