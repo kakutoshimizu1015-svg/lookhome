@@ -144,10 +144,7 @@
         }
         /* ===== END MOBILE LAYOUT ===== */
 
-        /* Path preview glow: 3 tiles ahead, fading */
-        .tile-path-1 { box-shadow:0 0 20px rgba(255,220,50,0.95), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,220,50,0.95) !important; }
-        .tile-path-2 { box-shadow:0 0 14px rgba(255,200,30,0.65), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,200,30,0.65) !important; }
-        .tile-path-3 { box-shadow:0 0 8px  rgba(255,180,20,0.35), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,180,20,0.35) !important; }
+        /* Path preview glow: moved after tile type styles for correct specificity */
         /* Manhole connection highlight */
         .tile-manhole-linked { animation:manhole-linked-glow 1.2s ease-in-out infinite !important; will-change:filter; }
         @keyframes manhole-linked-glow {
@@ -194,6 +191,36 @@
         }
         .tile.night-fog { opacity:0.18 !important; filter:brightness(0.3) !important; }
         /* ===== END MARIO PARTY MAP STYLE ===== */
+
+        /* ===== PATH PREVIEW GLOW (after tile types for correct override) ===== */
+        .tile.tile-path-1 {
+            box-shadow:0 0 22px rgba(255,220,50,0.95), 0 0 44px rgba(255,220,50,0.4), 0 4px 8px rgba(0,0,0,0.55) !important;
+            border-color:rgba(255,220,50,0.95) !important;
+            animation: path-pulse-1 1.2s ease-in-out infinite alternate !important;
+        }
+        .tile.tile-path-2 {
+            box-shadow:0 0 14px rgba(255,200,30,0.6), 0 0 28px rgba(255,200,30,0.2), 0 4px 8px rgba(0,0,0,0.55) !important;
+            border-color:rgba(255,200,30,0.6) !important;
+            animation: path-pulse-2 1.4s ease-in-out infinite alternate !important;
+        }
+        .tile.tile-path-3 {
+            box-shadow:0 0 8px rgba(255,180,20,0.3), 0 0 16px rgba(255,180,20,0.1), 0 4px 8px rgba(0,0,0,0.55) !important;
+            border-color:rgba(255,180,20,0.3) !important;
+            animation: path-pulse-3 1.6s ease-in-out infinite alternate !important;
+        }
+        @keyframes path-pulse-1 {
+            0%   { box-shadow:0 0 18px rgba(255,220,50,0.8),  0 0 36px rgba(255,220,50,0.3), 0 4px 8px rgba(0,0,0,0.55); }
+            100% { box-shadow:0 0 28px rgba(255,220,50,1),    0 0 56px rgba(255,220,50,0.5), 0 4px 8px rgba(0,0,0,0.55); }
+        }
+        @keyframes path-pulse-2 {
+            0%   { box-shadow:0 0 10px rgba(255,200,30,0.45), 0 0 22px rgba(255,200,30,0.15), 0 4px 8px rgba(0,0,0,0.55); }
+            100% { box-shadow:0 0 18px rgba(255,200,30,0.7),  0 0 34px rgba(255,200,30,0.25), 0 4px 8px rgba(0,0,0,0.55); }
+        }
+        @keyframes path-pulse-3 {
+            0%   { box-shadow:0 0 5px  rgba(255,180,20,0.2),  0 0 12px rgba(255,180,20,0.08), 0 4px 8px rgba(0,0,0,0.55); }
+            100% { box-shadow:0 0 10px rgba(255,180,20,0.35), 0 0 20px rgba(255,180,20,0.12), 0 4px 8px rgba(0,0,0,0.55); }
+        }
+        /* ===== END PATH PREVIEW GLOW ===== */
         @keyframes pulse-dest { 0%{transform:translateX(-50%) scale(1);} 100%{transform:translateX(-50%) scale(1.3);} }
         .tile-highlight-branch { box-shadow:0 0 20px #f1c40f,inset 0 0 15px rgba(241,196,15,0.8) !important; border:4px solid #f1c40f !important; cursor:pointer; animation:pulse-branch 0.8s infinite alternate; z-index:20 !important; transform:scale(1.15); }
         @keyframes pulse-branch { 0%{box-shadow:0 0 10px #f1c40f,inset 0 0 10px rgba(241,196,15,0.5); transform:scale(1.15);} 100%{box-shadow:0 0 30px #f1c40f,inset 0 0 20px rgba(241,196,15,1); transform:scale(1.25);} }
@@ -1085,6 +1112,10 @@ function initMapInteraction() {
 let globalMasterVolume = 1.0;
 let isUIAnimating = false;
 let pendingNetworkState = null;
+
+// ゲスト側の収集車演出トラッキング
+let guestTruckPathTiles = [];
+let guestTruckFirstStep = true;
 
 function setAnimating(state) {
     isUIAnimating = state;
@@ -4427,6 +4458,8 @@ async function processRoundEvents() {
     document.body.classList.remove('horror-mode');
     if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
         broadcastNetworkData({ type: 'truck_end' });
+        // 収集車ダメージの結果をゲストに即時反映（HP等の変化）
+        syncOnline();
     }
     
     // 警察パトロール（偶数ラウンドのみ）
@@ -5176,23 +5209,34 @@ function handleNetworkData(data, senderPeerId = null, conn = null) {
         if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
         log(`<span class="system" style="color:#c0392b;">🛻 ごみ収集車！</span>`);
         document.body.classList.add('horror-mode');
+        // ゲスト側トラッキングリセット
+        guestTruckPathTiles = [];
+        guestTruckFirstStep = true;
+        playSfx('hit');
     }
     else if (data.type === 'truck_step') {
         if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
-        // ハイライト表示（前のハイライトを消してから）
-        document.querySelectorAll('.truck-highlight').forEach(el => el.classList.remove('truck-highlight'));
+        // ホスト側と同等の演出：残光トレイル＋カメラ追従
         truckPos = data.tileId;
         updateTokens();
+        // 最初の1歩だけカメラ追従
+        if (guestTruckFirstStep) { scrollToTile(data.tileId); guestTruckFirstStep = false; }
         const el = document.getElementById(`tile-${data.tileId}`);
         if (el) {
             el.classList.add('truck-highlight');
-            setTimeout(() => el.classList.remove('truck-highlight'), 280);
+            guestTruckPathTiles.push(data.tileId);
+            // 残光エフェクト：直前のタイルを truck-path-glow に変換（ホストと同じ演出）
+            guestTruckPathTiles.slice(0, -1).forEach(pid => {
+                const pe = document.getElementById(`tile-${pid}`);
+                if (pe) { pe.classList.remove('truck-highlight'); pe.classList.add('truck-path-glow'); }
+            });
         }
     }
     else if (data.type === 'truck_end') {
         if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
         document.body.classList.remove('horror-mode');
         document.querySelectorAll('.truck-highlight, .truck-path-glow').forEach(el => { el.classList.remove('truck-highlight'); el.classList.remove('truck-path-glow'); });
+        guestTruckPathTiles = [];
     }
     else if (data.type === 'police_patrol_start') {
         if (isHost) { Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); }); }
