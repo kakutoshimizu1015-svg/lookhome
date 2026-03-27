@@ -276,8 +276,8 @@
         .npc-yakuza { background-color:#2c3e50; bottom:-2px; right:-2px; }
         .npc-loanshark { background-color:#8e44ad; top:50%; left:-2px; transform:translateY(-50%); }
         .npc-friend { background-color:#27ae60; bottom:-2px; left:-2px; }
-        /* 通常時は半透明 → マス目が見やすい */
-        .truck-token { width:40px; height:40px; border-radius:8px; position:absolute; z-index:30; border:2px solid rgba(255,34,0,0.35); box-shadow:none; transition:opacity 0.4s,box-shadow 0.4s,border-color 0.4s; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; justify-content:center; align-items:center; font-size:24px; background:rgba(90,0,0,0.30); animation:none; opacity:0.28; }
+        /* 通常時でも存在が分かる程度に表示 */
+        .truck-token { width:40px; height:40px; border-radius:8px; position:absolute; z-index:30; border:2px solid rgba(255,34,0,0.55); box-shadow:0 0 8px rgba(255,0,0,0.25); transition:opacity 0.4s,box-shadow 0.4s,border-color 0.4s; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; justify-content:center; align-items:center; font-size:24px; background:rgba(90,0,0,0.45); animation:none; opacity:0.55; }
         /* horror-mode 中だけフル表示 */
         body.horror-mode .truck-token { opacity:1 !important; background:radial-gradient(circle,#5a0000,#1a0000) !important; border:3px solid #ff2200 !important; box-shadow:0 0 25px #ff2200, 0 0 50px rgba(255,30,0,0.7), 0 4px 8px rgba(0,0,0,0.9) !important; animation:truck-idle 0.6s ease-in-out infinite alternate !important; }
         @keyframes truck-idle { 0%{box-shadow:0 0 20px #ff2200, 0 0 40px rgba(255,30,0,0.6);} 100%{box-shadow:0 0 50px #ff0000, 0 0 100px rgba(255,0,0,0.8), 0 0 140px rgba(255,0,0,0.3);} }
@@ -325,6 +325,22 @@
         @keyframes event-popup-anim { 0%{opacity:0;transform:scale(0.6) translateY(10px);} 13%{opacity:1;transform:scale(1.04) translateY(0);} 22%{transform:scale(1);} 74%{opacity:0.9;transform:scale(1) translateY(-8px);} 100%{opacity:0;transform:scale(0.9) translateY(-24px);} }
         
         #dice-overlay { position:fixed; top:25%; left:50%; transform:translate(-50%,-50%); background:rgba(62,47,42,0.95); color:#fdf5e6; padding:20px 40px; border-radius:20px; border:6px solid #e07a5f; z-index:200; display:none; flex-direction:column; align-items:center; box-shadow:0 0 40px rgba(0,0,0,0.8); text-align:center; }
+        /* 順番決めダイスオーバーレイ */
+        #turn-order-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; display:none; justify-content:center; align-items:center; }
+        #turn-order-box { background:rgba(62,47,42,0.97); border:6px solid #f1c40f; border-radius:20px; padding:25px 30px; max-width:500px; width:92%; max-height:85vh; overflow-y:auto; color:#fdf5e6; box-shadow:0 0 60px rgba(241,196,15,0.3); }
+        .to-player-row { display:flex; align-items:center; gap:10px; padding:10px 12px; margin:6px 0; background:#4a3b32; border-radius:10px; border:2px solid #8d6e63; transition:all 0.4s; }
+        .to-player-row.rolling { border-color:#f1c40f; box-shadow:0 0 12px rgba(241,196,15,0.5); }
+        .to-player-row.done { border-color:#2ecc71; }
+        .to-avatar { width:36px; height:36px; border-radius:8px; border:3px solid; display:flex; justify-content:center; align-items:center; font-size:22px; background:#8d7b68; flex-shrink:0; }
+        .to-name { font-weight:bold; font-size:14px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .to-dice-area { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+        .to-dice { width:36px; height:36px; background:#fdf5e6; color:#c0392b; font-size:18px; font-weight:bold; border-radius:8px; border:3px solid #3e2723; display:flex; justify-content:center; align-items:center; box-shadow:inset 0 0 6px rgba(0,0,0,0.2); }
+        .to-dice.rolling { animation:roll-anim 0.15s infinite; }
+        .to-dice.stopped { animation:none; box-shadow:0 0 10px #f1c40f, inset 0 0 6px rgba(0,0,0,0.2); }
+        .to-total { font-size:18px; font-weight:bold; color:#f1c40f; min-width:36px; text-align:center; text-shadow:0 0 8px rgba(241,196,15,0.5); }
+        .to-rank { font-size:20px; min-width:28px; text-align:center; }
+        @keyframes to-highlight { 0%{box-shadow:0 0 8px rgba(241,196,15,0.3);} 100%{box-shadow:0 0 25px rgba(241,196,15,0.8);} }
+        .to-player-row.winner { border-color:#f1c40f; animation:to-highlight 0.8s infinite alternate; background:#5c4a44; }
         .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1001; display:none; justify-content:center; align-items:center; }
         .modal-box { background:#87CEEB; border:var(--clay-border); border-radius:15px; padding:20px; width:90%; max-width:450px; box-shadow:0 0 20px rgba(0,0,0,0.8); color:var(--clay-text); text-align:center; margin:auto; max-height:90vh; overflow-y:auto; }
         
@@ -390,9 +406,8 @@
         .rules-section p { font-size: 14px; line-height: 1.5; margin: 5px 0; color: #333; }
         .rule-icon { font-size: 16px; margin-right: 4px; }
 
-        /* スマホ用レイアウト調整 */
+        /* スマホ用レイアウト調整 — タイル・トークンサイズはPCと同一に保持しズーム/パンで対応 */
         @media (max-width:768px) {
-            :root { --tile-size:42px; }
             h1 { font-size:18px; margin:5px 0; }
             body { padding:5px; }
             #setup-screen { padding:15px; margin-top:10px; }
@@ -410,9 +425,7 @@
             .avatar-large { width:50px; height:50px; margin:0; border-width:2px; }
             .turn-text-clay { width:100%; font-size:14px; margin-bottom:5px; }
             .status-box { width:30%; font-size:10px; padding:4px; margin:0; }
-            .tile { font-size:7px; }
-            .tile-id-label { font-size:9px; top:2px; left:4px; }
-            .player-token { width:16px; height:16px; border-width:2px; font-size:9px; }
+            /* タイル・トークンサイズはPC同一（--tile-size:80px, token:32px）を維持 */
             .btn-end-clay { grid-column:span 2; font-size:14px; padding:12px; }
             .card-btn-clay { min-width:100px; padding:6px; }
             #turn-banner-text { font-size:28px; padding:15px 20px; }
@@ -485,7 +498,7 @@
                 <div class="rules-section">
                     <h3>🏆 ゲームの目的</h3>
                     <p>指定のラウンド数終了時に、最も多くの<b>総合スコア</b>を獲得したプレイヤーが優勝！<br>
-                    スコア ＝ <b>所持P × 2</b> ＋ 陣地の価値 ＋ 資源価値 ＋ キル×3 − デス×8</p>
+                    スコア ＝ <b>所持P × 2</b> ＋ 陣地の価値 ＋ 資源価値 ＋ キル×3 − デス×5</p>
                 </div>
 
                 <!-- ターンの流れ -->
@@ -504,7 +517,7 @@
                     <h3>📊 ステータス</h3>
                     <ul>
                         <li><span class="rule-icon">⚡</span><b>AP:</b> 行動力。移動・アクション・カード使用に消費。ターン終了で0になる。</li>
-                        <li><span class="rule-icon">❤️</span><b>HP:</b> 体力。0になると病院送り → 所持Pが最大30P没収、装備1つランダム喪失、缶・ゴミをその場にドロップ。復活後HP100で再開。</li>
+                        <li><span class="rule-icon">❤️</span><b>HP:</b> 体力。0になると病院送り → 所持Pから最大15P没収、装備1つランダム喪失、缶・ゴミをその場にドロップ。復活後HP100で再開。</li>
                         <li><span class="rule-icon">💰</span><b>P:</b> お金。陣地化・カード購入などに使用。スコアの最大比重。</li>
                         <li><span class="rule-icon">🚩</span><b>陣地:</b> 占領したマスから毎ターンのダイスロール時に収入。3ラウンドに1回、維持費（1P/マス）が徴収される。</li>
                     </ul>
@@ -516,11 +529,11 @@
                     <p style="font-size:12px;color:#555;margin-bottom:8px;">各キャラは <b>パッシブ（自動発動）</b> と <b>アクションスキル（AP消費）</b> を1つずつ持ちます。<br>キャラアイコンをクリックすると詳細を確認できます。</p>
                     <ul style="font-size:13px; line-height:1.7;">
                         <li><span class="rule-icon">🏃</span><b>元アスリート —【健脚】</b>移動常に1AP・雨無効 ／ <b>【疾風ダッシュ】</b>3AP: ピッタリ3マス先へ跳躍（交番・罠を飛び越え可）</li>
-                        <li><span class="rule-icon">💼</span><b>元営業マン —【コミュ力】</b>バイト成功率70%・ショップ1P割引 ／ <b>【訪問販売】</b>2AP: 手札1枚を同マスの相手に強制購入させ3P徴収</li>
+                        <li><span class="rule-icon">💼</span><b>元営業マン —【コミュ力】</b>バイト成功率80%・ショップ1P割引 ／ <b>【訪問販売】</b>2AP: 手札1枚を同マスの相手に強制購入させ3P徴収</li>
                         <li><span class="rule-icon">🌿</span><b>サバイバー —【危機察知】</b>ゴミ漁り失敗の警察ペナ無効 ／ <b>【野宿】</b>2AP: その場でHP+15回復</li>
-                        <li><span class="rule-icon">👊</span><b>元ヤン —【威圧】</b>同マス/すれ違いで自動1Pカツアゲ ／ <b>【殴る】</b>2AP: 同マス相手に10ダメージ</li>
+                        <li><span class="rule-icon">👊</span><b>元ヤン —【威圧】</b>同マス/すれ違いで自動1Pカツアゲ（1ターン2P上限）／ <b>【殴る】</b>2AP: 同マス相手に10ダメージ</li>
                         <li><span class="rule-icon">💻</span><b>元ハッカー —【クラウドストレージ】</b>手札上限+2（デフォルト9枚）／ <b>【遠隔ハッキング】</b>3AP: どこからでもショップ在庫を強制入替え＆1枚購入</li>
-                        <li><span class="rule-icon">🎸</span><b>ストリートミュージシャン —【投げ銭】</b>他者が同マスに来るたび銀行から+2P ／ <b>【路上ライブ】</b>4AP: 周囲2マス以内の全員を強制引き寄せ</li>
+                        <li><span class="rule-icon">🎸</span><b>ストリートミュージシャン —【投げ銭】</b>他者が同マスor隣接に来るたび銀行から+3P ／ <b>【路上ライブ】</b>4AP: 周囲2マス以内の全員を強制引き寄せ</li>
                         <li><span class="rule-icon">🩺</span><b>闇医者 —【自己治癒】</b>ターン開始時に自動HP+5 ／ <b>【闇診療】</b>2AP: 同マスの相手HP+30の代わりに5P強制徴収</li>
                         <li><span class="rule-icon">🎲</span><b>ギャンブラー —【アドレナリン】</b>ゾロ目でAP倍＋HP+10回復 ／ <b>【イカサマ勝負】</b>2AP: 同マスの相手と1d6対決・勝者が5P奪取（同点は仕掛け側の負け）</li>
                         <li><span class="rule-icon">🕵️</span><b>元探偵 —【張り込み】</b>自分の陣地に相手が止まると手札1枚没収 ／ <b>【情報操作】</b>3AP: NPC1体を任意のマスへ強制移動</li>
@@ -531,12 +544,12 @@
                 <div class="rules-section">
                     <h3>🗺️ マスの種類と効果</h3>
                     <ul style="font-size:13px; line-height:1.6;">
-                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🏥</span><b>病院(開始地点):</b> HPが0になるとここへ搬送され、P没収・装備喪失・資源ドロップが発生する。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🏥</span><b>病院(開始地点):</b> HPが0になるとここへ搬送され、最大15P没収・装備1つ喪失・資源ドロップが発生する。</li>
                         <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🛣️</span><b>通常の道:</b> 特別な効果なし。</li>
                         <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🥫</span><b>空き缶:</b> 1APで缶を拾う（1ターン3回まで）。雨の日は雨具が必要。</li>
                         <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🗑️</span><b>ゴミ山:</b> 2APでゴミを漁る。失敗すると次回AP-2ペナルティ。</li>
                         <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">💱</span><b>買取所:</b> 缶・ゴミを現在の相場でP換金（0AP）。相場はラウンドごとに変動。</li>
-                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">💼</span><b>バイト:</b> 4APで挑戦。成功率50%（営業マンは70%）で10P獲得。</li>
+                        <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">💼</span><b>バイト:</b> 3APで挑戦。成功率60%（営業マンは80%）で12P獲得。</li>
                         <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🛒</span><b>ショップ:</b> カード購入（毎ターン在庫が刷新）や手札の売却（2P）ができる。</li>
                         <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🎲</span><b>イベント:</b> ミニゲームかストーリーイベントが発生。カード獲得のチャンス。</li>
                         <li><span class="rule-icon" style="display:inline-block;width:20px;text-align:center;">🏕️</span><b>避難所:</b> 止まると「ステルス」状態になり、次の敵を1回やり過ごせる。</li>
@@ -559,7 +572,7 @@
                         <li><span class="rule-icon">🧓</span><b>厄介なおじさん:</b> 絡まれてターン強制終了＋カード1枚喪失。</li>
                         <li><span class="rule-icon">🐀</span><b>野良動物:</b> 同マスにいる間、缶拾い・ゴミ漁りが不可能になる。</li>
                         <li><span class="rule-icon">🤝</span><b>仲間のホームレス:</b> 出会うと空き缶を1つもらえる有益なNPC。</li>
-                        <li><span class="rule-icon">🛻</span><b>ごみ収集車（毎ラウンド末）:</b> マップを暴走。轢かれると<b>80の大ダメージ</b>（70%の確率で命中）。次のラウンド開始前に「予兆」として危険エリアが予告される。</li>
+                        <li><span class="rule-icon">🛻</span><b>ごみ収集車（毎ラウンド末）:</b> マップを暴走。轢かれると<b>50の大ダメージ</b>（55%の確率で命中）。次のラウンド開始前に「予兆」として危険エリアが予告される。</li>
                     </ul>
                 </div>
 
@@ -799,6 +812,18 @@
     <div id="branch-prompt">🛣️ 光っているマスをタップして進む道を選んでください</div>
     
     <div id="dice-overlay"><div id="dice-message">サイコロを振っています...</div><div class="dice-container"><div id="dice-1" class="dice">1</div><div id="dice-2" class="dice">1</div></div><div id="dice-result"></div></div>
+    <!-- 順番決めダイスオーバーレイ -->
+    <div id="turn-order-overlay">
+        <div id="turn-order-box">
+            <h2 id="turn-order-title" style="margin:0 0 15px 0;color:#f1c40f;text-align:center;font-size:22px;border-bottom:2px dashed #f1c40f;padding-bottom:10px;">🎲 順番決めダイス！</h2>
+            <div id="turn-order-players"></div>
+            <div id="turn-order-result" style="display:none;margin-top:15px;padding:12px;background:#3e2f2a;border-radius:10px;text-align:center;">
+                <div style="font-size:16px;font-weight:bold;color:#f1c40f;margin-bottom:8px;">📋 ターン順が決定！</div>
+                <div id="turn-order-final"></div>
+            </div>
+            <div id="turn-order-status" style="text-align:center;margin-top:10px;font-size:14px;font-weight:bold;color:#bdc3c7;"></div>
+        </div>
+    </div>
     <div id="turn-banner-overlay"><div id="turn-banner-text"></div></div>
     <div id="event-popup-overlay"></div>
     <div id="tile-tooltip"><div class="tt-title" id="tt-title"></div><div class="tt-desc" id="tt-desc"></div></div>
@@ -821,7 +846,7 @@
                 <select id="p2-type"><option value="human">人間</option><option value="cpu" selected>CPU</option><option value="none">不参加</option></select>
                 <select id="p2-avatar"><option value="sales">💼元営業マン</option><option value="athlete">🏃元アスリート</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
                 <div id="p2-preview" class="avatar-preview" style="border-color:#3498db;">💼</div>
-                <div id="p2-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">バイト70%・ショップ割引/訪問販売</div>
+                <div id="p2-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">バイト80%・ショップ割引/訪問販売</div>
             </div>
             <div class="setup-row" style="color:#2ecc71;">🟢 <input type="text" id="p3-name" value="P3" class="name-input" maxlength="8">
                 <select id="p3-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
@@ -833,7 +858,7 @@
                 <select id="p4-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
                 <select id="p4-avatar"><option value="yankee">👊元ヤン</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
                 <div id="p4-preview" class="avatar-preview" style="border-color:#f1c40f;">👊</div>
-                <div id="p4-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">同マスカツアゲ/殴る10ダメ</div>
+                <div id="p4-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">カツアゲ(2P上限)/殴る10ダメ</div>
             </div>
             <div class="setup-row" style="color:#e67e22;">🟠 <input type="text" id="p5-name" value="P5" class="name-input" maxlength="8">
                 <select id="p5-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
@@ -845,7 +870,7 @@
                 <select id="p6-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
                 <select id="p6-avatar"><option value="musician">🎸ミュージシャン</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
                 <div id="p6-preview" class="avatar-preview" style="border-color:#9b59b6;">🎸</div>
-                <div id="p6-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">通過で銀行+2P/路上ライブ引き寄せ</div>
+                <div id="p6-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">隣接で銀行+3P/路上ライブ引き寄せ</div>
             </div>
             <div class="setup-row" style="color:#1abc9c;">🩵 <input type="text" id="p7-name" value="P7" class="name-input" maxlength="8">
                 <select id="p7-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
@@ -947,7 +972,7 @@
                     <button id="btn-can" class="btn-clay" onclick="actionCan()">🥫 缶拾い (1AP)</button>
                     <button id="btn-trash" class="btn-clay" onclick="actionTrash()">🗑️ ゴミ漁り (2AP)</button>
                     <button id="btn-occupy" class="btn-clay" onclick="actionOccupy()">🚩 陣地占領 (3AP)</button>
-                    <button id="btn-job" class="btn-clay" style="border-color:#2980b9;" onclick="actionJob()">💼 バイト (4AP)</button>
+                    <button id="btn-job" class="btn-clay" style="border-color:#2980b9;" onclick="actionJob()">💼 バイト (3AP)</button>
                     <button id="btn-exchange" class="btn-clay" style="border-color:#d4a017;display:none;" onclick="actionExchange()">💱 換金 (0AP)</button>
                     <button id="btn-shop" class="btn-clay" style="border-color:#8e44ad;display:none;" onclick="openShop()">🛒 ショップ</button>
                     <button id="btn-manhole" class="btn-clay" style="border-color:#2c3e50;display:none;" onclick="actionManhole()">🕳️ ワープ (1AP)</button>
@@ -1007,10 +1032,7 @@ function _zoomAt(px, py, delta) {
 }
 
 function mapZoomReset() {
-    mapScale = 1.0;
-    mapOffsetX = 0;
-    mapOffsetY = 0;
-    applyMapTransform(true);
+    autoFitMap();
 }
 
 // ドラッグ・ホイール初期化（ゲーム開始後に呼ぶ）
@@ -1168,11 +1190,11 @@ function updateVolume(val) {
 const charEmoji = { athlete:'🏃', sales:'💼', survivor:'🌿', yankee:'👊', hacker:'💻', musician:'🎸', doctor:'🩺', gambler:'🎲', detective:'🕵️' };
 const charInfo = {
     athlete:  { name:'元アスリート',           desc:'【健脚】移動常1AP・雨無効 / 【疾風ダッシュ】3AP:3マス先へ跳躍' },
-    sales:    { name:'元営業マン',             desc:'【コミュ力】バイト70%・ショップ1P割引 / 【訪問販売】2AP:カード押付けて3P徴収' },
+    sales:    { name:'元営業マン',             desc:'【コミュ力】バイト80%・ショップ1P割引 / 【訪問販売】2AP:カード押付けて3P徴収' },
     survivor: { name:'サバイバー',             desc:'【危機察知】ゴミ漁り失敗ペナ無効 / 【野宿】2AP:HP+15回復' },
-    yankee:   { name:'元ヤン',                desc:'【威圧】同マス/すれ違いで自動1Pカツアゲ / 【殴る】2AP:同マス相手に10ダメ' },
+    yankee:   { name:'元ヤン',                desc:'【威圧】同マス/すれ違いで自動1Pカツアゲ(1ターン2P上限) / 【殴る】2AP:同マス相手に10ダメ' },
     hacker:   { name:'元ハッカー',             desc:'【クラウドストレージ】手札上限+2 / 【遠隔ハッキング】3AP:どこからでもショップ強制入替え・1枚購入' },
-    musician: { name:'ストリートミュージシャン',  desc:'【投げ銭】他者が同マス通過で銀行+2P / 【路上ライブ】4AP:周囲2マス全員を強制引き寄せ' },
+    musician: { name:'ストリートミュージシャン',  desc:'【投げ銭】他者が同マスor隣接で銀行+3P / 【路上ライブ】4AP:周囲2マス全員を強制引き寄せ' },
     doctor:   { name:'闇医者',                desc:'【自己治癒】ターン開始時HP+5 / 【闇診療】2AP:同マス相手HP+30→5P強制徴収' },
     gambler:  { name:'ギャンブラー',            desc:'【アドレナリン】ゾロ目でAP倍+HP10回復 / 【イカサマ勝負】2AP:1d6対決・勝者が5P奪取' },
     detective:{ name:'元探偵',                desc:'【張り込み】自陣地侵入者の手札1枚没収 / 【情報操作】3AP:NPC1体を任意マスへ移動' },
@@ -1192,8 +1214,8 @@ const deckData = [
     {id:9,name:"今日の運勢",icon:"🟡",desc:"50%で±3P",color:"#f1c40f",type:"action"},
     {id:10,name:"野良猫の導き",icon:"🟡",desc:"+2P確定",color:"#f1c40f",type:"action"},
     {id:11,name:"密かなバイト",icon:"🟡",desc:"50%で+6P/-3P",color:"#f1c40f",type:"action"},
-    {id:12,name:"大暴落",icon:"💜",desc:"全員のP半減",color:"#8e44ad",type:"action"},
-    {id:13,name:"下剋上",icon:"💜",desc:"トップとP交換",color:"#8e44ad",type:"action"},
+    {id:12,name:"大暴落",icon:"💜",desc:"全員5P減少",color:"#8e44ad",type:"action"},
+    {id:13,name:"下剋上",icon:"💜",desc:"トップから最大15P奪取",color:"#8e44ad",type:"action"},
     {id:14,name:"宝くじ当選",icon:"🟡",desc:"10%で+15P",color:"#f39c12",type:"action"},
     {id:15,name:"エナジードリンク",icon:"🟢",desc:"即座にAP+5",color:"#2ecc71",type:"action"},
     {id:16,name:"スケボー",icon:"🟢",desc:"次回ダイス+5AP",color:"#2ecc71",type:"action"},
@@ -1201,9 +1223,9 @@ const deckData = [
     {id:18,name:"バット",icon:"🔴",desc:"射程1:20ダメージ",color:"#e74c3c",type:"weapon",range:1,dmg:20},
     {id:19,name:"釘バット",icon:"🔴",desc:"射程1:30ダメージ",color:"#c0392b",type:"weapon",range:1,dmg:30},
     {id:20,name:"拳銃",icon:"🔴",desc:"射程3:40ダメージ",color:"#c0392b",type:"weapon",range:3,dmg:40},
-    {id:21,name:"ショットガン",icon:"💜",desc:"射程2:全員50ダメ",color:"#8e44ad",type:"weapon",range:2,dmg:50,aoe:true},
-    {id:22,name:"パンチングマシン",icon:"🔴",desc:"同マス:80ダメージ",color:"#2c3e50",type:"weapon",range:0,dmg:80},
-    {id:23,name:"レーザー銃",icon:"💜",desc:"射程5:全員100ダメ",color:"#8e44ad",type:"weapon",range:5,dmg:100,aoe:true},
+    {id:21,name:"ショットガン",icon:"💜",desc:"射程2:全員30ダメ",color:"#8e44ad",type:"weapon",range:2,dmg:30,aoe:true},
+    {id:22,name:"パンチングマシン",icon:"🔴",desc:"同マス:50ダメージ",color:"#2c3e50",type:"weapon",range:0,dmg:50},
+    {id:23,name:"レーザー銃",icon:"💜",desc:"射程5:全員40ダメ",color:"#8e44ad",type:"weapon",range:5,dmg:40,aoe:true},
     {id:24,name:"ボロボロの自転車",icon:"🟢",desc:"毎ターンAP+2(装備)",color:"#2ecc71",type:"equip"},
     {id:25,name:"安全靴",icon:"🟢",desc:"ゴミ漁り1AP(装備)",color:"#2ecc71",type:"equip"},
     {id:26,name:"大きなリヤカー",icon:"🟢",desc:"陣地収入2倍(装備)",color:"#2ecc71",type:"equip"},
@@ -1449,8 +1471,8 @@ function dealDamage(target, dmg, source, attacker = null) {
         target.deaths = (target.deaths || 0) + 1;
         if (attacker) attacker.kills = (attacker.kills || 0) + 1;
 
-        // P没収（最大30P）
-        let lostP = Math.min(30, Math.max(0, Math.floor(target.p / 2)));
+        // P没収（最大15P）
+        let lostP = Math.min(15, Math.max(0, Math.floor(target.p / 3)));
         target.p -= lostP;
 
         // 装備をランダムで1つだけ落とす（全剥奪しない）
@@ -1586,7 +1608,7 @@ function setOfflineCharAssign(mode) {
     }
 }
 
-function startOfflineGame() {
+async function startOfflineGame() {
     let config = [
         { name: document.getElementById("p1-name").value || "P1", type: document.getElementById("p1-type").value, avatar: document.getElementById("p1-avatar").value },
         { name: document.getElementById("p2-name").value || "P2", type: document.getElementById("p2-type").value, avatar: document.getElementById("p2-avatar").value },
@@ -1647,6 +1669,9 @@ function startOfflineGame() {
     document.getElementById("setup-screen").style.display = "none";
     document.getElementById("game-screen").style.display = "flex";
     
+    // 順番決めダイス
+    await determineTurnOrder();
+    
     initBoard();
     log("ゲームスタート！" + maxRounds + "ラウンドで総資産を競え！");
     updateUI();
@@ -1659,12 +1684,12 @@ function pickDestTile() {
 
 // ========== BOARD RENDER ==========
 const tileTooltipData = {
-    center:    { title:"🏥 病院（スタート地点）", desc:"HPが0になると強制送還。P半減・装備全ロスト。" },
+    center:    { title:"🏥 病院（スタート地点）", desc:"HPが0になると強制送還。最大15P没収・装備1つロスト。" },
     normal:    { title:"🛣️ 通常の道", desc:"特別な効果なし。移動の通過点。" },
     can:       { title:"🥫 空き缶", desc:"1APで缶を拾う（1ターン3回まで）。雨の日は雨具が必要。" },
     trash:     { title:"🗑️ ゴミ山", desc:"2APでゴミを漁る。失敗すると警察に補導されAP-2ペナルティ。" },
     exchange:  { title:"💱 買取所", desc:"拾った缶・ゴミを現在相場でP換金（0AP）。" },
-    job:       { title:"💼 バイト", desc:"4APで挑戦。成功率50-70%で10P獲得。" },
+    job:       { title:"💼 バイト", desc:"3APで挑戦。成功率60-80%で12P獲得。" },
     shop:      { title:"🛒 ショップ", desc:"カードを購入（4-6P）または手持ちカードを2Pで売却できる。" },
     event:     { title:"🎲 イベント", desc:"ミニゲームまたはストーリーイベントが発生！カード獲得のチャンス。" },
     shelter:   { title:"🏕️ 避難所", desc:"止まるとステルス状態になり、次の敵を1回やり過ごせる。" },
@@ -1884,6 +1909,26 @@ function initBoard() {
     drawBoardPaths();
     updateTokens();
     initMapInteraction(); // ドラッグ・ホイールズームを有効化
+    // モバイルでもPC同様の表示比率になるよう自動ズーム
+    requestAnimationFrame(() => autoFitMap());
+}
+
+// ===== マップ自動フィット（モバイルでもPCと同じ比率で表示） =====
+function autoFitMap() {
+    const wrapper = document.getElementById('game-board-wrapper');
+    const board = document.getElementById('game-board');
+    if (!wrapper || !board) return;
+    const bw = board.scrollWidth;
+    const bh = board.scrollHeight;
+    const ww = wrapper.clientWidth;
+    const wh = wrapper.clientHeight;
+    if (bw === 0 || bh === 0) return;
+    const fitScale = Math.min(ww / bw, wh / bh, 1.0);
+    mapScale = fitScale;
+    // 中央揃え
+    mapOffsetX = (ww - bw * mapScale) / 2;
+    mapOffsetY = (wh - bh * mapScale) / 2;
+    applyMapTransform(false);
 }
 
 function updateTokens() {
@@ -2617,7 +2662,7 @@ function updateUI() {
     let trashCost = currentPlayer.equip.shoes ? 1 : 2;
     let canCan = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= 1 && tileType === "can" && canPickedThisTurn < 3 && (!isRainy || currentPlayer.rainGear) && !isBlockedByAnimal && !mgActive && !isBranchPicking;
     let canTrash = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= trashCost && tileType === "trash" && (!isRainy || currentPlayer.rainGear) && !isBlockedByAnimal && !mgActive && !isBranchPicking;
-    let canJob = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= 4 && tileType === "job" && !mgActive && !isBranchPicking;
+    let canJob = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= 3 && tileType === "job" && !mgActive && !isBranchPicking;
     let canExchange = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && tileType === "exchange" && (currentPlayer.cans > 0 || currentPlayer.trash > 0) && !mgActive && !isBranchPicking;
     let canShopBtn = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && tileType === "shop" && !mgActive && !isBranchPicking;
     let canManhole = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= 1 && tileType === "manhole" && !mgActive && !isBranchPicking;
@@ -2735,6 +2780,144 @@ function updateUI() {
 }
 
 // ========== ACTIONS ==========
+// ========== TURN ORDER DICE ==========
+async function determineTurnOrder() {
+    if (players.length < 2) return;
+
+    const overlay = document.getElementById('turn-order-overlay');
+    const container = document.getElementById('turn-order-players');
+    const statusEl = document.getElementById('turn-order-status');
+    const resultEl = document.getElementById('turn-order-result');
+    const finalEl = document.getElementById('turn-order-final');
+
+    // UIリセット
+    container.innerHTML = '';
+    resultEl.style.display = 'none';
+    statusEl.innerText = 'まもなくダイスロールが始まります...';
+
+    // プレイヤー行を構築
+    const rollData = players.map((p, idx) => {
+        const row = document.createElement('div');
+        row.className = 'to-player-row';
+        row.id = `to-row-${idx}`;
+        const emoji = charEmoji[p.charType] || '🏃';
+        row.innerHTML = `
+            <div class="to-rank" id="to-rank-${idx}">—</div>
+            <div class="to-avatar" style="border-color:${p.color};">${emoji}</div>
+            <div class="to-name" style="color:${p.color};">${p.name}${p.isCPU ? ' <span style="color:#bdc3c7;font-size:11px;">(CPU)</span>' : ''}</div>
+            <div class="to-dice-area">
+                <div class="to-dice" id="to-d1-${idx}">?</div>
+                <div class="to-dice" id="to-d2-${idx}">?</div>
+            </div>
+            <div class="to-total" id="to-total-${idx}">—</div>
+        `;
+        container.appendChild(row);
+        return { idx, player: p, d1: 0, d2: 0, total: 0 };
+    });
+
+    overlay.style.display = 'flex';
+    await sleep(800);
+
+    // 各プレイヤーが順番にダイスを振る
+    for (let i = 0; i < rollData.length; i++) {
+        const rd = rollData[i];
+        const row = document.getElementById(`to-row-${rd.idx}`);
+        const d1El = document.getElementById(`to-d1-${rd.idx}`);
+        const d2El = document.getElementById(`to-d2-${rd.idx}`);
+        const totalEl = document.getElementById(`to-total-${rd.idx}`);
+
+        row.classList.add('rolling');
+        d1El.classList.add('rolling');
+        d2El.classList.add('rolling');
+        statusEl.innerText = `${rd.player.name} がサイコロを振っています...`;
+        playSfx('dice');
+
+        // アニメーション
+        const rollInterval = setInterval(() => {
+            d1El.innerText = Math.floor(Math.random() * 6) + 1;
+            d2El.innerText = Math.floor(Math.random() * 6) + 1;
+        }, 80);
+
+        await sleep(1200);
+        clearInterval(rollInterval);
+
+        // 確定
+        rd.d1 = Math.floor(Math.random() * 6) + 1;
+        rd.d2 = Math.floor(Math.random() * 6) + 1;
+        rd.total = rd.d1 + rd.d2;
+
+        d1El.innerText = rd.d1;
+        d2El.innerText = rd.d2;
+        d1El.classList.remove('rolling');
+        d2El.classList.remove('rolling');
+        d1El.classList.add('stopped');
+        d2El.classList.add('stopped');
+        totalEl.innerText = rd.total;
+        row.classList.remove('rolling');
+        row.classList.add('done');
+
+        playSfx('success');
+        await sleep(600);
+    }
+
+    // ソート（同点はランダム決着）
+    rollData.sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total;
+        return Math.random() - 0.5;
+    });
+
+    statusEl.innerText = '順番を決定中...';
+    await sleep(800);
+
+    // 順位アイコンを付与し、行を並べ替え
+    const rankIcons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣'];
+    rollData.forEach((rd, sortedIdx) => {
+        const rankEl = document.getElementById(`to-rank-${rd.idx}`);
+        rankEl.innerText = rankIcons[sortedIdx] || `${sortedIdx + 1}`;
+        const row = document.getElementById(`to-row-${rd.idx}`);
+        row.style.order = sortedIdx;
+        if (sortedIdx === 0) row.classList.add('winner');
+    });
+
+    // 結果サマリー表示
+    let finalHTML = '';
+    rollData.forEach((rd, sortedIdx) => {
+        const emoji = charEmoji[rd.player.charType] || '🏃';
+        finalHTML += `<div style="margin:4px 0;font-size:14px;font-weight:bold;">
+            ${rankIcons[sortedIdx] || (sortedIdx+1)} 
+            <span style="color:${rd.player.color};">${emoji} ${rd.player.name}</span>
+            <span style="color:#bdc3c7;font-size:12px;">（${rd.d1}+${rd.d2}=${rd.total}）</span>
+        </div>`;
+    });
+    finalEl.innerHTML = finalHTML;
+    resultEl.style.display = 'block';
+    statusEl.innerText = '画面をタップして開始！';
+
+    // players配列を並び替え、IDを再割当て
+    const newOrder = rollData.map(rd => rd.player);
+    players = newOrder.map((p, i) => {
+        p.id = i;
+        p.color = pIdColors[i % 8];
+        return p;
+    });
+    turn = 0;
+
+    // クリックまたはタップで閉じる
+    await new Promise(resolve => {
+        const handler = () => {
+            overlay.removeEventListener('click', handler);
+            overlay.removeEventListener('touchend', handler);
+            resolve();
+        };
+        overlay.addEventListener('click', handler);
+        overlay.addEventListener('touchend', handler);
+    });
+
+    overlay.style.display = 'none';
+    playSfx('coin');
+    log('🎲 順番決めダイス完了！ターン順: ' + players.map((p, i) => `${i+1}.${p.name}`).join(' → '));
+}
+
 async function rollDice() {
     if (players.length === 0 || !players[turn]) return;
     resetAfkTimer(); // 操作があったのでAFKタイマーリセット
@@ -2822,6 +3005,7 @@ async function rollDice() {
     diceRolled = true;
     currentPlayer.bonusAP = 0;
     currentPlayer.penaltyAP = 0;
+    currentPlayer._katsuageTurn = 0; // 元ヤンカツアゲ上限リセット
 
     // 【ギャンブラー: アドレナリン】ゾロ目でHP+10
     if (isZorome && currentPlayer.charType === 'gambler') {
@@ -2899,18 +3083,26 @@ function checkYankee(movedPlayer, prevPos) {
 
     targets.forEach(target => {
         if (movedPlayer.charType === "yankee" && target.p > 0) {
-            target.p -= 1;
-            movedPlayer.p += 1;
-            log(`👊 ${movedPlayer.name}が${target.name}から1Pカツアゲ！`);
-            triggerEventPopup(movedPlayer.id, "👊", "カツアゲ！", `${target.name}から+1P強奪`, "good");
-            triggerEventPopup(target.id, "😠", "カツアゲされた！", `${movedPlayer.name}に-1P`, "bad");
+            if (!movedPlayer._katsuageTurn) movedPlayer._katsuageTurn = 0;
+            if (movedPlayer._katsuageTurn < 2) {
+                target.p -= 1;
+                movedPlayer.p += 1;
+                movedPlayer._katsuageTurn++;
+                log(`👊 ${movedPlayer.name}が${target.name}から1Pカツアゲ！(${movedPlayer._katsuageTurn}/2)`);
+                triggerEventPopup(movedPlayer.id, "👊", "カツアゲ！", `${target.name}から+1P強奪`, "good");
+                triggerEventPopup(target.id, "😠", "カツアゲされた！", `${movedPlayer.name}に-1P`, "bad");
+            }
         }
         if (target.charType === "yankee" && movedPlayer.p > 0) {
-            movedPlayer.p -= 1;
-            target.p += 1;
-            log(`👊 ${target.name}が${movedPlayer.name}から1Pカツアゲ！`);
-            triggerEventPopup(target.id, "👊", "カツアゲ！", `${movedPlayer.name}から+1P強奪`, "good");
-            triggerEventPopup(movedPlayer.id, "😠", "カツアゲされた！", `${target.name}に-1P`, "bad");
+            if (!target._katsuageTurn) target._katsuageTurn = 0;
+            if (target._katsuageTurn < 2) {
+                movedPlayer.p -= 1;
+                target.p += 1;
+                target._katsuageTurn++;
+                log(`👊 ${target.name}が${movedPlayer.name}から1Pカツアゲ！(${target._katsuageTurn}/2)`);
+                triggerEventPopup(target.id, "👊", "カツアゲ！", `${movedPlayer.name}から+1P強奪`, "good");
+                triggerEventPopup(movedPlayer.id, "😠", "カツアゲされた！", `${target.name}に-1P`, "bad");
+            }
         }
     });
 }
@@ -3266,12 +3458,15 @@ function executeMove(targetTileId) {
         log(`🏕️ 避難所で休息。ステルス獲得！`);
     }
 
-    // 【ミュージシャン: 投げ銭】このマスにミュージシャンがいれば銀行から+2P
+    // 【ミュージシャン: 投げ銭】同マスまたは隣接マスにいるミュージシャンに銀行から+3P
     players.forEach(m => {
-        if (m.id !== currentPlayer.id && m.charType === 'musician' && m.pos === currentPlayer.pos && m.hp > 0) {
-            m.p += 2;
-            log(`🎸 ${m.name}【投げ銭】${currentPlayer.name}が来て+2P！`);
-            triggerEventPopup(m.id, "🎸", "投げ銭！", `${currentPlayer.name}が来て+2P`, "good");
+        if (m.id !== currentPlayer.id && m.charType === 'musician' && m.hp > 0) {
+            const dist = getDistance(m.pos, currentPlayer.pos);
+            if (dist <= 1) {
+                m.p += 3;
+                log(`🎸 ${m.name}【投げ銭】${currentPlayer.name}が${dist === 0 ? '同マスに来て' : '隣接マスに来て'}+3P！`);
+                triggerEventPopup(m.id, "🎸", "投げ銭！", `${currentPlayer.name}が来て+3P`, "good");
+            }
         }
     });
 
@@ -3563,16 +3758,16 @@ function actionOccupy() {
 
 function actionJob() {
     let currentPlayer = players[turn];
-    currentPlayer.ap -= 4;
-    let successChance = currentPlayer.charType === "sales" ? 0.7 : 0.5;
+    currentPlayer.ap -= 3;
+    let successChance = currentPlayer.charType === "sales" ? 0.8 : 0.6;
     
     let isSuccess = Math.random() < successChance;
-    let pointsEarned = isSuccess ? 10 : 0;
+    let pointsEarned = isSuccess ? 12 : 0;
     
     if (isSuccess) currentPlayer.p += pointsEarned;
     
-    log(isSuccess ? `💼 バイト成功！10P獲得！` : `💼 バイト失敗...`);
-    triggerEventPopup(currentPlayer.id, isSuccess ? "💼" : "😞", isSuccess ? "バイト成功！" : "バイト失敗...", isSuccess ? "+10P獲得" : "次回がんばろう", isSuccess ? "good" : "bad");
+    log(isSuccess ? `💼 バイト成功！12P獲得！` : `💼 バイト失敗...`);
+    triggerEventPopup(currentPlayer.id, isSuccess ? "💼" : "😞", isSuccess ? "バイト成功！" : "バイト失敗...", isSuccess ? "+12P獲得" : "次回がんばろう", isSuccess ? "good" : "bad");
     if (!currentPlayer.isCPU) showJobResult(isSuccess, pointsEarned);
     
     syncOnline();
@@ -3810,15 +4005,15 @@ function useCard(index, cardId) {
             players.forEach(op => {
                 if (op.reaction === 'reflect') {
                     op.reaction = null;
-                    log(`🤝 ${op.name}の裏取引で大暴落を反射！${currentPlayer.name}のPが半減！`);
+                    log(`🤝 ${op.name}の裏取引で大暴落を反射！${currentPlayer.name}が10P失った！`);
                     triggerEventPopup(op.id, "🤝", "裏取引反射！", `大暴落を${currentPlayer.name}に返した`, "good");
-                    currentPlayer.p = Math.floor(currentPlayer.p / 2);
+                    currentPlayer.p = Math.max(0, currentPlayer.p - 10);
                 } else {
-                    op.p = Math.floor(op.p / 2);
+                    op.p = Math.max(0, op.p - 5);
                 }
             });
-            log(`😱 大暴落！全員のP半減！`);
-            players.forEach(op => triggerEventPopup(op.id, "📉", "大暴落！", "全員のP半減！", "bad"));
+            log(`😱 大暴落！全員-5P！`);
+            players.forEach(op => triggerEventPopup(op.id, "📉", "大暴落！", "全員-5P！", "bad"));
             break;
         case 13:
             let richerPlayers = players.filter(op => op.id !== currentPlayer.id && op.p > currentPlayer.p);
@@ -3826,16 +4021,18 @@ function useCard(index, cardId) {
                 let topPlayer = richerPlayers.reduce((a, b) => a.p > b.p ? a : b);
                 if (topPlayer.reaction === 'reflect') {
                     topPlayer.reaction = null;
-                    log(`🤝 ${topPlayer.name}の裏取引で下剋上を反射！${currentPlayer.name}がP没収！`);
+                    log(`🤝 ${topPlayer.name}の裏取引で下剋上を反射！${currentPlayer.name}が10P没収！`);
                     triggerEventPopup(topPlayer.id, "🤝", "裏取引反射！", `下剋上を${currentPlayer.name}に返した`, "good");
-                    currentPlayer.p = Math.floor(currentPlayer.p / 2);
+                    currentPlayer.p = Math.max(0, currentPlayer.p - 10);
                 } else {
-                    let tmp = currentPlayer.p;
-                    currentPlayer.p = topPlayer.p;
-                    topPlayer.p = tmp;
-                    log(`🔥 下剋上！${topPlayer.name}とP交換！`);
-                    triggerEventPopup(currentPlayer.id, "🔥", "下剋上！", `${topPlayer.name}とP交換`, "good");
-                    triggerEventPopup(topPlayer.id, "😱", "下剋上された！", `${currentPlayer.name}にP交換された`, "bad");
+                    // 差額の30%を奪取（上限15P）
+                    const diff = topPlayer.p - currentPlayer.p;
+                    const stealAmount = Math.min(15, Math.floor(diff * 0.3));
+                    topPlayer.p -= stealAmount;
+                    currentPlayer.p += stealAmount;
+                    log(`🔥 下剋上！${topPlayer.name}から${stealAmount}P奪取！`);
+                    triggerEventPopup(currentPlayer.id, "🔥", "下剋上！", `${topPlayer.name}から${stealAmount}P奪取`, "good");
+                    triggerEventPopup(topPlayer.id, "😱", "下剋上された！", `${currentPlayer.name}に${stealAmount}P奪われた`, "bad");
                 }
             } else {
                 log(`🔥 自分がトップ...（何も起きない）`);
@@ -4157,11 +4354,11 @@ function cancelWeaponArc() {
 // ========== キャラクター詳細モーダル ==========
 const charDetailData = {
     athlete:  { tagline:'雨も夜も止まらない、鍛え抜かれた肉体', passive:{name:'【健脚】',desc:'移動コストが常に1AP固定。雨の日の移動ペナルティを完全無効化。'}, action:{name:'【疾風ダッシュ】 (3AP)',desc:'ダイス後でも使用可。3マス先の到達点を列挙し、選んだ地点へ即時跳躍。交番・NPC・罠を飛び越える戦略移動が可能。'} },
-    sales:    { tagline:'口八丁で金を生み出す、元・敏腕セールスマン', passive:{name:'【コミュ力】',desc:'バイト成功率70%（通常50%）。ショップの全カード購入価格が常に1P割引。'}, action:{name:'【訪問販売】 (2AP)',desc:'同マスの相手にランダムな手札1枚を強制的に押し付け、3Pを徴収する。要らないカードで荒稼ぎ。'} },
+    sales:    { tagline:'口八丁で金を生み出す、元・敏腕セールスマン', passive:{name:'【コミュ力】',desc:'バイト成功率80%（通常60%）。ショップの全カード購入価格が常に1P割引。'}, action:{name:'【訪問販売】 (2AP)',desc:'同マスの相手にランダムな手札1枚を強制的に押し付け、3Pを徴収する。要らないカードで荒稼ぎ。'} },
     survivor: { tagline:'過酷な路上生活を生き抜いてきた、不死身のホームレス', passive:{name:'【危機察知】',desc:'ゴミ漁り失敗時の「警察ペナルティ（次回AP-2）」を完全無効化。'}, action:{name:'【野宿】 (2AP)',desc:'その場でHP15を即時回復。回復カードなしでも長期戦を生き残れる持久戦型スキル。'} },
-    yankee:   { tagline:'一度睨まれたら誰でも縮み上がる、元不良の威圧感', passive:{name:'【威圧】',desc:'同マスに止まった・すれ違った他プレイヤーから自動で1Pをカツアゲ。移動するだけで収入になる。'}, action:{name:'【殴る】 (2AP)',desc:'同マスの相手に10ダメージ。ダメージの一部はPとして落とさせる直接攻撃。'} },
+    yankee:   { tagline:'一度睨まれたら誰でも縮み上がる、元不良の威圧感', passive:{name:'【威圧】',desc:'同マスに止まった・すれ違った他プレイヤーから自動で1Pをカツアゲ（1ターン最大2Pまで）。移動するだけで収入になる。'}, action:{name:'【殴る】 (2AP)',desc:'同マスの相手に10ダメージ。ダメージの一部はPとして落とさせる直接攻撃。'} },
     hacker:   { tagline:'情報の海を泳ぐ、孤高のデジタル浮浪者', passive:{name:'【クラウドストレージ】',desc:'手札の上限が+2枚（デフォルト9枚）。リュック装備と重複可能。'}, action:{name:'【遠隔ハッキング】 (3AP)',desc:'どこにいてもショップの品揃えを強制入替えし、その場で1枚購入できる。他プレイヤーが狙うカードを潰すことも可。'} },
-    musician: { tagline:'路上ライブで人々を引き寄せる、カリスマ流浪のアーティスト', passive:{name:'【投げ銭】',desc:'他のプレイヤーが自分と同じマスに止まる/通過するたびに、銀行から2Pを自動獲得。'}, action:{name:'【路上ライブ】 (4AP)',desc:'周囲2マス以内の全プレイヤーを自分のマスに強制引き寄せ。ヤクザ横や元ヤンのカツアゲコンボなどに応用可。'} },
+    musician: { tagline:'路上ライブで人々を引き寄せる、カリスマ流浪のアーティスト', passive:{name:'【投げ銭】',desc:'他のプレイヤーが自分と同じマスまたは隣接マスに止まる/通過するたびに、銀行から3Pを自動獲得。'}, action:{name:'【路上ライブ】 (4AP)',desc:'周囲2マス以内の全プレイヤーを自分のマスに強制引き寄せ。ヤクザ横や元ヤンのカツアゲコンボなどに応用可。'} },
     doctor:   { tagline:'闇の診療所を開く、危うい善意の医者', passive:{name:'【自己治癒】',desc:'毎ターン開始時に自動でHP5を回復。長期戦で確実に真価を発揮する持久型パッシブ。'}, action:{name:'【闇診療】 (2AP)',desc:'同マスの相手のHPを30回復する代わりに5Pを強制徴収。助けるフリをしたカツアゲ。'} },
     gambler:  { tagline:'運命を賭けることに喜びを感じる、無一文の賭博師', passive:{name:'【アドレナリン】',desc:'ゾロ目が出た時、APが倍になるだけでなくHPも10回復。高リスク高リターンの勝負師スタイル。'}, action:{name:'【イカサマ勝負】 (2AP)',desc:'同マスの相手と1〜6のサイコロ対決。勝者が負けた方から5Pを奪う。同点は仕掛けた側の負け。'} },
     detective:{ tagline:'陰からすべてを見通す、元・辣腕探偵', passive:{name:'【張り込み】',desc:'自分の陣地に他プレイヤーが止まった時、通常の陣地収入に加えて相手の手札を1枚没収する。'}, action:{name:'【情報操作】 (3AP)',desc:'マップ上のNPC（警察・ヤクザなど）を1体選び、ランダムな別のマスへ瞬間移動させる。'} },
@@ -4445,8 +4642,8 @@ async function processRoundEvents() {
                 p.equip.doll = false;
                 log(`🎎 ${p.name}:身代わり人形が守った！`);
                 triggerEventPopup(p.id, "🎎", "身代わり人形！", "収集車の直撃を無効化！", "good");
-            } else if (Math.random() < 0.7) {
-                dealDamage(p, 80, "収集車");
+            } else if (Math.random() < 0.55) {
+                dealDamage(p, 50, "収集車");
                 showBloodAnim(p.name);
                 if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
                     broadcastNetworkData({ type: 'blood_anim', name: p.name });
@@ -4532,7 +4729,7 @@ function endGame() {
         // スコア計算：P×2.0（最大比重）+ 領土 + 資源 + キル×3 - デス×8
         const scaledP     = Math.round(p.p * 2.0);       // Pは2倍換算で最大比重
         const killBonus   = (p.kills  || 0) * 3;         // キル1回 +3
-        const deathPenalty= (p.deaths || 0) * 8;         // デス1回 -8（大きめペナルティ）
+        const deathPenalty= (p.deaths || 0) * 5;         // デス1回 -5（緩和）
         const totalScore  = scaledP + terrValue + resourceValue + killBonus - deathPenalty;
         
         return { name: p.name, color: p.color, p: p.p, scaledP, terrValue, resourceValue, killBonus, deathPenalty, totalScore, emoji: charEmoji[p.charType], deaths: p.deaths||0, kills: p.kills||0 };
@@ -4641,7 +4838,7 @@ async function processCPUTurn() {
             }
         }
         // バイト
-        else if (!acted && currentTile.type === "job" && cpuPlayer.ap >= 4 && Math.random() > 0.3) {
+        else if (!acted && currentTile.type === "job" && cpuPlayer.ap >= 3 && Math.random() > 0.3) {
             actionJob();
             acted = true;
         }
@@ -5713,13 +5910,17 @@ window.startOnlineGame = async function() {
     turn = 0;
     isOnlineMode = true;
     
-    const initialState = window.extractGameState();
-    broadcastNetworkData({ type: 'game_start', state: initialState });
-    
     document.getElementById("online-lobby-modal").style.display = "none";
     document.getElementById("setup-screen").style.display = "none";
     document.getElementById("main-title").style.display = "none";
     document.getElementById("game-screen").style.display = "flex";
+    
+    // 順番決めダイス（ホスト側で決定後、ゲスト全員に同期）
+    await determineTurnOrder();
+    
+    // 順番決め後の最終状態をゲストに送信
+    const initialState = window.extractGameState();
+    broadcastNetworkData({ type: 'game_start', state: initialState });
     
     initBoard();
     updateUI();
