@@ -2349,7 +2349,15 @@ function executeMove(targetTileId) {
             currentPlayer.ap = 0;
             log(`<span class="danger">🚓 警察に補導！次回AP-2、このターンの行動終了！</span>`);
             triggerEventPopup(currentPlayer.id, "🚓", "警察に補導！", "次回AP-2・このターン終了", "bad");
-            if (!currentPlayer.isCPU) showPoliceAnim(currentPlayer.name);
+            if (!currentPlayer.isCPU) {
+                showPoliceAnim(currentPlayer.name);
+                // 【オンライン共有】警察アニメを全員に配信
+                if (typeof isOnlineMode !== 'undefined' && isOnlineMode) {
+                    const _pmsg = { type: 'police_anim', name: currentPlayer.name };
+                    if (typeof isHost !== 'undefined' && isHost) { broadcastNetworkData(_pmsg); }
+                    else if (typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) { hostConnection.send(_pmsg); }
+                }
+            }
             syncOnline();
             updateUI();
             return;
@@ -2526,6 +2534,12 @@ async function processMiniGameResult(isWin, msg) {
         currentPlayer.hand.push(acquiredCardId);
         let cardName = acquiredCardId >= 0 ? deckData[acquiredCardId].name : "";
         triggerEventPopup(currentPlayer.id, "🎲", `ミニゲーム成功！`, `${msg}　カード「${cardName}」獲得！`, "good");
+        // 【オンライン共有】カードGET演出を全員に配信
+        if (typeof isOnlineMode !== 'undefined' && isOnlineMode) {
+            const _cmsg = { type: 'card_acquisition', cardId: acquiredCardId };
+            if (typeof isHost !== 'undefined' && isHost) { broadcastNetworkData(_cmsg); }
+            else if (typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) { hostConnection.send(_cmsg); }
+        }
     } else {
         triggerEventPopup(currentPlayer.id, "🎲", `ミニゲーム失敗...`, msg, "bad");
     }
@@ -3419,6 +3433,10 @@ async function processRoundEvents() {
     nextRoundWarning = dangerArea
         ? `次の収集車は「${areaNames[dangerArea[0]] || dangerArea[0]}」を中心に暴走するらしい…`
         : null;
+    // 【オンライン共有】予兆メッセージをゲストへ配信
+    if (nextRoundWarning && typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
+        broadcastNetworkData({ type: 'disaster_warning', message: nextRoundWarning });
+    }
 
     // 【陣地維持費（税金）】1マスにつき2P
     const TAX_PER_TILE = 2;
@@ -3503,6 +3521,10 @@ async function processRoundEvents() {
             } else if (Math.random() < 0.7) {
                 dealDamage(p, 80, "収集車");
                 showBloodAnim(p.name);
+                // 【オンライン共有】血のアニメをゲストへ配信
+                if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
+                    broadcastNetworkData({ type: 'blood_anim', name: p.name });
+                }
             } else {
                 log(`💨 ${p.name}は収集車をギリギリ回避！`);
                 triggerEventPopup(p.id, "💨", "ギリギリ回避！", "収集車をかわした！", "good");
@@ -3553,6 +3575,10 @@ async function processRoundEvents() {
                     log(`<span class="danger">🚓 ${p.name}がパトロール警察に補導！次回AP-2！</span>`);
                     triggerEventPopup(p.id, "🚓", "パトロールに補導！", "次回AP-2", "bad");
                     showPoliceAnim(p.name);
+                    // 【オンライン共有】警察アニメをゲストへ配信
+                    if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
+                        broadcastNetworkData({ type: 'police_anim', name: p.name });
+                    }
                 }
             }
         });
@@ -4297,6 +4323,38 @@ function handleNetworkData(data, senderPeerId = null, conn = null) {
             });
             setTimeout(() => { overlay.style.display = "none"; }, data.items.length * 400 + 2500);
         }
+    }
+    // ========== 演出系 オンライン共有ハンドラ ==========
+    else if (data.type === 'disaster_warning') {
+        // ホストは中継、全員(ゲスト・ホスト)が nextRoundWarning にセット → showTurnBanner で表示
+        if (isHost) {
+            Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); });
+        }
+        // ゲスト側: nextRoundWarning にセットしておき、ターン0開始時にshowTurnBannerが表示
+        if (!isHost) {
+            nextRoundWarning = data.message;
+        }
+    }
+    else if (data.type === 'blood_anim') {
+        // ホストは中継、全員が血のアニメを表示
+        if (isHost) {
+            Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); });
+        }
+        showBloodAnim(data.name);
+    }
+    else if (data.type === 'police_anim') {
+        // ホストは中継、全員が警察アニメを表示
+        if (isHost) {
+            Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); });
+        }
+        showPoliceAnim(data.name);
+    }
+    else if (data.type === 'card_acquisition') {
+        // ホストは中継、全員がカードGET演出を表示
+        if (isHost) {
+            Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); });
+        }
+        showCardAcquisition(data.cardId);
     }
 } // handleNetworkData ここまで
 
