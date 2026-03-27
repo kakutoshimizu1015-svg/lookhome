@@ -28,7 +28,7 @@
             --clay-shadow-out: 4px 4px 0px rgba(0,0,0,0.4);
             --clay-shadow-in: inset 2px 2px 5px rgba(0,0,0,0.3);
             --clay-border: 4px solid #3e2f2a;
-            --tile-size: 30px;
+            --tile-size: 80px;
         }
         * { box-sizing: border-box; }
         body { font-family: 'Hiragino Maru Gothic ProN','Meiryo',sans-serif; background-color: var(--clay-bg); color: var(--clay-text); margin:0; padding:10px; display:flex; flex-direction:column; align-items:center; overflow-x:hidden; transition: background 0.8s; }
@@ -93,9 +93,9 @@
         .zoom-btn:active { transform:scale(0.92); }
         #game-board-wrapper { overflow:hidden; width:100%; max-height:calc(100vh - 280px); cursor:grab; user-select:none; }
         #game-board-wrapper.dragging { cursor:grabbing; }
-        #game-board-inner { transform-origin: top left; transition: transform 0.12s ease; display:inline-block; }
-        #game-board { display:grid; gap:4px; padding:15px; border-radius:15px; border:var(--clay-border); box-shadow:var(--clay-shadow-out); background:radial-gradient(ellipse at 30% 20%, #4a9a35 0%, #2d6820 40%, #1e4a16 100%); transition:background 0.5s; width:max-content; margin:0 auto; position:relative; }
-        .tile { border-radius:50%; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:8px; font-weight:bold; position:relative; color:#fdf5e6; text-shadow:1px 1px 2px rgba(0,0,0,0.8); border:2px dashed #4a362a; box-shadow:inset 2px 2px 4px rgba(0,0,0,0.4),2px 2px 4px rgba(0,0,0,0.5); transition:all 0.3s; width:var(--tile-size); height:var(--tile-size); }
+        #game-board-inner { transform-origin: top left; transition: transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94); display:inline-block; will-change: transform; }
+        #game-board { display:grid; gap:20px; padding:30px; border-radius:15px; border:var(--clay-border); box-shadow:var(--clay-shadow-out); background:linear-gradient(to right,#b0b0b0 0%,#b0b0b0 32%,#f0c830 32%,#f0c830 68%,#f8f8f8 68%,#f8f8f8 100%); width:max-content; margin:0 auto; position:relative; isolation:isolate; }
+        .tile { border-radius:50%; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:8px; font-weight:bold; position:relative; color:#fdf5e6; text-shadow:1px 1px 2px rgba(0,0,0,0.8); border:2px dashed #4a362a; box-shadow:inset 2px 2px 4px rgba(0,0,0,0.4),2px 2px 4px rgba(0,0,0,0.5); transition:box-shadow 0.3s, transform 0.2s, opacity 0.3s; width:var(--tile-size); height:var(--tile-size); }
         .tile-id-label { position:absolute; top:4px; left:8px; font-size:10px; font-weight:900; color:rgba(255,255,255,0.8); text-shadow:1px 1px 1px #000; z-index:4; }
         .tile.slum { background-color:#796859; }
         .tile.commercial { background-color:#a89481; }
@@ -114,11 +114,50 @@
         .construction-mark { position:absolute; inset:0; background:repeating-linear-gradient(45deg,#f1c40f,#f1c40f 8px,#2c3e50 8px,#2c3e50 16px); opacity:0.8; border-radius:50%; z-index:4; display:none; justify-content:center; align-items:center; font-size:16px; }
         .destination-mark { position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); font-size:12px; z-index:6; animation:pulse-dest 1s infinite alternate; }
 
-        /* ===== MARIO PARTY MAP STYLE ===== */
-        #board-path-svg { position:absolute; top:0; left:0; pointer-events:none; z-index:1; overflow:visible; }
+        /* ===== MOBILE LAYOUT ===== */
+        body.layout-mobile #top-bar { flex-direction:column; }
+        body.layout-mobile #left-status-area { flex-direction:row; overflow-x:auto; }
+        body.layout-mobile #portrait-active { width:100%; flex-direction:row; flex-wrap:wrap; padding:6px; }
+        body.layout-mobile #weather-panel { width:auto; min-width:100px; flex-shrink:0; }
+        body.layout-mobile #hand-cards-area { overflow-x:auto; }
+        body.layout-mobile #main-area { flex-direction:column; }
+        body.layout-mobile #right-side-area { width:100%; flex-direction:row; flex-wrap:wrap; gap:8px; }
+        body.layout-mobile #action-panel { flex-direction:row; flex-wrap:wrap; padding:6px; gap:4px; }
+        body.layout-mobile #action-panel .btn-clay { flex:1; min-width:80px; font-size:11px; padding:4px; }
+        body.layout-mobile #player-list-panel { flex:1; min-width:150px; }
+        body.layout-mobile #game-board-wrapper { max-height:50vh; }
+        body.layout-mobile #log-area { display:none; }
+        /* auto-apply on narrow screens unless user forced PC mode */
+        @media (max-width: 700px) {
+            body:not(.layout-pc) #top-bar { flex-direction:column; }
+            body:not(.layout-pc) #left-status-area { flex-direction:row; overflow-x:auto; }
+            body:not(.layout-pc) #portrait-active { width:100%; flex-direction:row; flex-wrap:wrap; padding:6px; }
+            body:not(.layout-pc) #weather-panel { width:auto; min-width:90px; flex-shrink:0; }
+            body:not(.layout-pc) #main-area { flex-direction:column; }
+            body:not(.layout-pc) #right-side-area { width:100%; flex-direction:row; flex-wrap:wrap; gap:6px; }
+            body:not(.layout-pc) #action-panel { flex-direction:row; flex-wrap:wrap; padding:6px; gap:4px; }
+            body:not(.layout-pc) #action-panel .btn-clay { flex:1; min-width:75px; font-size:11px; padding:4px; }
+            body:not(.layout-pc) #player-list-panel { flex:1; }
+            body:not(.layout-pc) #game-board-wrapper { max-height:48vh; }
+            body:not(.layout-pc) #log-area { display:none; }
+            body:not(.layout-pc) #board-path-svg { /* SVG/tile alignment fix on mobile */ }
+        }
+        /* ===== END MOBILE LAYOUT ===== */
 
-        /* Base tile — 3D ball look */
-        .tile { z-index:3 !important; box-shadow:0 4px 8px rgba(0,0,0,0.55), inset 0 -3px 6px rgba(0,0,0,0.25), inset 0 3px 8px rgba(255,255,255,0.18) !important; border:2px solid rgba(255,255,255,0.85) !important; color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,0.9) !important; }
+        /* Path preview glow: 3 tiles ahead, fading */
+        .tile-path-1 { box-shadow:0 0 20px rgba(255,220,50,0.95), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,220,50,0.95) !important; }
+        .tile-path-2 { box-shadow:0 0 14px rgba(255,200,30,0.65), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,200,30,0.65) !important; }
+        .tile-path-3 { box-shadow:0 0 8px  rgba(255,180,20,0.35), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,180,20,0.35) !important; }
+        /* Manhole connection highlight */
+        .tile-manhole-linked { animation:manhole-linked-glow 1.2s ease-in-out infinite !important; will-change:filter; }
+        @keyframes manhole-linked-glow {
+            0%,100% { filter:drop-shadow(0 0 6px rgba(255,220,0,0.7)); }
+            50%     { filter:drop-shadow(0 0 18px rgba(255,220,0,1)); }
+        }
+        #board-path-svg { position:absolute; top:0; left:0; pointer-events:none; z-index:2; overflow:visible; }
+
+        /* Base tile — contain paint so repaints don't cascade */
+        .tile { z-index:3 !important; contain:layout style paint; box-shadow:0 4px 8px rgba(0,0,0,0.55), inset 0 -3px 6px rgba(0,0,0,0.25), inset 0 3px 8px rgba(255,255,255,0.18) !important; border:2px solid rgba(255,255,255,0.85) !important; color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,0.9) !important; transition:box-shadow 0.3s, transform 0.2s !important; }
 
         /* ── Type colors (highest priority — must come after area rules) ── */
         /* 通常/道  → 青 */
@@ -140,13 +179,13 @@
         /* 交番    → 赤 */
         .tile.koban    { background:radial-gradient(circle at 35% 28%, #ff7043, #b71c1c) !important; border-color:#ffccbc !important; }
         /* マンホール → グレー＋青発光 */
-        .tile.manhole  { background:radial-gradient(circle at 35% 28%, #90a4ae, #263238) !important; border:2px solid rgba(150,220,255,0.75) !important; border-radius:50% !important; animation:manhole-glow 1.8s ease-in-out infinite; }
+        .tile.manhole  { background:radial-gradient(circle at 35% 28%, #90a4ae, #263238) !important; border:2px solid rgba(150,220,255,0.75) !important; border-radius:50% !important; will-change:filter; animation:manhole-glow 1.8s ease-in-out infinite; }
         /* 病院(center) → ゴールド */
         .tile.center   { background:radial-gradient(circle at 35% 28%, #fff59d, #f9a825) !important; border:3px solid #f1c40f !important; box-shadow:0 0 18px #f1c40f, 0 4px 8px rgba(0,0,0,0.5) !important; border-radius:50% !important; }
 
         @keyframes manhole-glow {
-            0%,100% { box-shadow:0 0 8px rgba(100,180,255,0.4), 0 4px 8px rgba(0,0,0,0.5); }
-            50%     { box-shadow:0 0 22px rgba(100,200,255,0.95), 0 4px 8px rgba(0,0,0,0.5); }
+            0%,100% { filter: drop-shadow(0 0 3px rgba(80,160,255,0.5)); }
+            50%     { filter: drop-shadow(0 0 10px rgba(80,180,255,1)); }
         }
         .tile.night-fog { opacity:0.18 !important; filter:brightness(0.3) !important; }
         /* ===== END MARIO PARTY MAP STYLE ===== */
@@ -177,9 +216,16 @@
         #log span.system { color:#2980b9; }
         
         /* トークン類 */
-        .player-token { width:28px; height:28px; border-radius:6px; position:absolute; z-index:10; transition:all 0.3s; border-bottom:3px solid; border:3px solid; box-shadow:0 4px 8px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; font-size:18px; background:rgba(0,0,0,0.7); backdrop-filter:blur(2px); }
-        .pos-0 { bottom:-4px; left:-4px; } .pos-1 { bottom:-4px; right:-4px; } .pos-2 { top:-4px; left:-4px; } .pos-3 { top:-4px; right:-4px; }
-        .pos-4 { bottom:10px; left:-4px; } .pos-5 { bottom:10px; right:-4px; } .pos-6 { top:10px; left:-4px; } .pos-7 { top:10px; right:-4px; }
+        .player-token { width:32px; height:32px; border-radius:6px; position:absolute; z-index:10; transition:all 0.3s; border:3px solid; box-shadow:0 4px 8px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; font-size:20px; background:rgba(0,0,0,0.7); backdrop-filter:blur(2px); }
+        /* 80px tile — 4 tokens across in two rows */
+        .pos-0 { bottom:4px;  left:4px;  }
+        .pos-1 { bottom:4px;  left:40px; }
+        .pos-2 { bottom:4px;  right:4px; }
+        .pos-3 { bottom:4px;  right:40px;}
+        .pos-4 { top:4px;     left:4px;  }
+        .pos-5 { top:4px;     left:40px; }
+        .pos-6 { top:4px;     right:4px; }
+        .pos-7 { top:4px;     right:40px;}
         /* アクティブプレイヤーの呼吸アニメーション */
         @keyframes token-breathe {
             0%   { transform: scale(1);    box-shadow: 0 4px 10px rgba(0,0,0,0.9), 0 0 14px var(--token-color, #fff), 0 0 28px var(--token-color, #fff); }
@@ -613,6 +659,17 @@
                 <label style="font-weight: bold; display: block; margin-bottom: 5px;">🔊 音量: <span id="vol-disp">100%</span></label>
                 <input type="range" id="vol-slider" min="0" max="2" step="0.1" value="1" style="width: 100%;" onchange="updateVolume(this.value)">
             </div>
+
+            <div style="margin: 10px 0; text-align: left; background: var(--clay-panel); color: #fdf5e6; padding: 10px; border-radius: 8px; border: var(--clay-border);">
+                <div style="font-weight:bold;margin-bottom:8px;">📱 レイアウト切替</div>
+                <div style="display:flex;gap:8px;">
+                    <button id="layout-btn-auto" class="btn-large btn-green" style="flex:1;font-size:12px;padding:7px;" onclick="setLayoutMode('auto')">🔄 自動</button>
+                    <button id="layout-btn-pc"   class="btn-large btn-blue"  style="flex:1;font-size:12px;padding:7px;" onclick="setLayoutMode('pc')">🖥️ PC</button>
+                    <button id="layout-btn-sp"   class="btn-large"           style="flex:1;font-size:12px;padding:7px;background:#8e44ad;border-color:#6c3483;" onclick="setLayoutMode('sp')">📱 スマホ</button>
+                </div>
+                <div id="layout-mode-desc" style="font-size:11px;color:#bdc3c7;margin-top:6px;text-align:center;">現在: 自動（画面幅で切替）</div>
+            </div>
+
             <button class="btn-large btn-brown" style="width:100%;margin-top:15px;" onclick="promptReturnToTitle()">🏠 タイトルに戻る</button>
             <button class="btn-large" style="width:100%;margin-top:10px;background:#95a5a6;border-color:#7f8c8d;" onclick="toggleSettingsModal()">✖ 閉じる</button>
         </div>
@@ -894,7 +951,7 @@ let mapOffsetY = 0;
 function applyMapTransform(smooth) {
     const inner = document.getElementById('game-board-inner');
     if (!inner) return;
-    inner.style.transition = smooth ? 'transform 0.12s ease' : 'none';
+    inner.style.transition = smooth ? 'transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none';
     inner.style.transform = `translate(${mapOffsetX}px, ${mapOffsetY}px) scale(${mapScale})`;
 }
 
@@ -1624,158 +1681,93 @@ function waitForPopupsClear(maxWait = 3000) {
     });
 }
 
-// ========== MARIO PARTY ROAD RENDERER ==========
+// ========== ARROWS + AREA LABELS RENDERER ==========
 function drawBoardPaths() {
-    const TILE = 30, GAP = 4, PAD = 15, STEP = TILE + GAP, R = TILE / 2;
+    const TILE = 80, GAP = 20, PAD = 30, STEP = TILE + GAP, R = TILE / 2;
     const board = document.getElementById('game-board');
     const old = document.getElementById('board-path-svg');
     if (old) old.remove();
 
     const maxCol = Math.max(...mapData.map(t => t.col));
     const maxRow = Math.max(...mapData.map(t => t.row));
-    const W = maxCol * STEP + PAD * 2;
-    const H = maxRow * STEP + PAD * 2;
+    const W = (maxCol - 1) * STEP + TILE + PAD * 2;
+    const H = (maxRow - 1) * STEP + TILE + PAD * 2;
 
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg');
     svg.id = 'board-path-svg';
-    svg.setAttribute('width', W); svg.setAttribute('height', H);
+    svg.setAttribute('width', W);
+    svg.setAttribute('height', H);
+    // pointer-events:none so clicks go through to tiles; no background fill on SVG itself
+    svg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:2;display:block;overflow:visible;background:none;';
 
+    // Markers: single black semi-transparent arrow
     const defs = document.createElementNS(ns, 'defs');
     defs.innerHTML =
-        '<marker id="bpa" viewBox="0 0 14 14" refX="7" refY="7" markerWidth="3" markerHeight="3" orient="auto">' +
-        '<polygon points="0,1 13,7 0,13" fill="white" opacity="0.95"/></marker>';
+        '<marker id="arr-bk" viewBox="0 0 14 14" refX="7" refY="7" markerWidth="5" markerHeight="5" orient="auto">' +
+        '<polygon points="0,1 13,7 0,13" fill="rgba(0,0,0,0.55)"/></marker>';
     svg.appendChild(defs);
 
-    const getC = t => ({ x:(t.col-1)*STEP + R + PAD, y:(t.row-1)*STEP + R + PAD });
+    // Tile center helper
+    const tcx = t => (t.col - 1) * STEP + R + PAD;
+    const tcy = t => (t.row - 1) * STEP + R + PAD;
 
-    // Layer order: areaBg → areaText → roads → arrows
-    const bgG    = document.createElementNS(ns, 'g');
-    const textG  = document.createElementNS(ns, 'g');
-    const roadG  = document.createElementNS(ns, 'g');
-    const arrowG = document.createElementNS(ns, 'g');
-    svg.appendChild(bgG); svg.appendChild(textG);
-    svg.appendChild(roadG); svg.appendChild(arrowG);
-
-    // ===== AREA BACKGROUND + LABELS =====
-    const areaStyles = {
-        slum:       { fill:'rgba(110,110,110,0.55)',  textFill:'rgba(60,60,60,0.55)',    label:'スラム' },
-        commercial: { fill:'rgba(240,200,20,0.40)',   textFill:'rgba(120,90,0,0.55)',    label:'商業' },
-        luxury:     { fill:'rgba(255,255,255,0.45)',  textFill:'rgba(80,80,100,0.50)',   label:'高級住宅街' },
-    };
-    ['slum','commercial','luxury'].forEach(area => {
-        const st = areaStyles[area];
-        const tiles = mapData.filter(t => t.area === area);
-        if (!tiles.length) return;
-        const xs = tiles.map(t => getC(t).x);
-        const ys = tiles.map(t => getC(t).y);
-        const minX = Math.min(...xs) - TILE * 1.2;
-        const minY = Math.min(...ys) - TILE * 1.2;
-        const maxX = Math.max(...xs) + TILE * 1.2;
-        const maxY = Math.max(...ys) + TILE * 1.2;
-        const cx   = (minX + maxX) / 2;
-        const cy   = (minY + maxY) / 2;
-
-        const bg = document.createElementNS(ns, 'rect');
-        bg.setAttribute('x', minX); bg.setAttribute('y', minY);
-        bg.setAttribute('width', maxX - minX); bg.setAttribute('height', maxY - minY);
-        bg.setAttribute('fill', st.fill); bg.setAttribute('rx', '20');
-        bgG.appendChild(bg);
-
-        // Ghost label — large, clearly readable but not distracting
+    // ── Area ghost labels (CSS gradient handles the colors, we just overlay text) ──
+    // Position labels at fixed horizontal % of board width, vertically centered
+    const labelDefs = [
+        { label:'スラム',     xFrac:0.15, fill:'rgba(30,30,30,0.32)'  },
+        { label:'商業',       xFrac:0.50, fill:'rgba(70,45,0,0.32)'   },
+        { label:'高級住宅街', xFrac:0.84, fill:'rgba(40,40,70,0.32)'  },
+    ];
+    labelDefs.forEach(({ label, xFrac, fill }) => {
         const txt = document.createElementNS(ns, 'text');
-        txt.setAttribute('x', cx); txt.setAttribute('y', cy);
+        txt.setAttribute('x', W * xFrac);
+        txt.setAttribute('y', H * 0.5);
         txt.setAttribute('text-anchor', 'middle');
         txt.setAttribute('dominant-baseline', 'middle');
-        txt.setAttribute('font-size', '44');
+        txt.setAttribute('font-size', '64');
         txt.setAttribute('font-weight', '900');
-        txt.setAttribute('fill', st.textFill);
+        txt.setAttribute('fill', fill);
         txt.setAttribute('font-family', "'Hiragino Maru Gothic ProN','Meiryo',sans-serif");
         txt.setAttribute('letter-spacing', '4');
         txt.setAttribute('pointer-events', 'none');
-        txt.textContent = st.label;
-        textG.appendChild(txt);
+        txt.textContent = label;
+        svg.appendChild(txt);
     });
-    // ===== END AREA LABELS =====
 
-    // Track roads already drawn (avoid double-stroke on same segment)
-    const drawn = new Set();
-
+    // ── Arrows: tile-edge to tile-edge, black outline + white inner ──
     mapData.forEach(tile => {
-        const from = getC(tile);
+        const fx = tcx(tile), fy = tcy(tile);
         tile.next.forEach(nextId => {
             const next = mapData.find(t => t.id === nextId);
             if (!next) return;
-            const key = Math.min(tile.id, next.id) + '-' + Math.max(tile.id, next.id);
-
-            const to = getC(next);
-            const dx = to.x - from.x, dy = to.y - from.y;
-            const len = Math.sqrt(dx*dx + dy*dy);
+            const tx = tcx(next), ty = tcy(next);
+            const dx = tx - fx, dy = ty - fy;
+            const len = Math.sqrt(dx * dx + dy * dy);
             if (len < 2) return;
-            const ux = dx/len, uy = dy/len;
+            const ux = dx / len, uy = dy / len;
 
-            // Straight line — start/end trimmed to tile edge
-            const x1 = from.x + ux * (R + 1);
-            const y1 = from.y + uy * (R + 1);
-            const x2 = to.x   - ux * (R + 2);
-            const y2 = to.y   - uy * (R + 2);
+            // Start just outside source tile edge, end just inside dest tile edge
+            const x1 = fx + ux * (R + 4);
+            const y1 = fy + uy * (R + 4);
+            const x2 = tx - ux * (R + 8);   // leave room for arrowhead
+            const y2 = ty - uy * (R + 8);
 
-            if (!drawn.has(key)) {
-                // Outer shadow
-                const r0 = document.createElementNS(ns, 'line');
-                r0.setAttribute('x1',x1); r0.setAttribute('y1',y1);
-                r0.setAttribute('x2',x2); r0.setAttribute('y2',y2);
-                r0.setAttribute('stroke','#5a3a0a'); r0.setAttribute('stroke-width','36');
-                r0.setAttribute('stroke-linecap','round'); roadG.appendChild(r0);
-
-                // Tan border
-                const r1 = document.createElementNS(ns, 'line');
-                r1.setAttribute('x1',x1); r1.setAttribute('y1',y1);
-                r1.setAttribute('x2',x2); r1.setAttribute('y2',y2);
-                r1.setAttribute('stroke','#c8984a'); r1.setAttribute('stroke-width','30');
-                r1.setAttribute('stroke-linecap','round'); roadG.appendChild(r1);
-
-                // Main yellow
-                const r2 = document.createElementNS(ns, 'line');
-                r2.setAttribute('x1',x1); r2.setAttribute('y1',y1);
-                r2.setAttribute('x2',x2); r2.setAttribute('y2',y2);
-                r2.setAttribute('stroke','#e8c050'); r2.setAttribute('stroke-width','24');
-                r2.setAttribute('stroke-linecap','round'); roadG.appendChild(r2);
-
-                // Highlight stripe
-                const r3 = document.createElementNS(ns, 'line');
-                r3.setAttribute('x1',x1); r3.setAttribute('y1',y1);
-                r3.setAttribute('x2',x2); r3.setAttribute('y2',y2);
-                r3.setAttribute('stroke','#f9e898'); r3.setAttribute('stroke-width','9');
-                r3.setAttribute('stroke-linecap','round'); roadG.appendChild(r3);
-
-                drawn.add(key);
-            }
-
-            // Arrow at midpoint, pointing toward destination
-            const mx = (x1 + x2) / 2;
-            const my = (y1 + y2) / 2;
-            const aLen = 10;
-
-            const as = document.createElementNS(ns, 'line');
-            as.setAttribute('x1', mx - ux*(aLen+1)); as.setAttribute('y1', my - uy*(aLen+1));
-            as.setAttribute('x2', mx + ux*3); as.setAttribute('y2', my + uy*3);
-            as.setAttribute('stroke','rgba(0,0,0,0.35)'); as.setAttribute('stroke-width','3');
-            as.setAttribute('stroke-linecap','round'); as.setAttribute('marker-end','url(#bpa)');
-            arrowG.appendChild(as);
-
-            const ab = document.createElementNS(ns, 'line');
-            ab.setAttribute('x1', mx - ux*aLen); ab.setAttribute('y1', my - uy*aLen);
-            ab.setAttribute('x2', mx + ux*2);  ab.setAttribute('y2', my + uy*2);
-            ab.setAttribute('stroke','white'); ab.setAttribute('stroke-width','2');
-            ab.setAttribute('stroke-linecap','round'); ab.setAttribute('marker-end','url(#bpa)');
-            arrowG.appendChild(ab);
+            // Single black semi-transparent arrow, tile-edge to tile-edge
+            const arrow = document.createElementNS(ns, 'line');
+            arrow.setAttribute('x1', x1); arrow.setAttribute('y1', y1);
+            arrow.setAttribute('x2', x2); arrow.setAttribute('y2', y2);
+            arrow.setAttribute('stroke', 'rgba(0,0,0,0.50)');
+            arrow.setAttribute('stroke-width', '5');
+            arrow.setAttribute('stroke-linecap', 'round');
+            arrow.setAttribute('marker-end', 'url(#arr-bk)');
+            svg.appendChild(arrow);
         });
     });
 
     board.insertBefore(svg, board.firstChild);
 }
-// ========== END ROAD RENDERER ==========
+// ========== END RENDERER ==========
 
 function initBoard() {
     const board = document.getElementById("game-board");
@@ -1797,8 +1789,8 @@ function initBoard() {
         div.className = `tile ${tile.type} ${tile.area}`;
         const icon = tileIconMap[tile.type] || '';
         div.innerHTML = `
-            <div style="font-size:9px;line-height:1;z-index:2;pointer-events:none;">${icon}</div>
-            <div style="font-size:4px;font-weight:300;z-index:2;text-align:center;line-height:1.1;pointer-events:none;max-width:26px;overflow:hidden;white-space:nowrap;opacity:0.9;">${tile.name}</div>
+            <div style="font-size:26px;line-height:1;z-index:2;pointer-events:none;">${icon}</div>
+            <div style="font-size:9px;font-weight:300;z-index:2;text-align:center;line-height:1.3;pointer-events:none;max-width:72px;overflow:hidden;white-space:nowrap;opacity:0.9;">${tile.name}</div>
             <div class="owner-mark-clay" id="owner-${tile.id}"></div>
             <div class="construction-mark" id="const-${tile.id}">🚧</div>
         `;
@@ -1873,8 +1865,8 @@ function updateTokens() {
             <span style="font-size:18px;">${charEmoji[player.charType] || '🏃'}</span>
             <span style="font-size:7px;font-weight:900;color:${player.color};text-shadow:0 0 4px rgba(0,0,0,1);white-space:nowrap;max-width:32px;overflow:hidden;text-overflow:ellipsis;">${player.name}</span>
         </div>`;
-        token.style.width = '34px';
-        token.style.height = '34px';
+        token.style.width = '36px';
+        token.style.height = '36px';
         
         let tile = document.getElementById(`tile-${player.pos}`);
         if (tile) tile.appendChild(token);
@@ -2354,10 +2346,67 @@ function selectBranch(targetId) {
 // ==========================================
 // MAIN UI UPDATER (リファクタリング済)
 // ==========================================
+// ===== LAYOUT MODE =====
+let currentLayoutMode = localStorage.getItem('layoutMode') || 'auto';
+function setLayoutMode(mode) {
+    currentLayoutMode = mode;
+    localStorage.setItem('layoutMode', mode);
+    document.body.classList.remove('layout-pc','layout-mobile');
+    if (mode === 'pc') document.body.classList.add('layout-pc');
+    if (mode === 'sp') document.body.classList.add('layout-mobile');
+    const desc = { auto:'現在: 自動（画面幅で切替）', pc:'現在: PCレイアウト固定', sp:'現在: スマホレイアウト固定' };
+    const el = document.getElementById('layout-mode-desc');
+    if (el) el.textContent = desc[mode];
+    ['auto','pc','sp'].forEach(m => {
+        const btn = document.getElementById(`layout-btn-${m}`);
+        if (btn) btn.style.opacity = (m === mode) ? '1' : '0.55';
+    });
+}
+document.addEventListener('DOMContentLoaded', () => setLayoutMode(currentLayoutMode));
+// ===== END LAYOUT MODE =====
+
+function updatePathPreview() {
+    // Clear old highlights
+    document.querySelectorAll('.tile-path-1,.tile-path-2,.tile-path-3,.tile-manhole-linked').forEach(el => {
+        el.classList.remove('tile-path-1','tile-path-2','tile-path-3','tile-manhole-linked');
+    });
+    if (!players || players.length === 0 || gameOver) return;
+    const cp = players[turn];
+    if (!cp || cp.isCPU) return;
+
+    // ── 3 tiles ahead path preview ──
+    const visited = new Set([cp.pos]);
+    let frontier = [cp.pos];
+    for (let depth = 1; depth <= 3; depth++) {
+        const next = [];
+        frontier.forEach(id => {
+            const tile = mapData.find(t => t.id === id);
+            if (!tile) return;
+            tile.next.forEach(nid => {
+                if (!visited.has(nid)) {
+                    visited.add(nid);
+                    next.push(nid);
+                    const el = document.getElementById(`tile-${nid}`);
+                    if (el) el.classList.add(`tile-path-${depth}`);
+                }
+            });
+        });
+        frontier = next;
+    }
+
+    // ── Manhole: highlight all other manholes as warp destinations ──
+    const curTile = mapData.find(t => t.id === cp.pos);
+    if (curTile && curTile.type === 'manhole') {
+        mapData.filter(t => t.type === 'manhole' && t.id !== cp.pos).forEach(t => {
+            const el = document.getElementById(`tile-${t.id}`);
+            if (el) el.classList.add('tile-manhole-linked');
+        });
+    }
+}
+
 function updateUI() {
     if (gameOver || players.length === 0 || !players[turn]) return;
-    
-    const currentPlayer = players[turn];
+    updatePathPreview();
     let isMyChar = !currentPlayer.isCPU;
     
     if (typeof isOnlineMode !== 'undefined' && isOnlineMode && !currentPlayer.isCPU) {
@@ -4310,11 +4359,12 @@ async function processRoundEvents() {
     let truckRoll = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
     let truckMoveData = getDestRandom(truckPos, truckRoll);
     const truckPathTiles = [];
+    let truckFirstStep = true;
     
     for (let stepId of truckMoveData.hitList) {
         truckPos = stepId;
         updateTokens();
-        scrollToTile(stepId); // 収集車に自動スクロール
+        if (truckFirstStep) { scrollToTile(stepId); truckFirstStep = false; } // 最初の1歩だけ追従
         let targetElement = document.getElementById(`tile-${stepId}`);
         if (targetElement) {
             targetElement.classList.add('truck-highlight');
@@ -4382,7 +4432,7 @@ async function processRoundEvents() {
         for (let stepId of policeMoveData.hitList) {
             policePos = stepId;
             updateTokens();
-            scrollToTile(stepId); // 警察に自動スクロール
+            if (stepId === policeMoveData.hitList[0]) scrollToTile(stepId); // 最初の1歩だけ追従
             let targetElement = document.getElementById(`tile-${stepId}`);
             if (targetElement) targetElement.classList.add('police-highlight');
             if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
