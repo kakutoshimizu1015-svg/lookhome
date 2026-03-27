@@ -3894,13 +3894,15 @@ let weaponArcCanvas = null;
 let weaponArcAnimId = null;
 
 function getArcCoords(tileEl) {
-    const wrapper = document.getElementById('game-board-wrapper');
-    if (!wrapper || !tileEl) return null;
-    const wrapRect = wrapper.getBoundingClientRect();
+    const inner = document.getElementById('game-board-inner');
+    if (!inner || !tileEl) return null;
+    const innerRect = inner.getBoundingClientRect();
     const tileRect = tileEl.getBoundingClientRect();
+    // innerRect と tileRect はどちらもCSS transform適用後の画面座標
+    // 差分を mapScale で割ってcanvasのローカル座標（transform前）に変換
     return {
-        x: (tileRect.left - wrapRect.left + wrapper.scrollLeft + tileRect.width  / 2) / mapScale,
-        y: (tileRect.top  - wrapRect.top  + wrapper.scrollTop  + tileRect.height / 2) / mapScale,
+        x: (tileRect.left + tileRect.width  / 2 - innerRect.left) / mapScale,
+        y: (tileRect.top  + tileRect.height / 2 - innerRect.top)  / mapScale,
     };
 }
 
