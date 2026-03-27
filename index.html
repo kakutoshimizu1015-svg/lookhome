@@ -114,46 +114,7 @@
         .construction-mark { position:absolute; inset:0; background:repeating-linear-gradient(45deg,#f1c40f,#f1c40f 8px,#2c3e50 8px,#2c3e50 16px); opacity:0.8; border-radius:50%; z-index:4; display:none; justify-content:center; align-items:center; font-size:16px; }
         .destination-mark { position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); font-size:12px; z-index:6; animation:pulse-dest 1s infinite alternate; }
 
-        /* ===== MOBILE LAYOUT ===== */
-        body.layout-mobile #top-bar { flex-direction:column; }
-        body.layout-mobile #left-status-area { flex-direction:row; overflow-x:auto; }
-        body.layout-mobile #portrait-active { width:100%; flex-direction:row; flex-wrap:wrap; padding:6px; }
-        body.layout-mobile #weather-panel { width:auto; min-width:100px; flex-shrink:0; }
-        body.layout-mobile #hand-cards-area { overflow-x:auto; }
-        body.layout-mobile #main-area { flex-direction:column; }
-        body.layout-mobile #right-side-area { width:100%; flex-direction:row; flex-wrap:wrap; gap:8px; }
-        body.layout-mobile #action-panel { flex-direction:row; flex-wrap:wrap; padding:6px; gap:4px; }
-        body.layout-mobile #action-panel .btn-clay { flex:1; min-width:80px; font-size:11px; padding:4px; }
-        body.layout-mobile #player-list-panel { flex:1; min-width:150px; }
-        body.layout-mobile #game-board-wrapper { max-height:50vh; }
-        body.layout-mobile #log-area { display:none; }
-        /* auto-apply on narrow screens unless user forced PC mode */
-        @media (max-width: 700px) {
-            body:not(.layout-pc) #top-bar { flex-direction:column; }
-            body:not(.layout-pc) #left-status-area { flex-direction:row; overflow-x:auto; }
-            body:not(.layout-pc) #portrait-active { width:100%; flex-direction:row; flex-wrap:wrap; padding:6px; }
-            body:not(.layout-pc) #weather-panel { width:auto; min-width:90px; flex-shrink:0; }
-            body:not(.layout-pc) #main-area { flex-direction:column; }
-            body:not(.layout-pc) #right-side-area { width:100%; flex-direction:row; flex-wrap:wrap; gap:6px; }
-            body:not(.layout-pc) #action-panel { flex-direction:row; flex-wrap:wrap; padding:6px; gap:4px; }
-            body:not(.layout-pc) #action-panel .btn-clay { flex:1; min-width:75px; font-size:11px; padding:4px; }
-            body:not(.layout-pc) #player-list-panel { flex:1; }
-            body:not(.layout-pc) #game-board-wrapper { max-height:48vh; }
-            body:not(.layout-pc) #log-area { display:none; }
-            body:not(.layout-pc) #board-path-svg { /* SVG/tile alignment fix on mobile */ }
-        }
-        /* ===== END MOBILE LAYOUT ===== */
-
-        /* Path preview glow: 3 tiles ahead, fading */
-        .tile-path-1 { box-shadow:0 0 20px rgba(255,220,50,0.95), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,220,50,0.95) !important; }
-        .tile-path-2 { box-shadow:0 0 14px rgba(255,200,30,0.65), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,200,30,0.65) !important; }
-        .tile-path-3 { box-shadow:0 0 8px  rgba(255,180,20,0.35), 0 4px 8px rgba(0,0,0,0.55) !important; border-color:rgba(255,180,20,0.35) !important; }
-        /* Manhole connection highlight */
-        .tile-manhole-linked { animation:manhole-linked-glow 1.2s ease-in-out infinite !important; will-change:filter; }
-        @keyframes manhole-linked-glow {
-            0%,100% { filter:drop-shadow(0 0 6px rgba(255,220,0,0.7)); }
-            50%     { filter:drop-shadow(0 0 18px rgba(255,220,0,1)); }
-        }
+        /* ===== MARIO PARTY MAP STYLE ===== */
         #board-path-svg { position:absolute; top:0; left:0; pointer-events:none; z-index:2; overflow:visible; }
 
         /* Base tile — contain paint so repaints don't cascade */
@@ -659,17 +620,6 @@
                 <label style="font-weight: bold; display: block; margin-bottom: 5px;">🔊 音量: <span id="vol-disp">100%</span></label>
                 <input type="range" id="vol-slider" min="0" max="2" step="0.1" value="1" style="width: 100%;" onchange="updateVolume(this.value)">
             </div>
-
-            <div style="margin: 10px 0; text-align: left; background: var(--clay-panel); color: #fdf5e6; padding: 10px; border-radius: 8px; border: var(--clay-border);">
-                <div style="font-weight:bold;margin-bottom:8px;">📱 レイアウト切替</div>
-                <div style="display:flex;gap:8px;">
-                    <button id="layout-btn-auto" class="btn-large btn-green" style="flex:1;font-size:12px;padding:7px;" onclick="setLayoutMode('auto')">🔄 自動</button>
-                    <button id="layout-btn-pc"   class="btn-large btn-blue"  style="flex:1;font-size:12px;padding:7px;" onclick="setLayoutMode('pc')">🖥️ PC</button>
-                    <button id="layout-btn-sp"   class="btn-large"           style="flex:1;font-size:12px;padding:7px;background:#8e44ad;border-color:#6c3483;" onclick="setLayoutMode('sp')">📱 スマホ</button>
-                </div>
-                <div id="layout-mode-desc" style="font-size:11px;color:#bdc3c7;margin-top:6px;text-align:center;">現在: 自動（画面幅で切替）</div>
-            </div>
-
             <button class="btn-large btn-brown" style="width:100%;margin-top:15px;" onclick="promptReturnToTitle()">🏠 タイトルに戻る</button>
             <button class="btn-large" style="width:100%;margin-top:10px;background:#95a5a6;border-color:#7f8c8d;" onclick="toggleSettingsModal()">✖ 閉じる</button>
         </div>
@@ -1701,11 +1651,13 @@ function drawBoardPaths() {
     // pointer-events:none so clicks go through to tiles; no background fill on SVG itself
     svg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:2;display:block;overflow:visible;background:none;';
 
-    // Markers: single black semi-transparent arrow
+    // Markers: black outline + white inner
     const defs = document.createElementNS(ns, 'defs');
     defs.innerHTML =
         '<marker id="arr-bk" viewBox="0 0 14 14" refX="7" refY="7" markerWidth="5" markerHeight="5" orient="auto">' +
-        '<polygon points="0,1 13,7 0,13" fill="rgba(0,0,0,0.55)"/></marker>';
+        '<polygon points="0,0 14,7 0,14" fill="black"/></marker>' +
+        '<marker id="arr-wh" viewBox="0 0 14 14" refX="7" refY="7" markerWidth="4" markerHeight="4" orient="auto">' +
+        '<polygon points="2,2 12,7 2,12" fill="white"/></marker>';
     svg.appendChild(defs);
 
     // Tile center helper
@@ -1753,15 +1705,25 @@ function drawBoardPaths() {
             const x2 = tx - ux * (R + 8);   // leave room for arrowhead
             const y2 = ty - uy * (R + 8);
 
-            // Single black semi-transparent arrow, tile-edge to tile-edge
-            const arrow = document.createElementNS(ns, 'line');
-            arrow.setAttribute('x1', x1); arrow.setAttribute('y1', y1);
-            arrow.setAttribute('x2', x2); arrow.setAttribute('y2', y2);
-            arrow.setAttribute('stroke', 'rgba(0,0,0,0.50)');
-            arrow.setAttribute('stroke-width', '5');
-            arrow.setAttribute('stroke-linecap', 'round');
-            arrow.setAttribute('marker-end', 'url(#arr-bk)');
-            svg.appendChild(arrow);
+            // Black outline (thick)
+            const outline = document.createElementNS(ns, 'line');
+            outline.setAttribute('x1', x1); outline.setAttribute('y1', y1);
+            outline.setAttribute('x2', x2); outline.setAttribute('y2', y2);
+            outline.setAttribute('stroke', 'black');
+            outline.setAttribute('stroke-width', '7');
+            outline.setAttribute('stroke-linecap', 'round');
+            outline.setAttribute('marker-end', 'url(#arr-bk)');
+            svg.appendChild(outline);
+
+            // White inner line
+            const inner = document.createElementNS(ns, 'line');
+            inner.setAttribute('x1', x1); inner.setAttribute('y1', y1);
+            inner.setAttribute('x2', x2); inner.setAttribute('y2', y2);
+            inner.setAttribute('stroke', 'white');
+            inner.setAttribute('stroke-width', '3');
+            inner.setAttribute('stroke-linecap', 'round');
+            inner.setAttribute('marker-end', 'url(#arr-wh)');
+            svg.appendChild(inner);
         });
     });
 
@@ -2346,67 +2308,10 @@ function selectBranch(targetId) {
 // ==========================================
 // MAIN UI UPDATER (リファクタリング済)
 // ==========================================
-// ===== LAYOUT MODE =====
-let currentLayoutMode = localStorage.getItem('layoutMode') || 'auto';
-function setLayoutMode(mode) {
-    currentLayoutMode = mode;
-    localStorage.setItem('layoutMode', mode);
-    document.body.classList.remove('layout-pc','layout-mobile');
-    if (mode === 'pc') document.body.classList.add('layout-pc');
-    if (mode === 'sp') document.body.classList.add('layout-mobile');
-    const desc = { auto:'現在: 自動（画面幅で切替）', pc:'現在: PCレイアウト固定', sp:'現在: スマホレイアウト固定' };
-    const el = document.getElementById('layout-mode-desc');
-    if (el) el.textContent = desc[mode];
-    ['auto','pc','sp'].forEach(m => {
-        const btn = document.getElementById(`layout-btn-${m}`);
-        if (btn) btn.style.opacity = (m === mode) ? '1' : '0.55';
-    });
-}
-document.addEventListener('DOMContentLoaded', () => setLayoutMode(currentLayoutMode));
-// ===== END LAYOUT MODE =====
-
-function updatePathPreview() {
-    // Clear old highlights
-    document.querySelectorAll('.tile-path-1,.tile-path-2,.tile-path-3,.tile-manhole-linked').forEach(el => {
-        el.classList.remove('tile-path-1','tile-path-2','tile-path-3','tile-manhole-linked');
-    });
-    if (!players || players.length === 0 || gameOver) return;
-    const cp = players[turn];
-    if (!cp || cp.isCPU) return;
-
-    // ── 3 tiles ahead path preview ──
-    const visited = new Set([cp.pos]);
-    let frontier = [cp.pos];
-    for (let depth = 1; depth <= 3; depth++) {
-        const next = [];
-        frontier.forEach(id => {
-            const tile = mapData.find(t => t.id === id);
-            if (!tile) return;
-            tile.next.forEach(nid => {
-                if (!visited.has(nid)) {
-                    visited.add(nid);
-                    next.push(nid);
-                    const el = document.getElementById(`tile-${nid}`);
-                    if (el) el.classList.add(`tile-path-${depth}`);
-                }
-            });
-        });
-        frontier = next;
-    }
-
-    // ── Manhole: highlight all other manholes as warp destinations ──
-    const curTile = mapData.find(t => t.id === cp.pos);
-    if (curTile && curTile.type === 'manhole') {
-        mapData.filter(t => t.type === 'manhole' && t.id !== cp.pos).forEach(t => {
-            const el = document.getElementById(`tile-${t.id}`);
-            if (el) el.classList.add('tile-manhole-linked');
-        });
-    }
-}
-
 function updateUI() {
     if (gameOver || players.length === 0 || !players[turn]) return;
-    updatePathPreview();
+    
+    const currentPlayer = players[turn];
     let isMyChar = !currentPlayer.isCPU;
     
     if (typeof isOnlineMode !== 'undefined' && isOnlineMode && !currentPlayer.isCPU) {
