@@ -59,9 +59,11 @@
         #left-status-area { display:flex; gap:15px; flex-shrink:0; }
         #weather-panel { width:130px; display:flex; flex-direction:column; justify-content:center; }
         #weather-indicator { background:#3498db; width:100%; padding:6px; border-radius:8px; font-weight:bold; font-size:15px; text-align:center; border:2px solid #2980b9; box-shadow:var(--clay-shadow-in); transition:background 0.3s; }
-        #portrait-active { width:280px; display:flex; flex-direction:column; align-items:center; position:relative; padding:10px; }
-        .active-id-clay { padding:2px 8px; border-radius:6px; font-weight:bold; color:white; font-size:13px; border:2px solid #fff; box-shadow:1px 1px 3px rgba(0,0,0,0.5); }
-        .avatar-large { width:60px; height:60px; border-radius:12px; border:3px solid #e74c3c; box-shadow:var(--clay-shadow-in); margin:5px 0; display:flex; justify-content:center; align-items:center; font-size:36px; background:#8d7b68; }
+        #portrait-active { width:280px; display:flex; flex-direction:column; align-items:center; position:relative; padding:10px; transition: box-shadow 0.3s, border-color 0.3s; }
+        #portrait-active:hover { box-shadow: 0 0 18px rgba(241,196,15,0.55), var(--clay-shadow-out); border-color: rgba(241,196,15,0.7) !important; }
+        #portrait-active::after { content:'👆 タップでスキル確認'; position:absolute; bottom:6px; right:8px; font-size:9px; color:rgba(241,196,15,0.55); font-weight:bold; pointer-events:none; letter-spacing:0.3px; }
+        .avatar-large { width:60px; height:60px; border-radius:12px; border:3px solid #e74c3c; box-shadow:var(--clay-shadow-in); margin:5px 0; display:flex; justify-content:center; align-items:center; font-size:36px; background:#8d7b68; transition: box-shadow 0.3s, transform 0.2s; }
+        #portrait-active:hover .avatar-large { box-shadow: 0 0 16px rgba(241,196,15,0.7), var(--clay-shadow-in); transform: scale(1.06); }
         .status-box { background:#8d7b68; padding:5px; border-radius:8px; font-weight:bold; font-size:12px; text-align:center; border:2px solid #4a3b32; box-shadow:var(--clay-shadow-in); }
         .turn-text-clay { font-size:14px; font-weight:bold; text-align:center; background:#3e2f2a; padding:4px 8px; border-radius:15px; width:100%; margin:0; }
         .bankrupt { color:#e74c3c !important; animation: shake-btn 0.5s infinite; }
@@ -149,7 +151,10 @@
         .npc-yakuza { background-color:#2c3e50; bottom:-2px; right:-2px; }
         .npc-loanshark { background-color:#8e44ad; top:50%; left:-2px; transform:translateY(-50%); }
         .npc-friend { background-color:#27ae60; bottom:-2px; left:-2px; }
-        .truck-token { width:40px; height:40px; border-radius:8px; position:absolute; z-index:30; border:3px solid #ff2200; box-shadow:0 0 25px #ff2200, 0 0 50px rgba(255,30,0,0.7), 0 4px 8px rgba(0,0,0,0.9); transition:all 0.2s; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; justify-content:center; align-items:center; font-size:24px; background:radial-gradient(circle,#5a0000,#1a0000); animation:truck-idle 0.6s ease-in-out infinite alternate; }
+        /* 通常時は半透明 → マス目が見やすい */
+        .truck-token { width:40px; height:40px; border-radius:8px; position:absolute; z-index:30; border:2px solid rgba(255,34,0,0.35); box-shadow:none; transition:opacity 0.4s,box-shadow 0.4s,border-color 0.4s; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; justify-content:center; align-items:center; font-size:24px; background:rgba(90,0,0,0.30); animation:none; opacity:0.28; }
+        /* horror-mode 中だけフル表示 */
+        body.horror-mode .truck-token { opacity:1 !important; background:radial-gradient(circle,#5a0000,#1a0000) !important; border:3px solid #ff2200 !important; box-shadow:0 0 25px #ff2200, 0 0 50px rgba(255,30,0,0.7), 0 4px 8px rgba(0,0,0,0.9) !important; animation:truck-idle 0.6s ease-in-out infinite alternate !important; }
         @keyframes truck-idle { 0%{box-shadow:0 0 20px #ff2200, 0 0 40px rgba(255,30,0,0.6);} 100%{box-shadow:0 0 50px #ff0000, 0 0 100px rgba(255,0,0,0.8), 0 0 140px rgba(255,0,0,0.3);} }
         
         /* アニメーション・強調表示 */
@@ -559,6 +564,33 @@
         </div>
     </div>
 
+    <!-- キャラクター詳細モーダル -->
+    <div id="char-info-modal" class="modal-overlay" style="z-index:1100;display:none;" onclick="if(event.target===this)closeCharInfoModal()">
+        <div class="modal-box" style="max-width:420px;background:#1a1a2e;color:#fdf5e6;border:3px solid #f1c40f;padding:0;overflow:hidden;">
+            <div id="cim-header" style="padding:18px 20px 14px;display:flex;align-items:center;gap:12px;">
+                <div id="cim-emoji" style="font-size:52px;line-height:1;"></div>
+                <div style="flex:1;">
+                    <div id="cim-name" style="font-size:19px;font-weight:900;color:#f1c40f;"></div>
+                    <div id="cim-tagline" style="font-size:12px;color:#bdc3c7;margin-top:3px;font-style:italic;"></div>
+                </div>
+                <button onclick="closeCharInfoModal()" style="background:none;border:none;color:#bdc3c7;font-size:22px;cursor:pointer;padding:4px;">✕</button>
+            </div>
+            <div style="padding:0 18px 14px;">
+                <div style="background:rgba(46,204,113,0.12);border:2px solid #2ecc71;border-radius:10px;padding:11px 13px;margin-bottom:9px;">
+                    <div style="font-size:10px;font-weight:bold;color:#2ecc71;letter-spacing:1px;margin-bottom:5px;">⭐ パッシブスキル</div>
+                    <div id="cim-passive-name" style="font-size:14px;font-weight:900;margin-bottom:3px;"></div>
+                    <div id="cim-passive-desc" style="font-size:12px;color:#bdc3c7;line-height:1.6;"></div>
+                </div>
+                <div style="background:rgba(231,76,60,0.12);border:2px solid #e74c3c;border-radius:10px;padding:11px 13px;">
+                    <div style="font-size:10px;font-weight:bold;color:#e74c3c;letter-spacing:1px;margin-bottom:5px;">⚡ アクションスキル</div>
+                    <div id="cim-action-name" style="font-size:14px;font-weight:900;margin-bottom:3px;"></div>
+                    <div id="cim-action-desc" style="font-size:12px;color:#bdc3c7;line-height:1.6;"></div>
+                </div>
+            </div>
+            <div id="cim-status-area" style="padding:0 18px 16px;"></div>
+        </div>
+    </div>
+
     <div id="attack-overlay" class="modal-overlay" style="z-index:1003;">
         <div class="modal-box" style="background:#2c3e50;color:white;max-width:400px;">
             <h2 id="attack-title" style="color:#e74c3c;">⚔️ 攻撃対象を選択</h2>
@@ -589,51 +621,51 @@
             <h3 style="margin-top:0;color:#f2c779;">🖥️ オフラインで遊ぶ (2〜8人)</h3>
             <div class="setup-row" style="color:#e74c3c;">🔴 <input type="text" id="p1-name" value="P1" class="name-input" maxlength="8">
                 <select id="p1-type"><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p1-avatar"><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="survivor">サバイバー</option><option value="yankee">元ヤン</option></select>
+                <select id="p1-avatar"><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
                 <div id="p1-preview" class="avatar-preview" style="border-color:#e74c3c;">🏃</div>
-                <div id="p1-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">移動常に1AP/雨ペナ無効</div>
+                <div id="p1-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">移動常1AP・雨無効/疾風ダッシュ</div>
             </div>
             <div class="setup-row" style="color:#3498db;">🔵 <input type="text" id="p2-name" value="P2" class="name-input" maxlength="8">
                 <select id="p2-type"><option value="human">人間</option><option value="cpu" selected>CPU</option><option value="none">不参加</option></select>
-                <select id="p2-avatar"><option value="sales">元営業マン</option><option value="athlete">元アスリート</option><option value="survivor">サバイバー</option><option value="yankee">元ヤン</option></select>
+                <select id="p2-avatar"><option value="sales">💼元営業マン</option><option value="athlete">🏃元アスリート</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
                 <div id="p2-preview" class="avatar-preview" style="border-color:#3498db;">💼</div>
-                <div id="p2-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">バイト成功率70%</div>
+                <div id="p2-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">バイト70%・ショップ割引/訪問販売</div>
             </div>
             <div class="setup-row" style="color:#2ecc71;">🟢 <input type="text" id="p3-name" value="P3" class="name-input" maxlength="8">
                 <select id="p3-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p3-avatar"><option value="survivor">サバイバー</option><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="yankee">元ヤン</option></select>
+                <select id="p3-avatar"><option value="survivor">🌿サバイバー</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
                 <div id="p3-preview" class="avatar-preview" style="border-color:#2ecc71;">🌿</div>
-                <div id="p3-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ゴミ漁り失敗ペナ無効</div>
+                <div id="p3-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ゴミ漁りペナ無効/野宿HP+15</div>
             </div>
             <div class="setup-row" style="color:#f1c40f;">🟡 <input type="text" id="p4-name" value="P4" class="name-input" maxlength="8">
                 <select id="p4-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p4-avatar"><option value="yankee">元ヤン</option><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="survivor">サバイバー</option></select>
+                <select id="p4-avatar"><option value="yankee">👊元ヤン</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
                 <div id="p4-preview" class="avatar-preview" style="border-color:#f1c40f;">👊</div>
-                <div id="p4-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">同マス者から自動1P強奪</div>
+                <div id="p4-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">同マスカツアゲ/殴る10ダメ</div>
             </div>
             <div class="setup-row" style="color:#e67e22;">🟠 <input type="text" id="p5-name" value="P5" class="name-input" maxlength="8">
                 <select id="p5-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p5-avatar"><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="survivor">サバイバー</option><option value="yankee">元ヤン</option></select>
-                <div id="p5-preview" class="avatar-preview" style="border-color:#e67e22;">🏃</div>
-                <div id="p5-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">移動常に1AP/雨ペナ無効</div>
+                <select id="p5-avatar"><option value="hacker">💻元ハッカー</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
+                <div id="p5-preview" class="avatar-preview" style="border-color:#e67e22;">💻</div>
+                <div id="p5-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">手札上限+2/遠隔ハッキング</div>
             </div>
             <div class="setup-row" style="color:#9b59b6;">🟣 <input type="text" id="p6-name" value="P6" class="name-input" maxlength="8">
                 <select id="p6-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p6-avatar"><option value="sales">元営業マン</option><option value="athlete">元アスリート</option><option value="survivor">サバイバー</option><option value="yankee">元ヤン</option></select>
-                <div id="p6-preview" class="avatar-preview" style="border-color:#9b59b6;">💼</div>
-                <div id="p6-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">バイト成功率70%</div>
+                <select id="p6-avatar"><option value="musician">🎸ミュージシャン</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
+                <div id="p6-preview" class="avatar-preview" style="border-color:#9b59b6;">🎸</div>
+                <div id="p6-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">通過で銀行+2P/路上ライブ引き寄せ</div>
             </div>
             <div class="setup-row" style="color:#1abc9c;">🩵 <input type="text" id="p7-name" value="P7" class="name-input" maxlength="8">
                 <select id="p7-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p7-avatar"><option value="survivor">サバイバー</option><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="yankee">元ヤン</option></select>
-                <div id="p7-preview" class="avatar-preview" style="border-color:#1abc9c;">🌿</div>
-                <div id="p7-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ゴミ漁り失敗ペナ無効</div>
+                <select id="p7-avatar"><option value="doctor">🩺闇医者</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
+                <div id="p7-preview" class="avatar-preview" style="border-color:#1abc9c;">🩺</div>
+                <div id="p7-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ターン開始HP+5/闇診療5P徴収</div>
             </div>
             <div class="setup-row" style="color:#e91e8c;">🩷 <input type="text" id="p8-name" value="P8" class="name-input" maxlength="8">
                 <select id="p8-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p8-avatar"><option value="yankee">元ヤン</option><option value="athlete">元アスリート</option><option value="sales">元営業マン</option><option value="survivor">サバイバー</option></select>
-                <div id="p8-preview" class="avatar-preview" style="border-color:#e91e8c;">👊</div>
-                <div id="p8-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">同マス者から自動1P強奪</div>
+                <select id="p8-avatar"><option value="gambler">🎲ギャンブラー</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="detective">🕵️元探偵</option></select>
+                <div id="p8-preview" class="avatar-preview" style="border-color:#e91e8c;">🎲</div>
+                <div id="p8-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ゾロ目HP+10/イカサマ勝負5P</div>
             </div>
         </div>
 
@@ -649,6 +681,12 @@
                 </label>
                 <span style="font-size:11px;color:#fdf5e6;margin-left:4px;">全カードを最初から所持</span>
             </div>
+            <!-- ランダム配布設定 -->
+            <div class="setup-row" style="justify-content:center;gap:8px;margin-top:8px;">
+                <button id="offline-assign-choose-btn" class="btn-large btn-green" style="flex:1;max-width:200px;font-size:13px;padding:8px;" onclick="setOfflineCharAssign('choose')">🎭 各自キャラ選択</button>
+                <button id="offline-assign-random-btn" class="btn-large" style="flex:1;max-width:200px;font-size:13px;padding:8px;background:#8e44ad;border-color:#6c3483;opacity:0.6;" onclick="setOfflineCharAssign('random')">🎲 ランダム配布</button>
+            </div>
+            <div id="offline-assign-desc" style="text-align:center;font-size:11px;color:#fdf5e6;margin-top:4px;">現在: 各自がキャラを選択します</div>
             <button class="btn-large btn-brown" style="margin-top:15px;border-color:#2c1e16;" onclick="startOfflineGame()">🎲 ゲームを開始する</button>
         </div>
     </div>
@@ -665,7 +703,7 @@
                     <div id="daynight-display" style="font-size:11px;text-align:center;margin-top:4px;font-weight:bold;">☀️ 昼</div>
                     <div id="market-display" style="font-size:10px;text-align:center;margin-top:4px;font-weight:bold;background:#3e2f2a;padding:3px;border-radius:5px;">缶:1P ゴミ:2P</div>
                 </div>
-                <div id="portrait-active" class="panel">
+                <div id="portrait-active" class="panel" onclick="showCharInfoModal(players[turn])" style="cursor:pointer;" title="クリックでキャラ詳細を表示">
                     <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
                         <div id="active-p-id" class="active-id-clay">P1</div>
                         <div id="turn-info" class="turn-text-clay" style="flex-grow:1;margin-left:10px;">あなたのターン</div>
@@ -709,7 +747,15 @@
                     <button id="btn-exchange" class="btn-clay" style="border-color:#d4a017;display:none;" onclick="actionExchange()">💱 換金 (0AP)</button>
                     <button id="btn-shop" class="btn-clay" style="border-color:#8e44ad;display:none;" onclick="openShop()">🛒 ショップ</button>
                     <button id="btn-manhole" class="btn-clay" style="border-color:#2c3e50;display:none;" onclick="actionManhole()">🕳️ ワープ (1AP)</button>
-                    <button id="btn-punch" class="btn-clay" style="border-color:#e74c3c;display:none;" onclick="actionPunch()">👊 殴る (2AP)</button>
+                    <button id="btn-punch"    class="btn-clay" style="border-color:#e74c3c;display:none;" onclick="actionPunch()">👊 殴る [元ヤン] (2AP)</button>
+                    <button id="btn-dash"     class="btn-clay" style="border-color:#27ae60;display:none;" onclick="actionDash()">💨 疾風ダッシュ [アスリート] (3AP)</button>
+                    <button id="btn-sell"     class="btn-clay" style="border-color:#f39c12;display:none;" onclick="actionSalesVisit()">📦 訪問販売 [営業マン] (2AP)</button>
+                    <button id="btn-camp"     class="btn-clay" style="border-color:#1abc9c;display:none;" onclick="actionCamp()">⛺ 野宿 [サバイバー] (2AP)</button>
+                    <button id="btn-hack"     class="btn-clay" style="border-color:#3498db;display:none;" onclick="actionHack()">💻 遠隔ハッキング [ハッカー] (3AP)</button>
+                    <button id="btn-concert"  class="btn-clay" style="border-color:#9b59b6;display:none;" onclick="actionConcert()">🎸 路上ライブ [ミュージシャン] (4AP)</button>
+                    <button id="btn-darkcure" class="btn-clay" style="border-color:#e74c3c;display:none;" onclick="actionDarkCure()">🩺 闇診療 [闇医者] (2AP)</button>
+                    <button id="btn-gamble"   class="btn-clay" style="border-color:#f1c40f;display:none;" onclick="actionGamble()">🎲 イカサマ勝負 [ギャンブラー] (2AP)</button>
+                    <button id="btn-npcmove"  class="btn-clay" style="border-color:#95a5a6;display:none;" onclick="actionNpcMove()">🕵️ 情報操作 [探偵] (3AP)</button>
                     <div style="flex-grow:1;min-height:5px;"></div>
                     <button id="btn-end" class="btn btn-end-clay" onclick="endTurnClicked()">🛑 ターン終了</button>
                 </div>
@@ -780,12 +826,17 @@ function updateVolume(val) {
 }
 
 // ========== CONSTANTS & DATA ==========
-const charEmoji = { athlete: '🏃', sales: '💼', survivor: '🌿', yankee: '👊' };
+const charEmoji = { athlete:'🏃', sales:'💼', survivor:'🌿', yankee:'👊', hacker:'💻', musician:'🎸', doctor:'🩺', gambler:'🎲', detective:'🕵️' };
 const charInfo = {
-    athlete: { name: '元アスリート', desc: '移動常に1AP/雨ペナ無効' },
-    sales: { name: '元営業マン', desc: 'バイト成功率70%' },
-    survivor: { name: 'サバイバー', desc: 'ゴミ漁り失敗ペナ無効' },
-    yankee: { name: '元ヤン', desc: 'すれ違い時もカツアゲ/AP2で殴る(10ダメ)' }
+    athlete:  { name:'元アスリート',           desc:'【健脚】移動常1AP・雨無効 / 【疾風ダッシュ】3AP:3マス先へ跳躍' },
+    sales:    { name:'元営業マン',             desc:'【コミュ力】バイト70%・ショップ1P割引 / 【訪問販売】2AP:カード押付けて3P徴収' },
+    survivor: { name:'サバイバー',             desc:'【危機察知】ゴミ漁り失敗ペナ無効 / 【野宿】2AP:HP+15回復' },
+    yankee:   { name:'元ヤン',                desc:'【威圧】同マス/すれ違いで自動1Pカツアゲ / 【殴る】2AP:同マス相手に10ダメ' },
+    hacker:   { name:'元ハッカー',             desc:'【クラウドストレージ】手札上限+2 / 【遠隔ハッキング】3AP:どこからでもショップ強制入替え・1枚購入' },
+    musician: { name:'ストリートミュージシャン',  desc:'【投げ銭】他者が同マス通過で銀行+2P / 【路上ライブ】4AP:周囲2マス全員を強制引き寄せ' },
+    doctor:   { name:'闇医者',                desc:'【自己治癒】ターン開始時HP+5 / 【闇診療】2AP:同マス相手HP+30→5P強制徴収' },
+    gambler:  { name:'ギャンブラー',            desc:'【アドレナリン】ゾロ目でAP倍+HP10回復 / 【イカサマ勝負】2AP:1d6対決・勝者が5P奪取' },
+    detective:{ name:'元探偵',                desc:'【張り込み】自陣地侵入者の手札1枚没収 / 【情報操作】3AP:NPC1体を任意マスへ移動' },
 };
 const pIdColors = ["#e74c3c", "#3498db", "#2ecc71", "#f1c40f", "#e67e22", "#9b59b6", "#1abc9c", "#e91e8c"];
 
@@ -974,12 +1025,13 @@ window.applyGameState = function(state) {
 };
 
 function createPlayer(id, name, isCPU, charType) {
+    const baseMaxHand = charType === 'hacker' ? 9 : 7;
     return {
-        id, name, isCPU, pos: 0, hp: 100, p: 0, ap: 0, hand: [], maxHand: 7,
+        id, name, isCPU, pos: 0, hp: 100, p: 0, ap: 0, hand: [], maxHand: baseMaxHand,
         cans: 0, trash: 0, stealth: false, rainGear: false, hasID: false,
         bonusAP: 0, penaltyAP: 0, skipTurn: false, cannotMove: false,
         deaths: 0, kills: 0,
-        reaction: null, // 'block' | 'reflect' | 'counter' — リアクションカード状態
+        reaction: null,
         color: pIdColors[id % 8], charType,
         equip: { bicycle: false, shoes: false, cart: false, shield: false, helmet: false, doll: false, backpack: false }
     };
@@ -1169,6 +1221,23 @@ document.querySelectorAll('[id$="-avatar"]').forEach(selector => {
     });
 });
 
+let offlineCharAssign = 'choose'; // 'choose' | 'random'
+function setOfflineCharAssign(mode) {
+    offlineCharAssign = mode;
+    const desc = document.getElementById('offline-assign-desc');
+    const cb   = document.getElementById('offline-assign-choose-btn');
+    const rb   = document.getElementById('offline-assign-random-btn');
+    if (mode === 'random') {
+        if (desc) desc.innerText = '現在: ゲーム開始時に全員へランダムでキャラを配布します';
+        if (cb) { cb.style.background = ''; cb.style.opacity = '0.6'; }
+        if (rb) { rb.style.background = '#8e44ad'; rb.style.opacity = '1'; }
+    } else {
+        if (desc) desc.innerText = '現在: 各自がキャラを選択します';
+        if (cb) { cb.style.background = '#2ecc71'; cb.style.opacity = '1'; }
+        if (rb) { rb.style.background = ''; rb.style.opacity = '0.6'; }
+    }
+}
+
 function startOfflineGame() {
     let config = [
         { name: document.getElementById("p1-name").value || "P1", type: document.getElementById("p1-type").value, avatar: document.getElementById("p1-avatar").value },
@@ -1187,6 +1256,17 @@ function startOfflineGame() {
     });
     
     if (players.length < 2) { showToast("最低2人必要です！"); return; }
+    
+    // ランダム配布モード
+    if (offlineCharAssign === 'random') {
+        const allChars = Object.keys(charEmoji);
+        const shuffled = [...allChars].sort(() => Math.random() - 0.5);
+        players.forEach((p, i) => {
+            p.charType = shuffled[i % shuffled.length];
+            p.maxHand  = p.charType === 'hacker' ? 9 : 7;
+        });
+        log('🎲 キャラクターをランダムに割り当てました！');
+    }
     
     // クリエイティブモード：全カードを配布
     const isCreative = document.getElementById("creative-mode")?.checked;
@@ -1856,7 +1936,16 @@ function updateUI() {
     if (currentDisplayTurn !== turn) {
         currentDisplayTurn = turn;
         showTurnBanner(currentPlayer);
-        resetAfkTimer(); // 新しいターン開始時にAFKタイマーリセット
+        resetAfkTimer();
+        // 【闇医者: 自己治癒】ターン開始時HP+5
+        if (currentPlayer.charType === 'doctor') {
+            const healed = Math.min(5, 100 - currentPlayer.hp);
+            if (healed > 0) {
+                currentPlayer.hp = Math.min(100, currentPlayer.hp + 5);
+                log(`🩺 ${currentPlayer.name}【自己治癒】HP+${healed}自動回復！`);
+                triggerEventPopup(currentPlayer.id, "🩺", "自己治癒！", `ターン開始でHP+${healed}`, "good");
+            }
+        }
     }
 
     // 環境パネル更新
@@ -1953,15 +2042,18 @@ function updateUI() {
         let activeStyle = (index === turn) ? `box-shadow:0 0 12px #f1c40f;border-color:#f1c40f;background:#5c4a44;` : `border-color:${otherPlayer.color};opacity:0.9;`;
         let cpuTag = otherPlayer.isCPU ? "<span style='color:#bdc3c7;'>(CPU)</span>" : "";
         let pointsFormat = otherPlayer.p < 0 ? `<span style="color:#e74c3c;">${otherPlayer.p}P</span>` : `${otherPlayer.p}P`;
-        
-        listContainer.innerHTML += `
-            <div class="mini-player-clay" style="${activeStyle}">
-                <div class="avatar-small-clay" style="border-color:${otherPlayer.color};">${charEmoji[otherPlayer.charType]}</div>
-                <div style="font-size:10px;font-weight:bold;line-height:1.3;overflow:hidden;">
-                    <div style="color:${otherPlayer.color};white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${otherPlayer.name}${cpuTag}</div>
-                    <div style="color:#fdf5e6;">❤️${otherPlayer.hp} 💰${pointsFormat} 🎴${otherPlayer.hand.length}</div>
-                </div>
+        const div = document.createElement('div');
+        div.className = 'mini-player-clay';
+        div.style.cssText = activeStyle + 'cursor:pointer;';
+        div.title = `${otherPlayer.name}のキャラ詳細を表示`;
+        div.onclick = () => showCharInfoModal(otherPlayer);
+        div.innerHTML = `
+            <div class="avatar-small-clay" style="border-color:${otherPlayer.color};">${charEmoji[otherPlayer.charType]}</div>
+            <div style="font-size:10px;font-weight:bold;line-height:1.3;overflow:hidden;">
+                <div style="color:${otherPlayer.color};white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${otherPlayer.name}${cpuTag}</div>
+                <div style="color:#fdf5e6;">❤️${otherPlayer.hp} 💰${pointsFormat} 🎴${otherPlayer.hand.length}</div>
             </div>`;
+        listContainer.appendChild(div);
     });
 
     // アクションボタンの状態制御
@@ -2042,8 +2134,22 @@ function updateUI() {
         const canPunch = isYankee && !isNotMyTurn && !currentPlayer.isCPU && diceRolled && playersOnSameTile.length > 0 && currentPlayer.ap >= 2 && !mgActive && !isBranchPicking;
         punchBtn.style.display = isYankee && playersOnSameTile.length > 0 ? "block" : "none";
         punchBtn.disabled = !canPunch;
-        punchBtn.textContent = '👊 殴る [元ヤン] (2AP)';
     }
+    // キャラ固有アクションボタン
+    const ct = currentPlayer.charType;
+    const baseAct = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && !mgActive && !isBranchPicking;
+    const setBtn = (id, show, enabled) => {
+        const b = document.getElementById(id); if (!b) return;
+        b.style.display = show ? "block" : "none"; b.disabled = !enabled;
+    };
+    setBtn("btn-dash",     ct==='athlete',                              ct==='athlete'  && baseAct && currentPlayer.ap>=3);
+    setBtn("btn-sell",     ct==='sales'   && playersOnSameTile.length>0, ct==='sales'    && baseAct && currentPlayer.ap>=2 && playersOnSameTile.length>0 && currentPlayer.hand.length>0);
+    setBtn("btn-camp",     ct==='survivor',                             ct==='survivor' && baseAct && currentPlayer.ap>=2);
+    setBtn("btn-hack",     ct==='hacker',                              ct==='hacker'   && baseAct && currentPlayer.ap>=3);
+    setBtn("btn-concert",  ct==='musician',                             ct==='musician' && baseAct && currentPlayer.ap>=4);
+    setBtn("btn-darkcure", ct==='doctor'  && playersOnSameTile.length>0, ct==='doctor'   && baseAct && currentPlayer.ap>=2 && playersOnSameTile.length>0);
+    setBtn("btn-gamble",   ct==='gambler' && playersOnSameTile.length>0, ct==='gambler'  && baseAct && currentPlayer.ap>=2 && playersOnSameTile.length>0);
+    setBtn("btn-npcmove",  ct==='detective',                            ct==='detective'&& baseAct && currentPlayer.ap>=3);
 
     // ターン終了プロンプト
     const promptEl = document.getElementById("end-turn-prompt");
@@ -2193,7 +2299,17 @@ async function rollDice() {
     diceRolled = true;
     currentPlayer.bonusAP = 0;
     currentPlayer.penaltyAP = 0;
-    
+
+    // 【ギャンブラー: アドレナリン】ゾロ目でHP+10
+    if (isZorome && currentPlayer.charType === 'gambler') {
+        const healed = Math.min(10, 100 - currentPlayer.hp);
+        currentPlayer.hp = Math.min(100, currentPlayer.hp + 10);
+        if (healed > 0) {
+            log(`🎲 ${currentPlayer.name}【アドレナリン】ゾロ目興奮でHP+${healed}回復！`);
+            triggerEventPopup(currentPlayer.id, "🎲", "アドレナリン！", `ゾロ目でHP+${healed}回復`, "good");
+        }
+    }
+
     triggerEventPopup(currentPlayer.id, "⚡", `AP+${totalAP}！`, `ダイスロール${isZorome ? " ゾロ目！" : ""}`, "good");
     log(`<span class="highlight">${currentPlayer.name}</span>は${totalAP}AP獲得！${isZorome ? "(ゾロ目!)" : ""}`);
     
@@ -2283,13 +2399,201 @@ function actionPunch() {
     let targets = players.filter(op => op.id !== currentPlayer.id && op.pos === currentPlayer.pos && op.hp > 0);
     if (targets.length === 0) { showToast("同じマスに相手がいない！"); return; }
     currentPlayer.ap -= 2;
-    // 複数いるならランダムで1人
     let target = targets[Math.floor(Math.random() * targets.length)];
     dealDamage(target, 10, "殴る", currentPlayer);
     log(`👊 ${currentPlayer.name}が${target.name}を殴った！10ダメージ！`);
     triggerEventPopup(currentPlayer.id, "👊", "殴る！", `${target.name}に10ダメージ`, "damage");
     syncOnline();
     updateUI();
+}
+
+// ========== キャラクター固有アクション ==========
+
+// 【元アスリート】疾風ダッシュ (3AP): ピッタリ3マス先へ跳躍
+function actionDash() {
+    const cp = players[turn];
+    if (cp.ap < 3) { showToast("AP不足！"); return; }
+    const reach = new Set();
+    (function dfs(id, n) {
+        const t = mapData.find(x => x.id === id); if (!t) return;
+        t.next.filter(nx => nx !== constructionPos).forEach(nx => {
+            if (n === 1) reach.add(nx); else dfs(nx, n - 1);
+        });
+    })(cp.pos, 3);
+    const targets = [...reach];
+    if (targets.length === 0) { showToast("3マス先に進める場所がありません"); return; }
+    cp.ap -= 3;
+    if (targets.length === 1) {
+        cp.pos = targets[0];
+        const name = mapData.find(t => t.id === targets[0])?.name || targets[0];
+        log(`💨 ${cp.name}【疾風ダッシュ】「${name}」へ跳躍！`);
+        triggerEventPopup(cp.id, "💨", "疾風ダッシュ！", `「${name}」へ跳躍`, "good");
+        playSfx('move'); syncOnline(); updateUI();
+    } else {
+        isBranchPicking = true;
+        currentBranchOptions = targets;
+        log(`💨 ${cp.name}【疾風ダッシュ】着地点を選んでください`);
+        updateUI();
+    }
+}
+
+// 【元営業マン】訪問販売 (2AP): 手札1枚を同マスの相手に押し付け3P徴収
+function actionSalesVisit() {
+    const cp = players[turn];
+    if (cp.ap < 2) { showToast("AP不足！"); return; }
+    if (cp.hand.length === 0) { showToast("手札がありません！"); return; }
+    const targets = players.filter(op => op.id !== cp.id && op.pos === cp.pos && op.hp > 0);
+    if (targets.length === 0) { showToast("同じマスに相手がいません！"); return; }
+    cp.ap -= 2;
+    const target = targets[Math.floor(Math.random() * targets.length)];
+    const ci = Math.floor(Math.random() * cp.hand.length);
+    const cardId = cp.hand.splice(ci, 1)[0];
+    const cardName = deckData[cardId]?.name || '？';
+    target.hand.push(cardId);
+    const fee = Math.min(3, Math.max(0, target.p));
+    target.p -= fee; cp.p += fee;
+    log(`📦 ${cp.name}【訪問販売】${target.name}に「${cardName}」を押し付け${fee}P徴収！`);
+    triggerEventPopup(cp.id, "📦", "訪問販売！", `+${fee}P 徴収`, "good");
+    triggerEventPopup(target.id, "😫", "押し売りされた！", `「${cardName}」で-${fee}P`, "bad");
+    playSfx('coin'); syncOnline(); updateUI();
+}
+
+// 【サバイバー】野宿 (2AP): HP+15回復
+function actionCamp() {
+    const cp = players[turn];
+    if (cp.ap < 2) { showToast("AP不足！"); return; }
+    cp.ap -= 2;
+    const h = Math.min(15, 100 - cp.hp);
+    cp.hp = Math.min(100, cp.hp + 15);
+    log(`⛺ ${cp.name}【野宿】HP+${h}回復！`);
+    triggerEventPopup(cp.id, "⛺", "野宿！", `HP+${h}回復`, "good");
+    playSfx('success'); syncOnline(); updateUI();
+}
+
+// 【元ハッカー】遠隔ハッキング (3AP): ショップ在庫強制入替え→その場で購入
+function actionHack() {
+    const cp = players[turn];
+    if (cp.ap < 3) { showToast("AP不足！"); return; }
+    cp.ap -= 3;
+    shopStock = [];
+    const pool = [0,1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,24,25,26,27,28,29,30,31,32,33,34];
+    for (let i = 0; i < 6; i++) shopStock.push(pool[Math.floor(Math.random() * pool.length)]);
+    shopStockTurn = roundCount * 1000 + turn;
+    log(`💻 ${cp.name}【遠隔ハッキング】ショップを強制入替え！`);
+    triggerEventPopup(cp.id, "💻", "遠隔ハッキング！", "ショップ強制入替え", "card");
+    playSfx('card'); syncOnline(); openShop();
+}
+
+// 【ミュージシャン】路上ライブ (4AP): 周囲2マスの全員を強制引き寄せ
+function actionConcert() {
+    const cp = players[turn];
+    if (cp.ap < 4) { showToast("AP不足！"); return; }
+    cp.ap -= 4;
+    const pulled = [];
+    players.forEach(op => {
+        if (op.id === cp.id || op.hp <= 0) return;
+        if (getDistance(cp.pos, op.pos) <= 2) {
+            op.pos = cp.pos; pulled.push(op.name);
+            cp.p += 2;
+            triggerEventPopup(op.id, "🎸", "路上ライブに引き込まれた！", `${cp.name}のマスへ強制移動`, "bad");
+        }
+    });
+    if (pulled.length > 0) {
+        log(`🎸 ${cp.name}【路上ライブ】${pulled.join('・')}を引き寄せ！+${pulled.length * 2}P！`);
+        triggerEventPopup(cp.id, "🎸", "路上ライブ！", `${pulled.length}人引き寄せ+${pulled.length * 2}P`, "good");
+    } else {
+        log(`🎸 ${cp.name}【路上ライブ】周囲2マスに誰もいなかった...`);
+    }
+    playSfx('success'); syncOnline(); updateUI();
+}
+
+// 【闇医者】闇診療 (2AP): 同マスの相手HP+30→5P強制徴収
+function actionDarkCure() {
+    const cp = players[turn];
+    if (cp.ap < 2) { showToast("AP不足！"); return; }
+    const targets = players.filter(op => op.id !== cp.id && op.pos === cp.pos && op.hp > 0);
+    if (targets.length === 0) { showToast("同じマスに相手がいません！"); return; }
+    cp.ap -= 2;
+    const target = targets[Math.floor(Math.random() * targets.length)];
+    const h = Math.min(30, 100 - target.hp);
+    target.hp = Math.min(100, target.hp + 30);
+    const fee = Math.min(5, Math.max(0, target.p));
+    target.p -= fee; cp.p += fee;
+    log(`🩺 ${cp.name}【闇診療】${target.name}HP+${h}→診療費${fee}P徴収！`);
+    triggerEventPopup(cp.id, "🩺", "闇診療！", `${target.name}から+${fee}P`, "good");
+    triggerEventPopup(target.id, "🩺", "闇診療された！", `HP+${h}・診療費-${fee}P`, fee > 0 ? "bad" : "good");
+    playSfx('coin'); syncOnline(); updateUI();
+}
+
+// 【ギャンブラー】イカサマ勝負 (2AP): 1d6対決・勝者が5P奪取
+function actionGamble() {
+    const cp = players[turn];
+    if (cp.ap < 2) { showToast("AP不足！"); return; }
+    const targets = players.filter(op => op.id !== cp.id && op.pos === cp.pos && op.hp > 0);
+    if (targets.length === 0) { showToast("同じマスに相手がいません！"); return; }
+    cp.ap -= 2;
+    const target = targets[Math.floor(Math.random() * targets.length)];
+    const myR = Math.floor(Math.random() * 6) + 1;
+    const opR = Math.floor(Math.random() * 6) + 1;
+    log(`🎲 ${cp.name}【イカサマ勝負】vs ${target.name}: [${myR}] vs [${opR}]`);
+    if (myR > opR) {
+        const w = Math.min(5, Math.max(0, target.p));
+        target.p -= w; cp.p += w;
+        log(`🎲 ${cp.name}の勝ち！${w}P奪取！`);
+        triggerEventPopup(cp.id, "🎲", "勝負に勝った！", `+${w}P`, "good");
+        triggerEventPopup(target.id, "🎲", "勝負に負けた！", `-${w}P`, "bad");
+        playSfx('success');
+    } else {
+        const w = Math.min(5, Math.max(0, cp.p));
+        cp.p -= w; target.p += w;
+        log(`🎲 ${cp.name}の負け！${w}P失った...`);
+        triggerEventPopup(cp.id, "🎲", "勝負に負けた！", `-${w}P`, "bad");
+        triggerEventPopup(target.id, "🎲", "勝負に勝った！", `+${w}P`, "good");
+        playSfx('fail');
+    }
+    syncOnline(); updateUI();
+}
+
+// 【元探偵】情報操作 (3AP): NPC1体を任意マスへ移動
+function actionNpcMove() {
+    const cp = players[turn];
+    if (cp.ap < 3) { showToast("AP不足！"); return; }
+    const npcs = [
+        { label:'👮 警察',        get:()=>policePos,   set:v=>{policePos=v;} },
+        { label:'🧓 厄介なおじさん',get:()=>unclePos,    set:v=>{unclePos=v;} },
+        { label:'🐀 野良動物',    get:()=>animalPos,   set:v=>{animalPos=v;} },
+        { label:'😎 ヤクザ',      get:()=>yakuzaPos,   set:v=>{yakuzaPos=v;} },
+        { label:'💀 闇金',        get:()=>loansharkPos,set:v=>{loansharkPos=v;} },
+        { label:'🤝 仲間',        get:()=>friendPos,   set:v=>{friendPos=v;} },
+    ];
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:6000;display:flex;align-items:center;justify-content:center;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#2c3e50;color:#fdf5e6;padding:20px;border-radius:12px;border:3px solid #95a5a6;min-width:280px;max-width:360px;text-align:center;';
+    box.innerHTML = '<h3 style="margin-top:0;color:#f1c40f;">🕵️ 情報操作 — 動かすNPCを選択</h3>';
+    npcs.forEach(npc => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-large'; btn.style.cssText = 'width:100%;margin-bottom:6px;';
+        btn.innerText = npc.label;
+        btn.onclick = () => {
+            ov.remove();
+            cp.ap -= 3;
+            const dest = mapData[Math.floor(Math.random() * mapData.length)].id;
+            const destName = mapData.find(t => t.id === dest)?.name || dest;
+            npc.set(dest);
+            log(`🕵️ ${cp.name}【情報操作】${npc.label}を「${destName}」へ移動！`);
+            triggerEventPopup(cp.id, "🕵️", "情報操作！", `${npc.label}を移動`, "card");
+            playSfx('card'); syncOnline(); updateUI();
+        };
+        box.appendChild(btn);
+    });
+    const cancel = document.createElement('button');
+    cancel.className = 'btn-large';
+    cancel.style.cssText = 'width:100%;background:#7f8c8d;border-color:#5c4a44;';
+    cancel.innerText = '✕ キャンセル';
+    cancel.onclick = () => ov.remove();
+    box.appendChild(cancel);
+    ov.appendChild(box); document.body.appendChild(ov);
 }
 
 function executeMove(targetTileId) {
@@ -2351,11 +2655,10 @@ function executeMove(targetTileId) {
             triggerEventPopup(currentPlayer.id, "🚓", "警察に補導！", "次回AP-2・このターン終了", "bad");
             if (!currentPlayer.isCPU) {
                 showPoliceAnim(currentPlayer.name);
-                // 【オンライン共有】警察アニメを全員に配信
                 if (typeof isOnlineMode !== 'undefined' && isOnlineMode) {
-                    const _pmsg = { type: 'police_anim', name: currentPlayer.name };
-                    if (typeof isHost !== 'undefined' && isHost) { broadcastNetworkData(_pmsg); }
-                    else if (typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) { hostConnection.send(_pmsg); }
+                    const _pm = { type: 'police_anim', name: currentPlayer.name };
+                    if (typeof isHost !== 'undefined' && isHost) broadcastNetworkData(_pm);
+                    else if (typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) hostConnection.send(_pm);
                 }
             }
             syncOnline();
@@ -2427,6 +2730,29 @@ function executeMove(targetTileId) {
     if (tileType === "shelter") {
         currentPlayer.stealth = true;
         log(`🏕️ 避難所で休息。ステルス獲得！`);
+    }
+
+    // 【ミュージシャン: 投げ銭】このマスにミュージシャンがいれば銀行から+2P
+    players.forEach(m => {
+        if (m.id !== currentPlayer.id && m.charType === 'musician' && m.pos === currentPlayer.pos && m.hp > 0) {
+            m.p += 2;
+            log(`🎸 ${m.name}【投げ銭】${currentPlayer.name}が来て+2P！`);
+            triggerEventPopup(m.id, "🎸", "投げ銭！", `${currentPlayer.name}が来て+2P`, "good");
+        }
+    });
+
+    // 【探偵: 張り込み】自分の陣地に敵が止まったら手札1枚没収
+    const landedOnTerritoryOf = territories[currentPlayer.pos];
+    if (landedOnTerritoryOf !== undefined && landedOnTerritoryOf !== currentPlayer.id) {
+        const det = players.find(p => p.id === landedOnTerritoryOf && p.charType === 'detective' && p.hp > 0);
+        if (det && currentPlayer.hand.length > 0) {
+            const si = Math.floor(Math.random() * currentPlayer.hand.length);
+            const stolen = deckData[currentPlayer.hand[si]];
+            det.hand.push(currentPlayer.hand.splice(si, 1)[0]);
+            log(`🕵️ ${det.name}【張り込み】${currentPlayer.name}の「${stolen.name}」を没収！`);
+            triggerEventPopup(det.id, "🕵️", "張り込み！", `「${stolen.name}」を没収`, "good");
+            triggerEventPopup(currentPlayer.id, "🚨", "没収された！", `${det.name}に「${stolen.name}」を奪われた`, "bad");
+        }
     }
     
     syncOnline();
@@ -2534,11 +2860,10 @@ async function processMiniGameResult(isWin, msg) {
         currentPlayer.hand.push(acquiredCardId);
         let cardName = acquiredCardId >= 0 ? deckData[acquiredCardId].name : "";
         triggerEventPopup(currentPlayer.id, "🎲", `ミニゲーム成功！`, `${msg}　カード「${cardName}」獲得！`, "good");
-        // 【オンライン共有】カードGET演出を全員に配信
         if (typeof isOnlineMode !== 'undefined' && isOnlineMode) {
-            const _cmsg = { type: 'card_acquisition', cardId: acquiredCardId };
-            if (typeof isHost !== 'undefined' && isHost) { broadcastNetworkData(_cmsg); }
-            else if (typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) { hostConnection.send(_cmsg); }
+            const _cm = { type: 'card_acquisition', cardId: acquiredCardId };
+            if (typeof isHost !== 'undefined' && isHost) broadcastNetworkData(_cm);
+            else if (typeof hostConnection !== 'undefined' && hostConnection && hostConnection.open) hostConnection.send(_cm);
         }
     } else {
         triggerEventPopup(currentPlayer.id, "🎲", `ミニゲーム失敗...`, msg, "bad");
@@ -2803,14 +3128,13 @@ function openShop() {
     let currentPlayer = players[turn];
     document.getElementById("shop-p-display").innerText = currentPlayer.p;
 
-    // ターンが変わったときだけ在庫を再生成
-    if (shopStockTurn !== turn) {
+    // ターン×ラウンドのキーで在庫を毎回刷新
+    const shopStockKey = roundCount * 1000 + turn;
+    if (shopStockTurn !== shopStockKey) {
         shopStock = [];
         const pool = [0,1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,24,25,26,27,28,29,30,31,32,33,34];
-        for (let i = 0; i < 6; i++) {
-            shopStock.push(pool[Math.floor(Math.random() * pool.length)]);
-        }
-        shopStockTurn = turn;
+        for (let i = 0; i < 6; i++) shopStock.push(pool[Math.floor(Math.random() * pool.length)]);
+        shopStockTurn = shopStockKey;
     }
     
     let itemList = document.getElementById("shop-items-list");
@@ -2819,6 +3143,7 @@ function openShop() {
     shopStock.forEach((cardId) => {
         let cardData = deckData[cardId];
         let price = cardData.type === 'weapon' ? Math.max(5, cardData.dmg / 5) : cardData.type === 'equip' ? 6 : 4;
+        if (currentPlayer.charType === 'sales') price = Math.max(1, price - 1); // 【コミュ力】1P割引
         
         let btn = document.createElement("button");
         btn.className = "btn-clay";
@@ -3293,6 +3618,53 @@ function cancelWeaponArc() {
     if (ui) { ui.style.left = ''; ui.style.top = ''; ui.style.bottom = '20px'; ui.style.transform = 'translateX(-50%)'; }
 }
 
+// ========== キャラクター詳細モーダル ==========
+const charDetailData = {
+    athlete:  { tagline:'雨も夜も止まらない、鍛え抜かれた肉体', passive:{name:'【健脚】',desc:'移動コストが常に1AP固定。雨の日の移動ペナルティを完全無効化。'}, action:{name:'【疾風ダッシュ】 (3AP)',desc:'ダイス後でも使用可。3マス先の到達点を列挙し、選んだ地点へ即時跳躍。交番・NPC・罠を飛び越える戦略移動が可能。'} },
+    sales:    { tagline:'口八丁で金を生み出す、元・敏腕セールスマン', passive:{name:'【コミュ力】',desc:'バイト成功率70%（通常50%）。ショップの全カード購入価格が常に1P割引。'}, action:{name:'【訪問販売】 (2AP)',desc:'同マスの相手にランダムな手札1枚を強制的に押し付け、3Pを徴収する。要らないカードで荒稼ぎ。'} },
+    survivor: { tagline:'過酷な路上生活を生き抜いてきた、不死身のホームレス', passive:{name:'【危機察知】',desc:'ゴミ漁り失敗時の「警察ペナルティ（次回AP-2）」を完全無効化。'}, action:{name:'【野宿】 (2AP)',desc:'その場でHP15を即時回復。回復カードなしでも長期戦を生き残れる持久戦型スキル。'} },
+    yankee:   { tagline:'一度睨まれたら誰でも縮み上がる、元不良の威圧感', passive:{name:'【威圧】',desc:'同マスに止まった・すれ違った他プレイヤーから自動で1Pをカツアゲ。移動するだけで収入になる。'}, action:{name:'【殴る】 (2AP)',desc:'同マスの相手に10ダメージ。ダメージの一部はPとして落とさせる直接攻撃。'} },
+    hacker:   { tagline:'情報の海を泳ぐ、孤高のデジタル浮浪者', passive:{name:'【クラウドストレージ】',desc:'手札の上限が+2枚（デフォルト9枚）。リュック装備と重複可能。'}, action:{name:'【遠隔ハッキング】 (3AP)',desc:'どこにいてもショップの品揃えを強制入替えし、その場で1枚購入できる。他プレイヤーが狙うカードを潰すことも可。'} },
+    musician: { tagline:'路上ライブで人々を引き寄せる、カリスマ流浪のアーティスト', passive:{name:'【投げ銭】',desc:'他のプレイヤーが自分と同じマスに止まる/通過するたびに、銀行から2Pを自動獲得。'}, action:{name:'【路上ライブ】 (4AP)',desc:'周囲2マス以内の全プレイヤーを自分のマスに強制引き寄せ。ヤクザ横や元ヤンのカツアゲコンボなどに応用可。'} },
+    doctor:   { tagline:'闇の診療所を開く、危うい善意の医者', passive:{name:'【自己治癒】',desc:'毎ターン開始時に自動でHP5を回復。長期戦で確実に真価を発揮する持久型パッシブ。'}, action:{name:'【闇診療】 (2AP)',desc:'同マスの相手のHPを30回復する代わりに5Pを強制徴収。助けるフリをしたカツアゲ。'} },
+    gambler:  { tagline:'運命を賭けることに喜びを感じる、無一文の賭博師', passive:{name:'【アドレナリン】',desc:'ゾロ目が出た時、APが倍になるだけでなくHPも10回復。高リスク高リターンの勝負師スタイル。'}, action:{name:'【イカサマ勝負】 (2AP)',desc:'同マスの相手と1〜6のサイコロ対決。勝者が負けた方から5Pを奪う。同点は仕掛けた側の負け。'} },
+    detective:{ tagline:'陰からすべてを見通す、元・辣腕探偵', passive:{name:'【張り込み】',desc:'自分の陣地に他プレイヤーが止まった時、通常の陣地収入に加えて相手の手札を1枚没収する。'}, action:{name:'【情報操作】 (3AP)',desc:'マップ上のNPC（警察・ヤクザなど）を1体選び、ランダムな別のマスへ瞬間移動させる。'} },
+};
+
+function showCharInfoModal(player) {
+    if (!player) return;
+    const ct = player.charType;
+    const info = charInfo[ct]; const detail = charDetailData[ct];
+    if (!info || !detail) return;
+    document.getElementById('cim-emoji').innerText = charEmoji[ct] || '❓';
+    document.getElementById('cim-name').innerText = info.name;
+    document.getElementById('cim-tagline').innerText = detail.tagline;
+    const hdr = document.getElementById('cim-header');
+    hdr.style.background = `linear-gradient(135deg,${player.color}22 0%,rgba(26,26,46,0.95) 100%)`;
+    hdr.style.borderBottom = `2px solid ${player.color}44`;
+    document.getElementById('cim-passive-name').innerText = detail.passive.name;
+    document.getElementById('cim-passive-desc').innerText  = detail.passive.desc;
+    document.getElementById('cim-action-name').innerText   = detail.action.name;
+    document.getElementById('cim-action-desc').innerText   = detail.action.desc;
+    // 現在の状態・装備タグ
+    const equipLabels = {bicycle:'🚲自転車',shoes:'👢安全靴',cart:'🛒リヤカー',shield:'🛡️段ボール盾',helmet:'🪖ヘルメット',doll:'🎎身代わり人形',backpack:'🎒リュック'};
+    const reactionLabels = {block:'⚖️弁護士の盾',reflect:'🤝裏取引',counter:'🔄反撃'};
+    const tags = [];
+    if (player.stealth) tags.push('💨ステルス中');
+    if (player.rainGear) tags.push('☂️雨具装備');
+    if (player.hasID) tags.push('🪪身分証あり');
+    if (player.reaction) tags.push(reactionLabels[player.reaction] || player.reaction);
+    Object.entries(player.equip||{}).forEach(([k,v]) => { if(v && equipLabels[k]) tags.push(equipLabels[k]); });
+    const sa = document.getElementById('cim-status-area');
+    if (tags.length > 0) {
+        sa.innerHTML = `<div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:10px;">
+            <div style="font-size:10px;color:#bdc3c7;margin-bottom:5px;font-weight:bold;">現在の状態・装備</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">${tags.map(t=>`<span style="background:rgba(241,196,15,0.15);border:1px solid rgba(241,196,15,0.4);border-radius:5px;padding:2px 7px;font-size:11px;color:#f1c40f;">${t}</span>`).join('')}</div></div>`;
+    } else { sa.innerHTML = ''; }
+    document.getElementById('char-info-modal').style.display = 'flex';
+}
+function closeCharInfoModal() { document.getElementById('char-info-modal').style.display = 'none'; }
+
 // ========== TURN END & ROUND ==========
 function resetAfkTimer() {
     if (afkTimer) clearTimeout(afkTimer);
@@ -3433,32 +3805,35 @@ async function processRoundEvents() {
     nextRoundWarning = dangerArea
         ? `次の収集車は「${areaNames[dangerArea[0]] || dangerArea[0]}」を中心に暴走するらしい…`
         : null;
-    // 【オンライン共有】予兆メッセージをゲストへ配信
     if (nextRoundWarning && typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
         broadcastNetworkData({ type: 'disaster_warning', message: nextRoundWarning });
     }
 
-    // 【陣地維持費（税金）】1マスにつき2P
-    const TAX_PER_TILE = 2;
-    players.forEach(p => {
-        const ownedTileIds = Object.keys(territories).filter(k => territories[k] === p.id);
-        if (ownedTileIds.length === 0) return;
-        const tax = ownedTileIds.length * TAX_PER_TILE;
-        if (p.p >= tax) {
-            p.p -= tax;
-            log(`💸 ${p.name}の陣地維持費: -${tax}P (${ownedTileIds.length}マス×${TAX_PER_TILE}P)`);
-            summaryDigest.push(`💸 ${p.name}: 維持費 -${tax}P`);
-        } else {
-            // 払えない場合はランダムに陣地を失う
-            const lostId = ownedTileIds[Math.floor(Math.random() * ownedTileIds.length)];
-            delete territories[lostId];
-            p.p = 0;
-            const lostTileName = mapData.find(t => t.id == lostId)?.name || lostId;
-            log(`⚠️ ${p.name}は維持費を払えず！陣地「${lostTileName}」を失った！`);
-            summaryDigest.push(`⚠️ ${p.name}: 維持費不足→陣地「${lostTileName}」喪失`);
-            triggerEventPopup(p.id, "⚠️", "維持費不足！", `陣地「${lostTileName}」を失った`, "bad");
-        }
-    });
+    // 【陣地維持費】3ラウンドに1回、1マスにつき1P
+    const TAX_PER_TILE = 1;
+    if (roundCount % 3 === 0) {
+        players.forEach(p => {
+            const owned = Object.keys(territories).filter(k => territories[k] === p.id);
+            if (owned.length === 0) return;
+            const tax = owned.length * TAX_PER_TILE;
+            if (p.p >= tax) {
+                p.p -= tax;
+                log(`💸 ${p.name}の維持費: -${tax}P (${owned.length}マス×${TAX_PER_TILE}P)`);
+                summaryDigest.push(`💸 ${p.name}: 維持費 -${tax}P`);
+            } else {
+                const lostId = owned[Math.floor(Math.random() * owned.length)];
+                delete territories[lostId];
+                p.p = 0;
+                const lostName = mapData.find(t => t.id == lostId)?.name || lostId;
+                log(`⚠️ ${p.name}は維持費不足！陣地「${lostName}」を失った！`);
+                summaryDigest.push(`⚠️ ${p.name}: 維持費不足→陣地「${lostName}」喪失`);
+                triggerEventPopup(p.id, "⚠️", "維持費不足！", `陣地「${lostName}」を失った`, "bad");
+            }
+        });
+    } else {
+        const left = 3 - (roundCount % 3);
+        summaryDigest.push(`💸 維持費徴収まであと${left}ラウンド`);
+    }
 
     players.forEach(p => p.stealth = false); // ステルス解除
     
@@ -3521,7 +3896,6 @@ async function processRoundEvents() {
             } else if (Math.random() < 0.7) {
                 dealDamage(p, 80, "収集車");
                 showBloodAnim(p.name);
-                // 【オンライン共有】血のアニメをゲストへ配信
                 if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
                     broadcastNetworkData({ type: 'blood_anim', name: p.name });
                 }
@@ -3575,7 +3949,6 @@ async function processRoundEvents() {
                     log(`<span class="danger">🚓 ${p.name}がパトロール警察に補導！次回AP-2！</span>`);
                     triggerEventPopup(p.id, "🚓", "パトロールに補導！", "次回AP-2", "bad");
                     showPoliceAnim(p.name);
-                    // 【オンライン共有】警察アニメをゲストへ配信
                     if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && isHost) {
                         broadcastNetworkData({ type: 'police_anim', name: p.name });
                     }
@@ -3732,11 +4105,12 @@ async function processCPUTurn() {
         // ショップでCPUが買い物
         else if (!acted && currentTile.type === "shop" && cpuPlayer.p >= 4 && cpuPlayer.hand.length < cpuPlayer.maxHand && Math.random() > 0.3) {
             // ショップ在庫を生成（CPUターン用）
-            if (shopStockTurn !== turn) {
+            const cpuShopKey = roundCount * 1000 + turn;
+            if (shopStockTurn !== cpuShopKey) {
                 shopStock = [];
                 const pool = [0,1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,24,25,26,27,28,29,30,31,32,33,34];
                 for (let i = 0; i < 6; i++) shopStock.push(pool[Math.floor(Math.random() * pool.length)]);
-                shopStockTurn = turn;
+                shopStockTurn = cpuShopKey;
             }
             const wantHeal = cpuPlayer.hp < 60;
             // HP低い時は回復カード優先、それ以外はランダム
@@ -3873,6 +4247,11 @@ async function processCPUTurn() {
                         <option value="sales">💼 元営業マン</option>
                         <option value="survivor">🌿 サバイバー</option>
                         <option value="yankee">👊 元ヤン</option>
+                        <option value="hacker">💻 元ハッカー</option>
+                        <option value="musician">🎸 ミュージシャン</option>
+                        <option value="doctor">🩺 闇医者</option>
+                        <option value="gambler">🎲 ギャンブラー</option>
+                        <option value="detective">🕵️ 元探偵</option>
                     </select>
                 </div>
                 <div id="my-online-desc" style="width:100%; text-align:center; font-size:11px; color:#bdc3c7; margin-top:5px;">移動常に1AP/雨ペナ無効</div>
@@ -3880,6 +4259,14 @@ async function processCPUTurn() {
             
             <!-- ホスト用設定 -->
             <div id="host-settings" style="display: none;">
+                <div class="lobby-section" style="background:#5c4a44; color:#fdf5e6;">
+                    <h4 style="color:#fdf5e6; border-bottom-color:#8d6e63;">🎭 キャラクター割り当て</h4>
+                    <div style="display:flex;gap:8px;margin-bottom:6px;">
+                        <button id="btn-assign-choose" class="btn-large btn-green" style="flex:1;font-size:12px;padding:8px;" onclick="window.setCharAssignMode('choose')">🎭 各自選択</button>
+                        <button id="btn-assign-random" class="btn-large" style="flex:1;font-size:12px;padding:8px;background:#8e44ad;border-color:#6c3483;opacity:0.6;" onclick="window.setCharAssignMode('random')">🎲 ランダム配布</button>
+                    </div>
+                    <div id="char-assign-desc" style="font-size:11px;color:#bdc3c7;text-align:center;">現在: 各自がキャラを自由に選択します</div>
+                </div>
                 <div class="lobby-section" style="background:#5c4a44; color:#fdf5e6;">
                     <h4 style="color:#fdf5e6; border-bottom-color:#8d6e63;">🤖 CPU管理</h4>
                     <button class="btn-large btn-blue" style="width: 100%; padding: 8px; font-size:14px;" onclick="window.addCpuPlayer()">＋ CPUを追加する</button>
@@ -4324,36 +4711,20 @@ function handleNetworkData(data, senderPeerId = null, conn = null) {
             setTimeout(() => { overlay.style.display = "none"; }, data.items.length * 400 + 2500);
         }
     }
-    // ========== 演出系 オンライン共有ハンドラ ==========
     else if (data.type === 'disaster_warning') {
-        // ホストは中継、全員(ゲスト・ホスト)が nextRoundWarning にセット → showTurnBanner で表示
-        if (isHost) {
-            Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); });
-        }
-        // ゲスト側: nextRoundWarning にセットしておき、ターン0開始時にshowTurnBannerが表示
-        if (!isHost) {
-            nextRoundWarning = data.message;
-        }
+        if (isHost) Object.values(connections).forEach(c => { if (c.peer !== senderPeerId && c.open) c.send(data); });
+        if (!isHost) nextRoundWarning = data.message;
     }
     else if (data.type === 'blood_anim') {
-        // ホストは中継、全員が血のアニメを表示
-        if (isHost) {
-            Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); });
-        }
+        if (isHost) Object.values(connections).forEach(c => { if (c.peer !== senderPeerId && c.open) c.send(data); });
         showBloodAnim(data.name);
     }
     else if (data.type === 'police_anim') {
-        // ホストは中継、全員が警察アニメを表示
-        if (isHost) {
-            Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); });
-        }
+        if (isHost) Object.values(connections).forEach(c => { if (c.peer !== senderPeerId && c.open) c.send(data); });
         showPoliceAnim(data.name);
     }
     else if (data.type === 'card_acquisition') {
-        // ホストは中継、全員がカードGET演出を表示
-        if (isHost) {
-            Object.values(connections).forEach(conn => { if (conn.peer !== senderPeerId && conn.open) conn.send(data); });
-        }
+        if (isHost) Object.values(connections).forEach(c => { if (c.peer !== senderPeerId && c.open) c.send(data); });
         showCardAcquisition(data.cardId);
     }
 } // handleNetworkData ここまで
@@ -4558,6 +4929,24 @@ window.leaveRoom = function() {
     stopFirebaseRoomListener();
 };
 
+let charAssignMode = 'choose'; // 'choose' | 'random'
+
+window.setCharAssignMode = function(mode) {
+    charAssignMode = mode;
+    const desc = document.getElementById('char-assign-desc');
+    const cb = document.getElementById('btn-assign-choose');
+    const rb = document.getElementById('btn-assign-random');
+    if (mode === 'random') {
+        if (desc) desc.innerText = '現在: ゲーム開始時に全員へランダム配布します';
+        if (cb) { cb.style.background=''; cb.style.opacity='0.6'; }
+        if (rb) { rb.style.background='#8e44ad'; rb.style.opacity='1'; }
+    } else {
+        if (desc) desc.innerText = '現在: 各自がキャラを自由に選択します';
+        if (cb) { cb.style.background='#2ecc71'; cb.style.opacity='1'; }
+        if (rb) { rb.style.background=''; rb.style.opacity='0.6'; }
+    }
+};
+
 window.updateMyLobbyInfo = function() {
     const user = {
         userId: myUserId,
@@ -4670,10 +5059,15 @@ function updateLobbyUI(lobbyPlayersList, hostId) {
                     <input type="text" value="${p.name}" class="name-input" style="width:80px; padding:4px;" 
                         onchange="window.updateCpuInfo('${p.userId}', this.value, this.parentElement.querySelector('select').value)">
                     <select onchange="window.updateCpuInfo('${p.userId}', this.parentElement.querySelector('input').value, this.value)" style="padding:4px; font-size:12px;">
-                        <option value="athlete" ${p.charType==='athlete'?'selected':''}>🏃 アスリート</option>
-                        <option value="sales" ${p.charType==='sales'?'selected':''}>💼 営業マン</option>
-                        <option value="survivor" ${p.charType==='survivor'?'selected':''}>🌿 サバイバー</option>
-                        <option value="yankee" ${p.charType==='yankee'?'selected':''}>👊 元ヤン</option>
+                        <option value="athlete"   ${p.charType==='athlete'  ?'selected':''}>🏃 アスリート</option>
+                        <option value="sales"     ${p.charType==='sales'   ?'selected':''}>💼 営業マン</option>
+                        <option value="survivor"  ${p.charType==='survivor'?'selected':''}>🌿 サバイバー</option>
+                        <option value="yankee"    ${p.charType==='yankee'  ?'selected':''}>👊 元ヤン</option>
+                        <option value="hacker"    ${p.charType==='hacker'  ?'selected':''}>💻 ハッカー</option>
+                        <option value="musician"  ${p.charType==='musician'?'selected':''}>🎸 ミュージシャン</option>
+                        <option value="doctor"    ${p.charType==='doctor'  ?'selected':''}>🩺 闇医者</option>
+                        <option value="gambler"   ${p.charType==='gambler' ?'selected':''}>🎲 ギャンブラー</option>
+                        <option value="detective" ${p.charType==='detective'?'selected':''}>🕵️ 元探偵</option>
                     </select>
                     <button class="cpu-del-btn" onclick="window.removeCpu('${p.userId}')">✕ 削除</button>
                 </div>
@@ -4740,6 +5134,16 @@ window.startOnlineGame = async function() {
         p.userId = lp.userId;
         return p;
     });
+    // ランダム配布モード
+    if (charAssignMode === 'random') {
+        const allChars = Object.keys(charEmoji);
+        const shuffled = [...allChars].sort(() => Math.random() - 0.5);
+        players.forEach((p, i) => {
+            p.charType = shuffled[i % shuffled.length];
+            p.maxHand = p.charType === 'hacker' ? 9 : 7;
+        });
+        log('🎲 キャラクターをランダムに割り当てました！');
+    }
     turn = 0;
     isOnlineMode = true;
     
