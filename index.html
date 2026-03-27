@@ -226,7 +226,7 @@
         /* タイルツールチップ */
         #tile-tooltip { position:fixed; z-index:9800; background:rgba(10,10,20,0.97); color:#fdf5e6; border:2px solid #f1c40f; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:bold; pointer-events:none; display:none; max-width:200px; box-shadow:0 4px 16px rgba(0,0,0,0.8); line-height:1.5; }
         #tile-tooltip .tt-title { font-size:15px; color:#f1c40f; border-bottom:1px dashed #8d6e63; padding-bottom:4px; margin-bottom:4px; }
-        #tile-tooltip .tt-desc { font-size:12px; color:#bdc3c7; }
+        #tile-tooltip .tt-desc { font-size:12px; color:#bdc3c7; white-space:pre-line; line-height:1.6; }
 
         /* その他の装飾・ユーティリティ */
         .hp-bar-outer { width:100%; height:8px; background:#333; border-radius:4px; overflow:hidden; margin-top:2px; }
@@ -826,6 +826,10 @@ const deckData = [
     {id:32,name:"拾ったホットドッグ",icon:"🌭",desc:"HP+30回復(食中毒50%)",color:"#e67e22",type:"heal",heal:30,risk:25},
     {id:33,name:"謎のエネルギーバー",icon:"🍫",desc:"HP+10＆AP+3",color:"#27ae60",type:"heal",heal:10,risk:0,apBonus:3},
     {id:34,name:"水道水",icon:"💧",desc:"HP+5確定回復",color:"#3498db",type:"heal",heal:5,risk:0},
+    // リアクションカード（相手効果の無効化/反射）
+    {id:35,name:"弁護士の盾",icon:"⚖️",desc:"次の攻撃/カツアゲを完全無効(1回)",color:"#16a085",type:"reaction",effect:"block"},
+    {id:36,name:"裏取引",icon:"🤝",desc:"次の下剋上/大暴落を反射(使った相手に効果)",color:"#8e44ad",type:"reaction",effect:"reflect"},
+    {id:37,name:"反撃の一撃",icon:"🔄",desc:"次のダメージを受けたとき、同量を相手に返す",color:"#c0392b",type:"reaction",effect:"counter"},
 ];
 
 function genSmallMap(){return[
@@ -856,6 +860,7 @@ let gameOver = false;
 let cpuActing = false;
 let afkTimer = null;
 const AFK_TIMEOUT = 5 * 60 * 1000; // 5分操作なしで強制スキップ
+let nextRoundWarning = null; // 予兆メッセージ（次ラウンド開始時に表示）
 
 // NPC Positions
 let truckPos = 0, policePos = 0, unclePos = 0, animalPos = 0, yakuzaPos = 0, loansharkPos = 0, friendPos = 0;
@@ -974,6 +979,7 @@ function createPlayer(id, name, isCPU, charType) {
         cans: 0, trash: 0, stealth: false, rainGear: false, hasID: false,
         bonusAP: 0, penaltyAP: 0, skipTurn: false, cannotMove: false,
         deaths: 0, kills: 0,
+        reaction: null, // 'block' | 'reflect' | 'counter' — リアクションカード状態
         color: pIdColors[id % 8], charType,
         equip: { bicycle: false, shoes: false, cart: false, shield: false, helmet: false, doll: false, backpack: false }
     };
@@ -981,6 +987,24 @@ function createPlayer(id, name, isCPU, charType) {
 
 // ========== DAMAGE SYSTEM ==========
 function dealDamage(target, dmg, source, attacker = null) {
+    // リアクション: block（無効化）
+    if (target.reaction === 'block') {
+        target.reaction = null;
+        log(`⚖️ ${target.name}の弁護士の盾がダメージを無効化！`);
+        triggerEventPopup(target.id, "⚖️", "弁護士の盾発動！", "ダメージを完全無効化", "good");
+        playSfx('success');
+        return 0;
+    }
+    // リアクション: counter（反撃）
+    if (target.reaction === 'counter' && attacker) {
+        target.reaction = null;
+        log(`🔄 ${target.name}が反撃！${attacker.name}に${dmg}ダメージ返し！`);
+        triggerEventPopup(target.id, "🔄", "反撃！", `${attacker.name}に${dmg}ダメージ反射`, "good");
+        attacker.hp -= dmg;
+        if (attacker.hp < 0) attacker.hp = 0;
+        playSfx('hit');
+        return 0;
+    }
     if (target.equip.helmet) {
         target.equip.helmet = false;
         log(`🪖 ${target.name}のヘルメットがダメージを完全吸収！`);
@@ -1280,10 +1304,32 @@ function initBoard() {
         const ttKey = tile.type in tileTooltipData ? tile.type : tile.area;
         const ttData = tileTooltipData[ttKey];
         if (ttData) {
+            const npcInfo = {
+                [()=>policePos]:    { emoji:'👮', name:'警察', desc:'遭遇→AP-2ペナルティ' },
+                [()=>unclePos]:     { emoji:'🧓', name:'厄介なおじさん', desc:'遭遇→カード破棄&強制終了' },
+                [()=>animalPos]:    { emoji:'🐀', name:'野良動物', desc:'遭遇→缶/ゴミ漁り不可' },
+                [()=>yakuzaPos]:    { emoji:'😎', name:'ヤクザ', desc:'遭遇→30ダメ+カード強奪' },
+                [()=>loansharkPos]: { emoji:'💀', name:'闇金', desc:'遭遇→最大10P没収' },
+                [()=>friendPos]:    { emoji:'🤝', name:'仲間のホームレス', desc:'遭遇→缶1個もらえる' },
+            };
+            const npcPosMap = () => [
+                { pos: policePos,    info: { emoji:'👮', name:'警察', desc:'遭遇するとAP-2ペナルティ' } },
+                { pos: unclePos,     info: { emoji:'🧓', name:'厄介なおじさん', desc:'遭遇するとカード破棄＆強制ターン終了' } },
+                { pos: animalPos,    info: { emoji:'🐀', name:'野良動物', desc:'遭遇すると缶拾い/ゴミ漁り不可' } },
+                { pos: yakuzaPos,    info: { emoji:'😎', name:'ヤクザ', desc:'遭遇すると30ダメ＋カード1枚強奪' } },
+                { pos: loansharkPos, info: { emoji:'💀', name:'闇金', desc:'遭遇すると最大10P没収' } },
+                { pos: friendPos,    info: { emoji:'🤝', name:'仲間のホームレス', desc:'出会うと缶を1個もらえる' } },
+            ];
             const showTT = (e) => {
                 const tt = document.getElementById('tile-tooltip');
                 document.getElementById('tt-title').textContent = ttData.title;
-                document.getElementById('tt-desc').textContent = ttData.desc;
+                // NPCがこのタイルにいれば追記
+                const npcsHere = npcPosMap().filter(n => n.pos === tile.id);
+                let descText = ttData.desc;
+                if (npcsHere.length > 0) {
+                    descText += '\n─────\n' + npcsHere.map(n => `${n.info.emoji}${n.info.name}: ${n.info.desc}`).join('\n');
+                }
+                document.getElementById('tt-desc').textContent = descText;
                 tt.style.display = 'block';
                 const x = (e.clientX || (e.touches && e.touches[0].clientX) || 0) + 14;
                 const y = (e.clientY || (e.touches && e.touches[0].clientY) || 0) - 10;
@@ -1332,6 +1378,14 @@ function updateTokens() {
     let truckTile = document.getElementById(`tile-${truckPos}`);
     if (truckTile) truckTile.appendChild(truckToken);
     
+    const npcTooltips = {
+        'npc-police':    { title: '👮 警察', desc: '遭遇するとAP-2ペナルティ。偶数ラウンドにパトロール巡回あり。身分証・ステルスで回避可。' },
+        'npc-uncle':     { title: '🧓 厄介なおじさん', desc: '絡まれるとカード1枚破棄＆ターン強制終了。' },
+        'npc-animal':    { title: '🐀 野良動物', desc: 'スラムエリアを彷徨う。遭遇すると缶拾い/ゴミ漁りができない。' },
+        'npc-yakuza':    { title: '😎 ヤクザ', desc: '遭遇すると30ダメージ＋カード1枚強奪。身代わり人形で防御可。' },
+        'npc-loanshark': { title: '💀 闇金', desc: '遭遇するとP没収（最大10P）。身代わり人形で防御可。' },
+        'npc-friend':    { title: '🤝 仲間のホームレス', desc: '出会うと空き缶を1個もらえる有益なNPC。' },
+    };
     const npcs = [
         { pos: policePos, cls: 'npc-police', txt: '👮' },
         { pos: unclePos, cls: 'npc-uncle', txt: '🧓' },
@@ -1343,6 +1397,21 @@ function updateTokens() {
     npcs.forEach(npc => {
         let node = document.createElement("div");
         node.className = `npc-token ${npc.cls}`; node.innerHTML = npc.txt;
+        // NPCツールチップ
+        const tt = npcTooltips[npc.cls];
+        if (tt) {
+            const showNpcTT = (e) => {
+                const tip = document.getElementById('tile-tooltip');
+                document.getElementById('tt-title').textContent = tt.title;
+                document.getElementById('tt-desc').textContent = tt.desc;
+                tip.style.display = 'block';
+                tip.style.left = Math.min((e.clientX||0)+14, window.innerWidth-220)+'px';
+                tip.style.top  = Math.max((e.clientY||0)-10, 4)+'px';
+            };
+            node.addEventListener('mouseenter', showNpcTT);
+            node.addEventListener('mousemove', showNpcTT);
+            node.addEventListener('mouseleave', () => { document.getElementById('tile-tooltip').style.display='none'; });
+        }
         let tileNode = document.getElementById(`tile-${npc.pos}`);
         if (tileNode) tileNode.appendChild(node);
     });
@@ -1472,25 +1541,74 @@ function toggleHighlight(btnId, isOn) {
     else btn.classList.remove("btn-active-highlight");
 }
 
-function showTurnBanner(player) {
-    // ポップアップが消えてからバナーを表示
-    waitForPopupsClear(2500).then(() => {
-        const banner = document.getElementById("turn-banner-overlay");
-        const text = document.getElementById("turn-banner-text");
-        text.innerText = `${player.name} のターン`;
-        text.style.borderColor = player.color;
-        text.style.textShadow = `0 0 20px ${player.color}, 2px 2px 4px rgba(0,0,0,0.8)`;
-        
-        banner.style.display = "flex";
-        banner.animate([
-            {opacity: 0, transform: "scale(0.8)"},
-            {opacity: 1, transform: "scale(1)", offset: 0.1},
-            {opacity: 1, transform: "scale(1)", offset: 0.9},
-            {opacity: 0, transform: "scale(1.2)"}
-        ], { duration: 1500, fill: "forwards" });
-        
-        // ターン開始時に自動スクロール
-        setTimeout(() => scrollToCurrentPlayer(), 300);
+async function showTurnBanner(player) {
+    // ① まずダメージ等のポップアップが全て消えるのを待つ
+    await waitForPopupsClear(3000);
+
+    // ② 予兆演出（ターン0のみ）→ 演出が終わるまで待機
+    if (turn === 0 && nextRoundWarning && roundCount > 0) {
+        const warning = nextRoundWarning;
+        nextRoundWarning = null;
+        await showDisasterWarning(warning); // Promiseを返すように変更
+    }
+
+    // ③ ターンバナーを表示
+    const banner = document.getElementById("turn-banner-overlay");
+    const text = document.getElementById("turn-banner-text");
+    text.innerText = `${player.name} のターン`;
+    text.style.borderColor = player.color;
+    text.style.textShadow = `0 0 20px ${player.color}, 2px 2px 4px rgba(0,0,0,0.8)`;
+
+    banner.style.display = "flex";
+    banner.animate([
+        {opacity: 0, transform: "scale(0.8)"},
+        {opacity: 1, transform: "scale(1)", offset: 0.1},
+        {opacity: 1, transform: "scale(1)", offset: 0.9},
+        {opacity: 0, transform: "scale(1.2)"}
+    ], { duration: 1500, fill: "forwards" });
+
+    // ターン開始時に自動スクロール
+    setTimeout(() => scrollToCurrentPlayer(), 300);
+}
+
+// 災害予兆演出（Promiseを返し、演出が終わるまで待てるようにする）
+function showDisasterWarning(message) {
+    return new Promise(resolve => {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            background:rgba(0,0,0,0); pointer-events:none;
+        `;
+        overlay.innerHTML = `
+            <div style="text-align:center; padding:30px 40px; border:3px solid #e74c3c;
+                border-radius:16px; background:rgba(20,0,0,0.92);
+                box-shadow:0 0 60px #e74c3c, 0 0 120px rgba(231,76,60,0.5);
+                animation:warningPulse 0.4s ease-in-out infinite alternate;">
+                <div style="font-size:52px; margin-bottom:10px;">🛻⚠️</div>
+                <div style="font-size:22px; font-weight:900; color:#ff3333; text-shadow:0 0 20px #ff0000;
+                    letter-spacing:2px; margin-bottom:12px;">【 予 兆 】</div>
+                <div style="font-size:16px; color:#ffaa88; max-width:340px; line-height:1.7;">${message}</div>
+            </div>
+        `;
+        const style = document.createElement('style');
+        style.textContent = `@keyframes warningPulse {
+            0%  { box-shadow: 0 0 40px #e74c3c, 0 0 80px rgba(231,76,60,0.4); }
+            100%{ box-shadow: 0 0 80px #ff0000, 0 0 160px rgba(255,0,0,0.7), 0 0 240px rgba(255,0,0,0.2); }
+        }`;
+        document.head.appendChild(style);
+        document.body.appendChild(overlay);
+        overlay.animate([
+            { background: 'rgba(0,0,0,0)' },
+            { background: 'rgba(60,0,0,0.85)', offset: 0.1 },
+            { background: 'rgba(60,0,0,0.85)', offset: 0.9 },
+            { background: 'rgba(0,0,0,0)' }
+        ], { duration: 3500, fill: 'forwards' });
+        setTimeout(() => {
+            overlay.remove();
+            style.remove();
+            resolve(); // 演出完了を通知
+        }, 3600);
     });
 }
 
@@ -1865,11 +1983,22 @@ function updateUI() {
     let tileType = currentTile.type;
     let isBlockedByAnimal = (currentPlayer.pos === animalPos);
     
-    // 占領AP計算: 自分の陣地でないマス=3AP、他人の陣地の上書き=6AP
+    // 占領コスト計算: APは不要、Pのみ（空きマス3P、敵陣地5P、空き巣割引あり）
     const isEnemyTerritory = territories[currentPlayer.pos] !== undefined && territories[currentPlayer.pos] !== currentPlayer.id;
     let canOccupyLogic = ["normal","can","trash","job","exchange","shelter"].includes(tileType) && territories[currentPlayer.pos] !== currentPlayer.id && currentPlayer.pos !== unclePos;
-    const occupyCost = isEnemyTerritory ? 6 : 3;
-    let canOccupy = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= occupyCost && canOccupyLogic && !mgActive && !isBranchPicking;
+    let occupyPCost = isEnemyTerritory ? 5 : 3;
+    // 空き巣割引: 敵の陣地で所有者が遠いほどPコスト減
+    let remoteDiscount = 0;
+    if (isEnemyTerritory) {
+        const ownerId = territories[currentPlayer.pos];
+        const owner = players.find(p => p.id === ownerId);
+        if (owner) {
+            const dist = getDistance(owner.pos, currentPlayer.pos);
+            remoteDiscount = Math.min(3, Math.floor(dist / 2));
+            occupyPCost = Math.max(1, occupyPCost - remoteDiscount);
+        }
+    }
+    let canOccupy = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.p >= occupyPCost && canOccupyLogic && !mgActive && !isBranchPicking;
     let trashCost = currentPlayer.equip.shoes ? 1 : 2;
     let canCan = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= 1 && tileType === "can" && canPickedThisTurn < 3 && (!isRainy || currentPlayer.rainGear) && !isBlockedByAnimal && !mgActive && !isBranchPicking;
     let canTrash = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && currentPlayer.ap >= trashCost && tileType === "trash" && (!isRainy || currentPlayer.rainGear) && !isBlockedByAnimal && !mgActive && !isBranchPicking;
@@ -1882,7 +2011,13 @@ function updateUI() {
     document.getElementById("btn-trash").innerText = `🗑️ ゴミ漁り (${trashCost}AP)`;
     document.getElementById("btn-trash").disabled = !canTrash;
     const occupyBtn = document.getElementById("btn-occupy");
-    occupyBtn.innerText = isEnemyTerritory ? `🚩 敵陣地奪取 (6AP)` : `🚩 陣地占領 (3AP)`;
+    if (isEnemyTerritory) {
+        occupyBtn.innerText = remoteDiscount > 0
+            ? `🚩 敵陣奪取 (${occupyPCost}P) 空き巣-${remoteDiscount}P`
+            : `🚩 敵陣地奪取 (${occupyPCost}P)`;
+    } else {
+        occupyBtn.innerText = `🚩 陣地占領 (3P)`;
+    }
     occupyBtn.disabled = !canOccupy;
     document.getElementById("btn-job").disabled = !canJob;
     
@@ -1900,18 +2035,14 @@ function updateUI() {
     let pvpDisplay = playersOnSameTile.length > 0 ? "block" : "none";
     let canPvP = !isNotMyTurn && !currentPlayer.isCPU && diceRolled && playersOnSameTile.length > 0 && !mgActive && !isBranchPicking;
     
+    // PvP: 殴る（元ヤン専用）
     const punchBtn = document.getElementById("btn-punch");
     if (punchBtn) {
-        punchBtn.style.display = pvpDisplay;
-        punchBtn.disabled = !(canPvP && currentPlayer.ap >= 2);
-        // 元ヤンは強調表示
-        if (currentPlayer.charType === "yankee") {
-            punchBtn.style.borderColor = '#e74c3c';
-            punchBtn.textContent = '👊 殴る [元ヤン] (2AP)';
-        } else {
-            punchBtn.style.borderColor = '#e74c3c';
-            punchBtn.textContent = '👊 殴る (2AP)';
-        }
+        const isYankee = currentPlayer.charType === "yankee";
+        const canPunch = isYankee && !isNotMyTurn && !currentPlayer.isCPU && diceRolled && playersOnSameTile.length > 0 && currentPlayer.ap >= 2 && !mgActive && !isBranchPicking;
+        punchBtn.style.display = isYankee && playersOnSameTile.length > 0 ? "block" : "none";
+        punchBtn.disabled = !canPunch;
+        punchBtn.textContent = '👊 殴る [元ヤン] (2AP)';
     }
 
     // ターン終了プロンプト
@@ -2535,12 +2666,21 @@ function actionTrash() {
 function actionOccupy() {
     let currentPlayer = players[turn];
     const isEnemy = territories[currentPlayer.pos] !== undefined && territories[currentPlayer.pos] !== currentPlayer.id;
-    const cost = isEnemy ? 6 : 3;
-    currentPlayer.ap -= cost;
+    let pCost = isEnemy ? 5 : 3;
+    // 空き巣割引（敵陣地のみ）
+    if (isEnemy) {
+        const owner = players.find(p => p.id === territories[currentPlayer.pos]);
+        if (owner) {
+            const dist = getDistance(owner.pos, currentPlayer.pos);
+            pCost = Math.max(1, pCost - Math.min(3, Math.floor(dist / 2)));
+        }
+    }
+    if (currentPlayer.p < pCost) { showToast(`P不足！陣地化には${pCost}P必要です`); return; }
+    currentPlayer.p -= pCost;  // APは消費しない
     territories[currentPlayer.pos] = currentPlayer.id;
     playSfx('success');
     const tileName = mapData.find(t => t.id === currentPlayer.pos).name;
-    const msg = isEnemy ? `敵陣地「${tileName}」を奪取！` : `「${tileName}」を陣地化！`;
+    const msg = isEnemy ? `敵陣地「${tileName}」を奪取！(-${pCost}P)` : `「${tileName}」を陣地化！(-${pCost}P)`;
     log(`🚩 ${msg}`);
     triggerEventPopup(currentPlayer.id, "🚩", isEnemy ? "敵陣地奪取！" : "陣地占領！", msg, "good");
     syncOnline();
@@ -2729,15 +2869,10 @@ function useCard(index, cardId) {
     
     // 武器カードの処理 → 弧型UIを使用
     if (cardData.type === 'weapon') {
-        let targetsInRange = players.filter(op => op.id !== currentPlayer.id && op.hp > 0 && getDistance(currentPlayer.pos, op.pos) <= cardData.range);
-        
-        if (targetsInRange.length === 0) {
-            log("⚔️ 射程内に敵がいない！");
-            syncOnline(); updateUI(); return;
-        }
-        
-        // 弧型UIを表示して照準を決めてもらう
-        showWeaponArcUI(cardData, targetsInRange, currentPlayer);
+        // 射程内に関係なく全プレイヤーを潜在ターゲットとして弧型UIを表示
+        let allTargets = players.filter(op => op.id !== currentPlayer.id && op.hp > 0);
+        // 弧型UIに「前後Nマス以内」の情報を渡す（射程はgetDistanceで判定）
+        showWeaponArcUI(cardData, allTargets, currentPlayer);
         return;
     }
     
@@ -2798,7 +2933,16 @@ function useCard(index, cardId) {
             else { currentPlayer.p = Math.max(0, currentPlayer.p - 3); log(`🟡 密かなバイト失敗...-3P。`); triggerEventPopup(currentPlayer.id, "💼", "密かなバイト失敗...", "-3P", "bad"); }
             break;
         case 12:
-            players.forEach(op => op.p = Math.floor(op.p / 2));
+            players.forEach(op => {
+                if (op.reaction === 'reflect') {
+                    op.reaction = null;
+                    log(`🤝 ${op.name}の裏取引で大暴落を反射！${currentPlayer.name}のPが半減！`);
+                    triggerEventPopup(op.id, "🤝", "裏取引反射！", `大暴落を${currentPlayer.name}に返した`, "good");
+                    currentPlayer.p = Math.floor(currentPlayer.p / 2);
+                } else {
+                    op.p = Math.floor(op.p / 2);
+                }
+            });
             log(`😱 大暴落！全員のP半減！`);
             players.forEach(op => triggerEventPopup(op.id, "📉", "大暴落！", "全員のP半減！", "bad"));
             break;
@@ -2806,12 +2950,19 @@ function useCard(index, cardId) {
             let richerPlayers = players.filter(op => op.id !== currentPlayer.id && op.p > currentPlayer.p);
             if (richerPlayers.length > 0) {
                 let topPlayer = richerPlayers.reduce((a, b) => a.p > b.p ? a : b);
-                let tmp = currentPlayer.p;
-                currentPlayer.p = topPlayer.p;
-                topPlayer.p = tmp;
-                log(`🔥 下剋上！${topPlayer.name}とP交換！`);
-                triggerEventPopup(currentPlayer.id, "🔥", "下剋上！", `${topPlayer.name}とP交換`, "good");
-                triggerEventPopup(topPlayer.id, "😱", "下剋上された！", `${currentPlayer.name}にP交換された`, "bad");
+                if (topPlayer.reaction === 'reflect') {
+                    topPlayer.reaction = null;
+                    log(`🤝 ${topPlayer.name}の裏取引で下剋上を反射！${currentPlayer.name}がP没収！`);
+                    triggerEventPopup(topPlayer.id, "🤝", "裏取引反射！", `下剋上を${currentPlayer.name}に返した`, "good");
+                    currentPlayer.p = Math.floor(currentPlayer.p / 2);
+                } else {
+                    let tmp = currentPlayer.p;
+                    currentPlayer.p = topPlayer.p;
+                    topPlayer.p = tmp;
+                    log(`🔥 下剋上！${topPlayer.name}とP交換！`);
+                    triggerEventPopup(currentPlayer.id, "🔥", "下剋上！", `${topPlayer.name}とP交換`, "good");
+                    triggerEventPopup(topPlayer.id, "😱", "下剋上された！", `${currentPlayer.name}にP交換された`, "bad");
+                }
             } else {
                 log(`🔥 自分がトップ...（何も起きない）`);
             }
@@ -2828,6 +2979,10 @@ function useCard(index, cardId) {
         case 27: currentPlayer.equip.shield = true; log(`🛡️ 段ボールの盾装備！ダメージ半減！`); triggerEventPopup(currentPlayer.id, "🛡️", "段ボールの盾装備！", "次のダメージを半減", "card"); break;
         case 28: currentPlayer.equip.helmet = true; log(`🪖 ヘルメット装備！ダメージ1回無効！`); triggerEventPopup(currentPlayer.id, "🪖", "ヘルメット装備！", "次のダメージを完全無効", "card"); break;
         case 29: currentPlayer.equip.doll = true; log(`🎎 身代わり人形装備！NPC妨害1回無効！`); triggerEventPopup(currentPlayer.id, "🎎", "身代わり人形装備！", "NPC妨害を1回無効化", "card"); break;
+        // リアクションカード
+        case 35: currentPlayer.reaction = 'block';   log(`⚖️ 弁護士の盾発動！次の攻撃を無効化！`); triggerEventPopup(currentPlayer.id, "⚖️", "弁護士の盾！", "次の攻撃/カツアゲを無効化", "good"); break;
+        case 36: currentPlayer.reaction = 'reflect'; log(`🤝 裏取引発動！次の下剋上/暴落を反射！`); triggerEventPopup(currentPlayer.id, "🤝", "裏取引！", "次のP操作を反射", "good"); break;
+        case 37: currentPlayer.reaction = 'counter'; log(`🔄 反撃の一撃発動！次のダメージを反射！`); triggerEventPopup(currentPlayer.id, "🔄", "反撃の一撃！", "次のダメージを相手に返す", "good"); break;
         // 回復カード
         default:
             if (cardData && cardData.type === 'heal') {
@@ -3251,6 +3406,42 @@ async function processRoundEvents() {
     loansharkPos = mapData[Math.floor(Math.random() * mapData.length)].id;
     friendPos = mapData[Math.floor(Math.random() * mapData.length)].id;
     
+    // 【予兆システム】次の収集車が多く通過するエリアを予告（次ラウンド開始時に演出表示）
+    const areaNames = { slum: 'スラムエリア', commercial: '商業エリア', luxury: '高級エリア' };
+    const truckPreviewRoll = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
+    const previewPath = getDestRandom(truckPos, truckPreviewRoll);
+    const areaCounts = {};
+    previewPath.hitList.forEach(tid => {
+        const t = mapData.find(x => x.id === tid);
+        if (t) areaCounts[t.area] = (areaCounts[t.area] || 0) + 1;
+    });
+    const dangerArea = Object.entries(areaCounts).sort((a,b)=>b[1]-a[1])[0];
+    nextRoundWarning = dangerArea
+        ? `次の収集車は「${areaNames[dangerArea[0]] || dangerArea[0]}」を中心に暴走するらしい…`
+        : null;
+
+    // 【陣地維持費（税金）】1マスにつき2P
+    const TAX_PER_TILE = 2;
+    players.forEach(p => {
+        const ownedTileIds = Object.keys(territories).filter(k => territories[k] === p.id);
+        if (ownedTileIds.length === 0) return;
+        const tax = ownedTileIds.length * TAX_PER_TILE;
+        if (p.p >= tax) {
+            p.p -= tax;
+            log(`💸 ${p.name}の陣地維持費: -${tax}P (${ownedTileIds.length}マス×${TAX_PER_TILE}P)`);
+            summaryDigest.push(`💸 ${p.name}: 維持費 -${tax}P`);
+        } else {
+            // 払えない場合はランダムに陣地を失う
+            const lostId = ownedTileIds[Math.floor(Math.random() * ownedTileIds.length)];
+            delete territories[lostId];
+            p.p = 0;
+            const lostTileName = mapData.find(t => t.id == lostId)?.name || lostId;
+            log(`⚠️ ${p.name}は維持費を払えず！陣地「${lostTileName}」を失った！`);
+            summaryDigest.push(`⚠️ ${p.name}: 維持費不足→陣地「${lostTileName}」喪失`);
+            triggerEventPopup(p.id, "⚠️", "維持費不足！", `陣地「${lostTileName}」を失った`, "bad");
+        }
+    });
+
     players.forEach(p => p.stealth = false); // ステルス解除
     
     await displayRoundSummary(summaryDigest);
