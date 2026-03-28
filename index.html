@@ -3115,7 +3115,9 @@ function updateUI() {
     
     // 占領コスト計算: APは不要、Pのみ（空きマス3P、敵陣地5P、空き巣割引あり）
     const isEnemyTerritory = territories[currentPlayer.pos] !== undefined && territories[currentPlayer.pos] !== currentPlayer.id;
-    let canOccupyLogic = ["normal","can","trash","job","exchange","shelter"].includes(tileType) && territories[currentPlayer.pos] !== currentPlayer.id && currentPlayer.pos !== unclePos;
+    const tileOwner = territories[currentPlayer.pos] !== undefined ? players.find(p => p.id === territories[currentPlayer.pos]) : null;
+    const isTeamTerritory = tileOwner && isSameTeam(currentPlayer, tileOwner);
+    let canOccupyLogic = ["normal","can","trash","job","exchange","shelter"].includes(tileType) && territories[currentPlayer.pos] !== currentPlayer.id && !isTeamTerritory && currentPlayer.pos !== unclePos;
     let occupyPCost = isEnemyTerritory ? 5 : 3;
     // 空き巣割引: 敵の陣地で所有者が遠いほどPコスト減
     let remoteDiscount = 0;
@@ -3255,7 +3257,7 @@ function updateUI() {
 
 // ========== ACTIONS ==========
 // ========== TURN ORDER DICE ==========
-async function determineTurnOrder() {
+async function determineTurnOrder(preRolledData) {
     if (players.length < 2) return;
 
     const overlay = document.getElementById('turn-order-overlay');
@@ -3264,12 +3266,10 @@ async function determineTurnOrder() {
     const resultEl = document.getElementById('turn-order-result');
     const finalEl = document.getElementById('turn-order-final');
 
-    // UIリセット
     container.innerHTML = '';
     resultEl.style.display = 'none';
     statusEl.innerText = 'まもなくダイスロールが始まります...';
 
-    // プレイヤー行を構築
     const rollData = players.map((p, idx) => {
         const row = document.createElement('div');
         row.className = 'to-player-row';
@@ -3289,10 +3289,16 @@ async function determineTurnOrder() {
         return { idx, player: p, d1: 0, d2: 0, total: 0 };
     });
 
+    // pre-rolled dice values (from host or generated locally)
+    const diceValues = preRolledData ? preRolledData.diceValues : rollData.map(() => ({
+        d1: Math.floor(Math.random() * 6) + 1,
+        d2: Math.floor(Math.random() * 6) + 1
+    }));
+    const sortedOrder = preRolledData ? preRolledData.sortedOrder : null;
+
     overlay.style.display = 'flex';
     await sleep(800);
 
-    // 各プレイヤーが順番にダイスを振る
     for (let i = 0; i < rollData.length; i++) {
         const rd = rollData[i];
         const row = document.getElementById(`to-row-${rd.idx}`);
@@ -3306,7 +3312,6 @@ async function determineTurnOrder() {
         statusEl.innerText = `${rd.player.name} がサイコロを振っています...`;
         playSfx('dice');
 
-        // アニメーション
         const rollInterval = setInterval(() => {
             d1El.innerText = Math.floor(Math.random() * 6) + 1;
             d2El.innerText = Math.floor(Math.random() * 6) + 1;
@@ -3315,9 +3320,8 @@ async function determineTurnOrder() {
         await sleep(1200);
         clearInterval(rollInterval);
 
-        // 確定
-        rd.d1 = Math.floor(Math.random() * 6) + 1;
-        rd.d2 = Math.floor(Math.random() * 6) + 1;
+        rd.d1 = diceValues[i].d1;
+        rd.d2 = diceValues[i].d2;
         rd.total = rd.d1 + rd.d2;
 
         d1El.innerText = rd.d1;
@@ -3334,18 +3338,23 @@ async function determineTurnOrder() {
         await sleep(600);
     }
 
-    // ソート（同点はランダム決着）
-    rollData.sort((a, b) => {
-        if (b.total !== a.total) return b.total - a.total;
-        return Math.random() - 0.5;
-    });
+    // Use pre-computed sort order if provided, otherwise sort now
+    let finalOrder;
+    if (sortedOrder) {
+        finalOrder = sortedOrder.map(origIdx => rollData.find(rd => rd.idx === origIdx));
+    } else {
+        rollData.sort((a, b) => {
+            if (b.total !== a.total) return b.total - a.total;
+            return Math.random() - 0.5;
+        });
+        finalOrder = rollData;
+    }
 
     statusEl.innerText = '順番を決定中...';
     await sleep(800);
 
-    // 順位アイコンを付与し、行を並べ替え
     const rankIcons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣'];
-    rollData.forEach((rd, sortedIdx) => {
+    finalOrder.forEach((rd, sortedIdx) => {
         const rankEl = document.getElementById(`to-rank-${rd.idx}`);
         rankEl.innerText = rankIcons[sortedIdx] || `${sortedIdx + 1}`;
         const row = document.getElementById(`to-row-${rd.idx}`);
@@ -3353,9 +3362,8 @@ async function determineTurnOrder() {
         if (sortedIdx === 0) row.classList.add('winner');
     });
 
-    // 結果サマリー表示
     let finalHTML = '';
-    rollData.forEach((rd, sortedIdx) => {
+    finalOrder.forEach((rd, sortedIdx) => {
         const emoji = charEmoji[rd.player.charType] || '🏃';
         finalHTML += `<div style="margin:4px 0;font-size:14px;font-weight:bold;">
             ${rankIcons[sortedIdx] || (sortedIdx+1)} 
@@ -3367,8 +3375,7 @@ async function determineTurnOrder() {
     resultEl.style.display = 'block';
     statusEl.innerText = '画面をタップして開始！';
 
-    // players配列を並び替え、IDを再割当て
-    const newOrder = rollData.map(rd => rd.player);
+    const newOrder = finalOrder.map(rd => rd.player);
     players = newOrder.map((p, i) => {
         p.id = i;
         p.color = pIdColors[i % 8];
@@ -3376,7 +3383,6 @@ async function determineTurnOrder() {
     });
     turn = 0;
 
-    // クリックまたはタップで閉じる
     await new Promise(resolve => {
         const handler = () => {
             overlay.removeEventListener('click', handler);
@@ -3390,6 +3396,9 @@ async function determineTurnOrder() {
     overlay.style.display = 'none';
     playSfx('coin');
     log('🎲 順番決めダイス完了！ターン順: ' + players.map((p, i) => `${i+1}.${p.name}`).join(' → '));
+    
+    // Return the roll data so host can share it
+    return { diceValues, sortedOrder: finalOrder.map(rd => rd.idx) };
 }
 
 async function rollDice() {
@@ -3400,7 +3409,7 @@ async function rollDice() {
     toggleHighlight("btn-roll", false);
     
     // ネットワーク同期 (サイコロ開始)
-    if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof myRoomId !== 'undefined' && myRoomId && !currentPlayer.isCPU) {
+    if (typeof isOnlineMode !== 'undefined' && isOnlineMode && !currentPlayer.isCPU) {
         let msg = { type: 'dice_start', name: currentPlayer.name };
         if (typeof isHost !== 'undefined' && isHost) { 
             if (typeof broadcastNetworkData === 'function') broadcastNetworkData(msg); 
@@ -3460,7 +3469,7 @@ async function rollDice() {
     playSfx('success');
     
     // ネットワーク同期 (サイコロ結果)
-    if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof myRoomId !== 'undefined' && myRoomId && !currentPlayer.isCPU) {
+    if (typeof isOnlineMode !== 'undefined' && isOnlineMode && !currentPlayer.isCPU) {
         let msg = { type: 'dice_result', d1: dice1Val, d2: dice2Val, text: textResult };
         if (typeof isHost !== 'undefined' && isHost) { 
             if (typeof broadcastNetworkData === 'function') broadcastNetworkData(msg); 
@@ -3683,7 +3692,8 @@ function actionConcert() {
         if (getDistance(cp.pos, op.pos) <= 2) {
             op.pos = cp.pos; pulled.push(op.name);
             cp.p += 2;
-            triggerEventPopup(op.id, "🎸", "路上ライブに引き込まれた！", `${cp.name}のマスへ強制移動`, "bad");
+            const isAlly = isSameTeam(cp, op);
+            triggerEventPopup(op.id, "🎸", isAlly ? "ライブに合流！" : "路上ライブに引き込まれた！", `${cp.name}のマスへ移動`, isAlly ? "good" : "bad");
         }
     });
     if (pulled.length > 0) {
@@ -4356,6 +4366,11 @@ function actionTrash() {
 
 function actionOccupy() {
     let currentPlayer = players[turn];
+    // チームメイトの陣地は上書きしない
+    const ownerOfTile = territories[currentPlayer.pos] !== undefined ? players.find(p => p.id === territories[currentPlayer.pos]) : null;
+    if (ownerOfTile && isSameTeam(currentPlayer, ownerOfTile)) {
+        showToast("チームメイトの陣地です！"); return;
+    }
     const isEnemy = territories[currentPlayer.pos] !== undefined && territories[currentPlayer.pos] !== currentPlayer.id;
     let pCost = isEnemy ? 5 : 3;
     // 空き巣割引（敵陣地のみ）
@@ -4598,7 +4613,7 @@ function useCard(index, cardId) {
         case 5:
             let diceRoll = Math.floor(Math.random() * 6) + 1;
             if (diceRoll >= 4) {
-                let enemyTerritories = Object.keys(territories).filter(k => territories[k] !== currentPlayer.id);
+                let enemyTerritories = Object.keys(territories).filter(k => territories[k] !== currentPlayer.id && !isSameTeam(currentPlayer, players.find(p=>p.id===territories[k])));
                 if (enemyTerritories.length > 0) {
                     let targetTerritory = enemyTerritories[Math.floor(Math.random() * enemyTerritories.length)];
                     territories[targetTerritory] = currentPlayer.id;
@@ -5454,11 +5469,16 @@ async function processCPUTurn() {
         }
         // 陣地占領（APではなくPを使用。P残高チェック必須）
         else if (!acted && ["normal", "can", "trash", "job", "exchange", "shelter"].includes(currentTile.type) && territories[cpuPlayer.pos] !== cpuPlayer.id && cpuPlayer.pos !== unclePos && Math.random() > 0.4) {
-            const isEnemyT = territories[cpuPlayer.pos] !== undefined && territories[cpuPlayer.pos] !== cpuPlayer.id;
-            const neededP = isEnemyT ? 5 : 3;
-            if (cpuPlayer.p >= neededP) {
-                actionOccupy();
-                acted = true;
+            const tileOwnerId = territories[cpuPlayer.pos];
+            const tileOwnerP = tileOwnerId !== undefined ? players.find(p => p.id === tileOwnerId) : null;
+            if (tileOwnerP && isSameTeam(cpuPlayer, tileOwnerP)) { /* skip teammate territory */ }
+            else {
+                const isEnemyT = tileOwnerId !== undefined && tileOwnerId !== cpuPlayer.id;
+                const neededP = isEnemyT ? 5 : 3;
+                if (cpuPlayer.p >= neededP) {
+                    actionOccupy();
+                    acted = true;
+                }
             }
         }
         // バイト
@@ -5658,6 +5678,14 @@ async function processCPUTurn() {
                 <div class="lobby-section" style="background:#5c4a44; color:#fdf5e6;">
                     <h4 style="color:#fdf5e6; border-bottom-color:#8d6e63;">🤖 CPU管理</h4>
                     <button class="btn-large btn-blue" style="width: 100%; padding: 8px; font-size:14px;" onclick="window.addCpuPlayer()">＋ CPUを追加する</button>
+                </div>
+                
+                <div class="lobby-section" style="background:#5c4a44; color:#fdf5e6;">
+                    <h4 style="color:#fdf5e6; border-bottom-color:#8d6e63;">🤝 チーム設定</h4>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-large" style="flex:1;font-size:12px;padding:8px;background:#8e44ad;border-color:#6c3483;" onclick="window.onlineRandomTeam()">🎲 ランダムチーム分け</button>
+                        <button class="btn-large" style="flex:1;font-size:12px;padding:8px;background:#95a5a6;border-color:#7f8c8d;" onclick="window.onlineClearTeam()">⚪ チームリセット</button>
+                    </div>
                 </div>
                 
                 <div class="lobby-section" style="background:#5c4a44; color:#fdf5e6;">
@@ -5952,6 +5980,31 @@ function handleNetworkData(data, senderPeerId = null, conn = null) {
         lobbyPlayers = data.players;
         if(data.roomName) hostRoomName = data.roomName;
         updateLobbyUI(data.players, data.hostId);
+    }
+    else if (data.type === 'game_pregame') {
+        if (!isHost) {
+            isOnlineMode = true;
+            document.getElementById("online-lobby-modal").style.display = "none";
+            document.getElementById("setup-screen").style.display = "none";
+            document.getElementById("main-title").style.display = "none";
+            document.getElementById("game-screen").style.display = "flex";
+            window.applyGameState(data.state);
+            log("🌐 ゲームの準備中... 順番決めダイスを待っています");
+        }
+    }
+    else if (data.type === 'turn_order_anim') {
+        // ゲスト側: ホストと同じダイス値で順番決めアニメーションを再生
+        if (!isHost) {
+            (async () => {
+                await determineTurnOrder({ diceValues: data.diceValues, sortedOrder: data.sortedOrder });
+            })();
+        }
+        // ホスト→他ゲストへの中継
+        if (isHost) {
+            Object.values(connections).forEach(conn => {
+                if (conn.peer !== senderPeerId && conn.open) conn.send(data);
+            });
+        }
     }
     else if (data.type === 'game_start') {
         if (!isHost) {
@@ -6406,6 +6459,28 @@ window.removeCpu = function(cpuId) {
     updateLobbyUI(lobbyPlayers, myUserId);
 };
 
+window.onlineRandomTeam = function() {
+    if (!isHost || lobbyPlayers.length < 2) return;
+    const availableColors = Object.keys(teamColors).filter(k => k !== 'none');
+    const numTeams = Math.min(Math.max(2, Math.floor(lobbyPlayers.length / 2)), availableColors.length);
+    const teamPool = availableColors.slice(0, numTeams);
+    const shuffled = [...lobbyPlayers.keys()].sort(() => Math.random() - 0.5);
+    shuffled.forEach((idx, i) => {
+        lobbyPlayers[idx].teamColor = teamPool[i % numTeams];
+    });
+    broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId, roomName: hostRoomName });
+    updateLobbyUI(lobbyPlayers, myUserId);
+    showToast(`🎲 ${numTeams}チームにランダム分けしました！`);
+};
+
+window.onlineClearTeam = function() {
+    if (!isHost) return;
+    lobbyPlayers.forEach(p => p.teamColor = 'none');
+    broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId, roomName: hostRoomName });
+    updateLobbyUI(lobbyPlayers, myUserId);
+    showToast('⚪ 全員ソロモードに戻しました');
+};
+
 function showLobbyUI() {
     hideAllOnlineUIs();
     document.getElementById("online-lobby-modal").style.display = "flex";
@@ -6563,8 +6638,21 @@ window.startOnlineGame = async function() {
     document.getElementById("main-title").style.display = "none";
     document.getElementById("game-screen").style.display = "flex";
     
-    // 順番決めダイス（ホスト側で決定後、ゲスト全員に同期）
-    await determineTurnOrder();
+    // ゲスト側にもプレイヤー情報とマップを先に送って画面を準備させる
+    const preGameState = window.extractGameState();
+    broadcastNetworkData({ type: 'game_pregame', state: preGameState });
+    
+    // 順番決めダイス（ホスト側で値を事前決定→アニメーション実行）
+    const turnOrderResult = await determineTurnOrder();
+    
+    // ゲストに同じダイス値と順番を送信してアニメーションを実行させる
+    if (turnOrderResult) {
+        broadcastNetworkData({
+            type: 'turn_order_anim',
+            diceValues: turnOrderResult.diceValues,
+            sortedOrder: turnOrderResult.sortedOrder
+        });
+    }
     
     // 順番決め後の最終状態をゲストに送信
     const initialState = window.extractGameState();
