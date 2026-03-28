@@ -1478,6 +1478,7 @@ function initMapInteraction() {
 let globalMasterVolume = 1.0;
 let isUIAnimating = false;
 let pendingNetworkState = null;
+let turnBannerActive = false; // ターンバナー表示中フラグ
 
 // ゲスト側の収集車演出トラッキング
 let guestTruckPathTiles = [];
@@ -2602,7 +2603,8 @@ async function showTurnBanner(player) {
         await showDisasterWarning(warning); // Promiseを返すように変更
     }
 
-    // ③ ターンバナーを表示
+    // ③ ターンバナーを表示（表示中はサイコロ操作をブロック）
+    turnBannerActive = true;
     const banner = document.getElementById("turn-banner-overlay");
     const text = document.getElementById("turn-banner-text");
     text.innerText = `${player.name} のターン`;
@@ -2619,6 +2621,13 @@ async function showTurnBanner(player) {
 
     // ターン開始時に自動スクロール
     setTimeout(() => scrollToCurrentPlayer(), 300);
+
+    // バナーアニメーション完了後にフラグを解除＆UIを再描画
+    setTimeout(() => {
+        turnBannerActive = false;
+        banner.style.display = "none";
+        updateUI();
+    }, 1500);
 }
 
 // 災害予兆演出（Promiseを返し、演出が終わるまで待てるようにする）
@@ -3098,7 +3107,7 @@ function updateUI() {
     let isHandOverLimit = currentPlayer.hand.length > currentPlayer.maxHand;
     if (isHandOverLimit) isNotMyTurn = true; // 手札を捨てるまで行動不能
     
-    let canRoll = !isNotMyTurn && !diceRolled && !currentPlayer.isCPU && !mgActive && !isBranchPicking;
+    let canRoll = !isNotMyTurn && !diceRolled && !currentPlayer.isCPU && !mgActive && !isBranchPicking && !turnBannerActive;
     document.getElementById("btn-roll").disabled = !canRoll;
     toggleHighlight("btn-roll", canRoll);
     
@@ -5763,6 +5772,8 @@ let lobbyPlayers = [];
 
 // Firebase用の部屋参照キー
 let currentHostRoomRef = null;
+let hostHeartbeatInterval = null; // ハートビート用タイマー
+const ROOM_TTL_MS = 5 * 60 * 1000; // 5分以上ハートビートなしの部屋は削除
 
 let hostRoomName = "";
 let hostPassword = "";
@@ -5792,6 +5803,18 @@ function checkPeerJS() {
     }
     return true;
 }
+
+// タブ/ブラウザを閉じたときにFirebase部屋を確実に削除
+window.addEventListener('beforeunload', () => {
+    if (hostHeartbeatInterval) {
+        clearInterval(hostHeartbeatInterval);
+        hostHeartbeatInterval = null;
+    }
+    if (isHost && currentHostRoomRef) {
+        // sendBeacon的にFirebaseへ削除を試みる（onDisconnectの補完）
+        try { currentHostRoomRef.remove(); } catch(e) {}
+    }
+});
 
 window.copyRoomId = function(id) {
     const tempInput = document.createElement("input");
@@ -5863,9 +5886,17 @@ function startFirebaseRoomListener() {
             return;
         }
         
+        const now = Date.now();
         let roomCount = 0;
         Object.keys(rooms).forEach(roomId => {
             const room = rooms[roomId];
+            
+            // ハートビートが一定時間途絶えた幽霊ルームを自動削除
+            const heartbeat = room.lastHeartbeat || room.timestamp || 0;
+            if (now - heartbeat > ROOM_TTL_MS) {
+                db.ref('rooms/' + roomId).remove().catch(() => {});
+                return;
+            }
             
             // 満員の部屋は表示しない (オプション)
             if (room.players >= 4) return;
@@ -6245,10 +6276,21 @@ function tryCreateRoomProcess(targetId) {
                 name: hostRoomName,
                 hostName: lobbyPlayers[0].name,
                 players: lobbyPlayers.length,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                lastHeartbeat: firebase.database.ServerValue.TIMESTAMP
             });
             // ブラウザが閉じられたら自動的にFirebaseから削除するお掃除予約
             currentHostRoomRef.onDisconnect().remove();
+            // 定期ハートビート（30秒ごとにタイムスタンプ更新で生存証明）
+            if (hostHeartbeatInterval) clearInterval(hostHeartbeatInterval);
+            hostHeartbeatInterval = setInterval(() => {
+                if (currentHostRoomRef) {
+                    currentHostRoomRef.update({ 
+                        lastHeartbeat: firebase.database.ServerValue.TIMESTAMP,
+                        players: lobbyPlayers.length 
+                    }).catch(() => {});
+                }
+            }, 30000);
         }
     });
 
@@ -6595,6 +6637,11 @@ window.startOnlineGame = async function() {
         currentHostRoomRef.onDisconnect().cancel();
         currentHostRoomRef = null;
     }
+    // ハートビート停止
+    if (hostHeartbeatInterval) {
+        clearInterval(hostHeartbeatInterval);
+        hostHeartbeatInterval = null;
+    }
     
     const mapSizeStr = document.getElementById("online-map-size").value;
     maxRounds = parseInt(document.getElementById("online-max-rounds").value);
@@ -6642,17 +6689,30 @@ window.startOnlineGame = async function() {
     const preGameState = window.extractGameState();
     broadcastNetworkData({ type: 'game_pregame', state: preGameState });
     
-    // 順番決めダイス（ホスト側で値を事前決定→アニメーション実行）
-    const turnOrderResult = await determineTurnOrder();
+    // ダイス値を事前に生成し、ゲストに先に送信してから同時にアニメーション開始
+    const preRolledDiceValues = players.map(() => ({
+        d1: Math.floor(Math.random() * 6) + 1,
+        d2: Math.floor(Math.random() * 6) + 1
+    }));
+    // ソート順も事前に決定
+    const preRollData = players.map((p, idx) => ({
+        idx, total: preRolledDiceValues[idx].d1 + preRolledDiceValues[idx].d2
+    }));
+    preRollData.sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total;
+        return Math.random() - 0.5;
+    });
+    const preSortedOrder = preRollData.map(rd => rd.idx);
     
-    // ゲストに同じダイス値と順番を送信してアニメーションを実行させる
-    if (turnOrderResult) {
-        broadcastNetworkData({
-            type: 'turn_order_anim',
-            diceValues: turnOrderResult.diceValues,
-            sortedOrder: turnOrderResult.sortedOrder
-        });
-    }
+    // ゲストにダイス値と順番を先に送信（ゲスト側も即座にアニメーション開始）
+    broadcastNetworkData({
+        type: 'turn_order_anim',
+        diceValues: preRolledDiceValues,
+        sortedOrder: preSortedOrder
+    });
+    
+    // ホスト側も同じ値でアニメーションを同時実行
+    await determineTurnOrder({ diceValues: preRolledDiceValues, sortedOrder: preSortedOrder });
     
     // 順番決め後の最終状態をゲストに送信
     const initialState = window.extractGameState();
@@ -6691,6 +6751,11 @@ window.executeReturnToTitle = function() {
             currentHostRoomRef.remove();
             currentHostRoomRef.onDisconnect().cancel();
             currentHostRoomRef = null;
+        }
+        // ハートビート停止
+        if (hostHeartbeatInterval) {
+            clearInterval(hostHeartbeatInterval);
+            hostHeartbeatInterval = null;
         }
         
         if (peer) {
