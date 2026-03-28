@@ -458,6 +458,340 @@
         .cpu-row input { width:80px; }
         .cpu-del-btn { background:#e74c3c; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-weight:bold; font-size:11px; }
         .cpu-del-btn:hover { background:#c0392b; }
+
+        /* ========== TUTORIAL MODE ========== */
+        #tutorial-overlay {
+            position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(10,10,25,0.97);
+            z-index:30000; display:none; flex-direction:column;
+            overflow:hidden;
+            font-family:'Hiragino Maru Gothic ProN','Meiryo',sans-serif;
+        }
+        #tutorial-overlay.active { display:flex; }
+
+        /* ヘッダー */
+        .tut-header {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:12px 20px;
+            background:linear-gradient(135deg, #1a1a3e 0%, #2c1e3e 100%);
+            border-bottom:3px solid #f1c40f;
+            flex-shrink:0;
+        }
+        .tut-header-title {
+            font-size:20px; font-weight:900; color:#f1c40f;
+            text-shadow:0 0 12px rgba(241,196,15,0.4);
+            display:flex; align-items:center; gap:8px;
+        }
+        .tut-close-btn {
+            background:rgba(231,76,60,0.15); border:2px solid #e74c3c;
+            color:#e74c3c; border-radius:8px; padding:6px 14px;
+            font-weight:bold; cursor:pointer; font-size:14px;
+            transition:all 0.2s;
+        }
+        .tut-close-btn:hover { background:#e74c3c; color:#fff; }
+
+        /* タブナビゲーション */
+        .tut-tabs {
+            display:flex; overflow-x:auto; gap:0;
+            background:#1a1a2e;
+            border-bottom:2px solid #2c2c4e;
+            flex-shrink:0;
+            scrollbar-width:thin;
+            -webkit-overflow-scrolling:touch;
+        }
+        .tut-tab {
+            padding:10px 16px; font-size:13px; font-weight:bold;
+            color:#7f8c8d; background:transparent;
+            border:none; cursor:pointer; white-space:nowrap;
+            border-bottom:3px solid transparent;
+            transition:all 0.25s; flex-shrink:0;
+        }
+        .tut-tab:hover { color:#bdc3c7; background:rgba(255,255,255,0.03); }
+        .tut-tab.active {
+            color:#f1c40f; border-bottom-color:#f1c40f;
+            background:rgba(241,196,15,0.06);
+        }
+
+        /* コンテンツエリア */
+        .tut-content {
+            flex:1; overflow-y:auto; padding:20px;
+            scrollbar-width:thin;
+        }
+        .tut-page { display:none; animation:tut-fade-in 0.35s ease; }
+        .tut-page.active { display:block; }
+        @keyframes tut-fade-in { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:translateY(0);} }
+
+        /* セクションカード */
+        .tut-card {
+            background:linear-gradient(145deg, rgba(40,40,65,0.95), rgba(30,30,50,0.95));
+            border:2px solid rgba(255,255,255,0.08);
+            border-radius:14px; padding:20px; margin-bottom:18px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.4);
+            transition:border-color 0.3s;
+        }
+        .tut-card:hover { border-color:rgba(241,196,15,0.2); }
+        .tut-card h3 {
+            margin:0 0 12px 0; font-size:18px; color:#f1c40f;
+            display:flex; align-items:center; gap:8px;
+            border-bottom:1px dashed rgba(241,196,15,0.3);
+            padding-bottom:8px;
+        }
+        .tut-card p, .tut-card li {
+            color:#d5d5e0; font-size:14px; line-height:1.75;
+            margin:6px 0;
+        }
+        .tut-card ul { padding-left:18px; margin:8px 0; }
+        .tut-card b { color:#fdf5e6; }
+        .tut-card em { color:#f39c12; font-style:normal; font-weight:bold; }
+
+        /* ステップ表示（ターンの流れ等） */
+        .tut-steps { display:flex; flex-direction:column; gap:0; margin:12px 0; }
+        .tut-step {
+            display:flex; gap:14px; align-items:flex-start;
+            position:relative; padding:14px 0;
+        }
+        .tut-step:not(:last-child)::after {
+            content:''; position:absolute;
+            left:19px; top:44px; bottom:-2px;
+            width:2px; background:linear-gradient(180deg, #f1c40f, rgba(241,196,15,0.1));
+        }
+        .tut-step-num {
+            width:40px; height:40px; border-radius:50%;
+            background:linear-gradient(135deg, #f1c40f, #e67e22);
+            display:flex; align-items:center; justify-content:center;
+            font-size:18px; font-weight:900; color:#1a1a2e;
+            flex-shrink:0; box-shadow:0 0 14px rgba(241,196,15,0.3);
+            z-index:1;
+        }
+        .tut-step-body { flex:1; }
+        .tut-step-title { font-size:16px; font-weight:900; color:#fdf5e6; margin-bottom:4px; }
+        .tut-step-desc { font-size:13px; color:#b0b0c0; line-height:1.6; }
+
+        /* タイル説明用グリッド */
+        .tut-tile-grid {
+            display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+            gap:10px; margin:12px 0;
+        }
+        .tut-tile-item {
+            display:flex; align-items:center; gap:10px;
+            padding:10px 12px; border-radius:10px;
+            background:rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.06);
+            transition:background 0.2s;
+        }
+        .tut-tile-item:hover { background:rgba(255,255,255,0.08); }
+        .tut-tile-dot {
+            width:36px; height:36px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:16px; flex-shrink:0;
+            box-shadow:0 2px 8px rgba(0,0,0,0.4);
+            border:2px solid rgba(255,255,255,0.3);
+        }
+        .tut-tile-info { flex:1; }
+        .tut-tile-name { font-size:13px; font-weight:bold; color:#fdf5e6; }
+        .tut-tile-desc { font-size:11px; color:#95a5a6; line-height:1.4; }
+
+        /* キャラ攻略カード */
+        .tut-char-grid {
+            display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+            gap:14px; margin:12px 0;
+        }
+        .tut-char-card {
+            background:linear-gradient(145deg, rgba(50,50,75,0.9), rgba(35,35,55,0.9));
+            border:2px solid rgba(255,255,255,0.08);
+            border-radius:12px; padding:16px; transition:all 0.3s;
+            cursor:pointer; position:relative; overflow:hidden;
+        }
+        .tut-char-card:hover { border-color:rgba(241,196,15,0.4); transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,0.5); }
+        .tut-char-card.expanded .tut-char-strategy { display:block; }
+        .tut-char-head { display:flex; align-items:center; gap:12px; }
+        .tut-char-emoji {
+            font-size:38px; width:56px; height:56px;
+            display:flex; align-items:center; justify-content:center;
+            background:rgba(0,0,0,0.3); border-radius:12px;
+            border:2px solid; flex-shrink:0;
+        }
+        .tut-char-meta { flex:1; }
+        .tut-char-name { font-size:16px; font-weight:900; color:#fdf5e6; }
+        .tut-char-role { font-size:11px; color:#95a5a6; margin-top:2px; }
+        .tut-char-skills { margin-top:10px; }
+        .tut-skill-row {
+            display:flex; gap:8px; align-items:flex-start;
+            margin:6px 0; font-size:12px; color:#c0c0d0;
+        }
+        .tut-skill-badge {
+            font-size:10px; font-weight:bold; padding:2px 6px;
+            border-radius:4px; flex-shrink:0; margin-top:1px;
+        }
+        .tut-skill-badge.passive { background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid rgba(46,204,113,0.3); }
+        .tut-skill-badge.action  { background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid rgba(231,76,60,0.3); }
+        .tut-char-strategy {
+            display:none; margin-top:12px; padding-top:12px;
+            border-top:1px dashed rgba(255,255,255,0.1);
+        }
+        .tut-strat-title { font-size:12px; font-weight:bold; color:#f1c40f; margin-bottom:6px; }
+        .tut-strat-text { font-size:12px; color:#a0a0b8; line-height:1.65; }
+        .tut-char-expand {
+            font-size:11px; color:#7f8c8d; text-align:center;
+            margin-top:8px; transition:color 0.2s;
+        }
+        .tut-char-card:hover .tut-char-expand { color:#f1c40f; }
+
+        /* ハイライトボックス */
+        .tut-highlight {
+            background:rgba(241,196,15,0.08);
+            border-left:4px solid #f1c40f;
+            padding:12px 16px; border-radius:0 8px 8px 0;
+            margin:12px 0;
+        }
+        .tut-highlight p { color:#e0d5a0; margin:0; }
+        .tut-highlight strong { color:#f1c40f; }
+
+        /* UI説明用のモック */
+        .tut-ui-mock {
+            background:rgba(92,74,68,0.6);
+            border:2px solid #8d6e63;
+            border-radius:12px; padding:14px;
+            margin:12px 0; position:relative;
+        }
+        .tut-ui-label {
+            position:absolute; top:-10px; left:14px;
+            background:#f1c40f; color:#1a1a2e;
+            padding:2px 10px; border-radius:4px;
+            font-size:11px; font-weight:900;
+        }
+        .tut-ui-mock-row { display:flex; gap:8px; flex-wrap:wrap; margin:6px 0; }
+        .tut-mock-stat {
+            background:#8d7b68; padding:6px 10px; border-radius:6px;
+            font-size:12px; font-weight:bold; color:#fdf5e6;
+            border:1px solid #4a3b32; display:flex; align-items:center; gap:4px;
+        }
+        .tut-mock-btn {
+            background:#e07a5f; color:#fff; padding:8px 14px;
+            border-radius:6px; font-size:12px; font-weight:bold;
+            border:2px solid #3e2f2a; display:inline-block;
+        }
+        .tut-mock-btn.disabled { opacity:0.4; }
+        .tut-mock-btn.highlight { box-shadow:0 0 12px rgba(241,196,15,0.6); border-color:#f1c40f; }
+        .tut-arrow-label {
+            display:flex; align-items:center; gap:6px;
+            font-size:12px; color:#f1c40f; font-weight:bold; margin:6px 0;
+        }
+
+        /* NPC一覧 */
+        .tut-npc-list { display:flex; flex-direction:column; gap:8px; margin:10px 0; }
+        .tut-npc-item {
+            display:flex; align-items:center; gap:10px;
+            padding:10px; border-radius:8px;
+            background:rgba(255,255,255,0.03);
+            border:1px solid rgba(255,255,255,0.06);
+        }
+        .tut-npc-icon { font-size:28px; width:42px; text-align:center; flex-shrink:0; }
+        .tut-npc-info { flex:1; }
+        .tut-npc-name { font-size:13px; font-weight:bold; color:#fdf5e6; }
+        .tut-npc-desc { font-size:11px; color:#95a5a6; line-height:1.4; margin-top:2px; }
+
+        /* フッターナビ */
+        .tut-footer {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:12px 20px;
+            background:#1a1a2e;
+            border-top:2px solid #2c2c4e;
+            flex-shrink:0;
+        }
+        .tut-footer-btn {
+            padding:8px 20px; border-radius:8px;
+            font-weight:bold; font-size:14px; cursor:pointer;
+            border:2px solid; transition:all 0.2s;
+        }
+        .tut-footer-btn.prev { background:transparent; border-color:#7f8c8d; color:#7f8c8d; }
+        .tut-footer-btn.prev:hover { border-color:#bdc3c7; color:#bdc3c7; }
+        .tut-footer-btn.next { background:#f1c40f; border-color:#f1c40f; color:#1a1a2e; }
+        .tut-footer-btn.next:hover { background:#f39c12; border-color:#f39c12; }
+        .tut-footer-btn:disabled { opacity:0.3; cursor:not-allowed; }
+        .tut-progress {
+            font-size:12px; color:#7f8c8d; font-weight:bold;
+        }
+
+        @media (max-width:600px) {
+            .tut-header { padding:10px 14px; }
+            .tut-header-title { font-size:16px; }
+            .tut-content { padding:14px; }
+            .tut-card { padding:14px; }
+            .tut-tile-grid { grid-template-columns:1fr; }
+            .tut-char-grid { grid-template-columns:1fr; }
+            .tut-tab { padding:8px 12px; font-size:12px; }
+        }
+
+        /* ========== TUTORIAL SANDBOX GUIDE ========== */
+        #tut-sandbox-guide {
+            position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+            z-index:29000; display:none; width:92%; max-width:520px;
+            background:linear-gradient(145deg, rgba(20,20,40,0.97), rgba(10,10,25,0.97));
+            border:3px solid #f1c40f; border-radius:16px;
+            box-shadow:0 0 40px rgba(241,196,15,0.25), 0 8px 32px rgba(0,0,0,0.6);
+            color:#fdf5e6; font-family:'Hiragino Maru Gothic ProN','Meiryo',sans-serif;
+            overflow:hidden;
+            animation:tut-guide-in 0.4s ease;
+        }
+        @keyframes tut-guide-in { from{opacity:0;transform:translateX(-50%) translateY(30px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+        #tut-sandbox-guide.active { display:block; }
+        .tsg-header {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:10px 16px; background:rgba(241,196,15,0.1);
+            border-bottom:1px solid rgba(241,196,15,0.2);
+        }
+        .tsg-title { font-size:14px; font-weight:900; color:#f1c40f; }
+        .tsg-step-counter { font-size:11px; color:#95a5a6; }
+        .tsg-body { padding:14px 16px; }
+        .tsg-icon { font-size:32px; float:left; margin-right:12px; margin-bottom:4px; }
+        .tsg-text { font-size:14px; line-height:1.7; color:#d5d5e0; }
+        .tsg-text b { color:#f1c40f; }
+        .tsg-text em { color:#2ecc71; font-style:normal; font-weight:bold; }
+        .tsg-footer {
+            display:flex; gap:8px; padding:10px 16px;
+            border-top:1px solid rgba(255,255,255,0.06);
+            justify-content:space-between;
+        }
+        .tsg-btn {
+            padding:8px 16px; border-radius:8px; font-weight:bold;
+            font-size:13px; cursor:pointer; border:2px solid;
+            transition:all 0.2s; flex:1; text-align:center;
+        }
+        .tsg-btn.back { background:rgba(231,76,60,0.15); border-color:#e74c3c; color:#e74c3c; }
+        .tsg-btn.back:hover { background:#e74c3c; color:#fff; }
+        .tsg-btn.next-step { background:#f1c40f; border-color:#f1c40f; color:#1a1a2e; }
+        .tsg-btn.next-step:hover { background:#f39c12; }
+        .tsg-btn.wait { background:rgba(52,152,219,0.15); border-color:#3498db; color:#3498db; cursor:default; animation:tsg-pulse 1.5s infinite; }
+        @keyframes tsg-pulse { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
+
+        /* UI ハイライト枠 */
+        .tut-highlight-ring {
+            position:fixed; z-index:28000; pointer-events:none;
+            border:3px solid #f1c40f; border-radius:12px;
+            box-shadow:0 0 0 4000px rgba(0,0,0,0.55), 0 0 20px rgba(241,196,15,0.6);
+            display:none;
+        }
+        .tut-highlight-ring.active { display:block; }
+
+        /* 体験ボタン */
+        .tut-try-btn {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:10px 20px; margin-top:14px;
+            background:linear-gradient(135deg,#f1c40f,#e67e22);
+            color:#1a1a2e; font-weight:900; font-size:14px;
+            border:none; border-radius:10px; cursor:pointer;
+            box-shadow:0 4px 16px rgba(241,196,15,0.4);
+            transition:all 0.2s;
+        }
+        .tut-try-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(241,196,15,0.6); }
+        .tut-try-btn:active { transform:translateY(0); }
+
+        @media (max-width:600px) {
+            #tut-sandbox-guide { bottom:8px; max-width:96%; }
+            .tsg-body { padding:10px 12px; }
+            .tsg-text { font-size:13px; }
+        }
     </style>
 </head>
 <body class="sunny">
@@ -479,16 +813,52 @@
         
         <!-- 遊び方ボタン (イベント伝播を止めて、タイトルクリック判定を防ぐ) -->
         <button class="btn-large btn-brown" style="font-size: 16px; margin-top: 30px; padding: 10px 20px;" onclick="event.stopPropagation(); toggleRulesModal();">📖 遊び方・ルールを見る</button>
+        <button class="btn-large" style="font-size: 14px; margin-top: 10px; padding: 8px 20px; background:linear-gradient(135deg,#8e44ad,#2c3e50); border-color:#f1c40f; color:#f1c40f;" onclick="event.stopPropagation(); window.openTutorialFromTitle();">📚 初めての方はこちら（チュートリアル）</button>
     </div>
 
     <!-- モード選択画面 -->
     <div id="mode-select-overlay" style="display: none;">
         <h2 style="font-size: 32px; color: #fdf5e6; text-shadow: var(--clay-shadow-out); margin-bottom: 30px;">モード選択</h2>
-        <button class="btn-large btn-brown" style="font-size: 24px; padding: 20px 40px; width: 80%; max-width: 400px; margin-bottom: 20px;" onclick="window.startOfflineMode()">🎮 オフラインで遊ぶ<br><span style="font-size:14px;font-weight:normal;">(1台の端末で2〜4人)</span></button>
-        <button class="btn-large btn-blue" style="font-size: 24px; padding: 20px 40px; width: 80%; max-width: 400px; margin-bottom: 20px;" onclick="window.startOnlineModeMenu()">🌐 オンラインで遊ぶ<br><span style="font-size:14px;font-weight:normal;">(離れた友達と通信プレイ)</span></button>
+        <button class="btn-large btn-brown" style="font-size: 24px; padding: 20px 40px; width: 80%; max-width: 400px; margin-bottom: 20px;" onclick="window.startOfflineMode()">🎮 オフラインで遊ぶ<br><span style="font-size:14px;font-weight:normal;">(1台の端末で2〜8人)</span></button>
+        <button class="btn-large btn-blue" style="font-size: 24px; padding: 20px 40px; width: 80%; max-width: 400px; margin-bottom: 20px;" onclick="window.startOnlineModeMenu()">🌐 オンラインで遊ぶ<br><span style="font-size:14px;font-weight:normal;">(離れた友達と最大8人)</span></button>
+        <button class="btn-large" style="font-size: 20px; padding: 16px 40px; width: 80%; max-width: 400px; margin-bottom: 20px; background:linear-gradient(135deg,#8e44ad,#2c3e50); border-color:#f1c40f; color:#f1c40f;" onclick="window.openTutorial()">📚 チュートリアル<br><span style="font-size:13px;font-weight:normal;color:#fdf5e6;">初めての方はこちら！</span></button>
     </div>
 
     <!-- 遊び方・ルール モーダル -->
+
+    <!-- ========== チュートリアルモード ========== -->
+    <!-- サンドボックスガイドUI -->
+    <div id="tut-sandbox-guide">
+        <div class="tsg-header">
+            <span class="tsg-title" id="tsg-title">📚 体験モード</span>
+            <span class="tsg-step-counter" id="tsg-step-counter">1/3</span>
+        </div>
+        <div class="tsg-body">
+            <div class="tsg-icon" id="tsg-icon">🎲</div>
+            <div class="tsg-text" id="tsg-text">説明テキスト</div>
+        </div>
+        <div class="tsg-footer">
+            <button class="tsg-btn back" onclick="exitTutorialSandbox()">📚 チュートリアルに戻る</button>
+            <button class="tsg-btn next-step" id="tsg-next-btn" onclick="tutSandboxNextStep()">次へ ▶</button>
+        </div>
+    </div>
+    <div class="tut-highlight-ring" id="tut-highlight-ring"></div>
+
+    <div id="tutorial-overlay">
+        <div class="tut-header">
+            <div class="tut-header-title">📚 チュートリアル</div>
+            <button class="tut-close-btn" onclick="closeTutorial()">✕ 閉じる</button>
+        </div>
+        <div class="tut-tabs" id="tut-tabs"></div>
+        <div class="tut-content" id="tut-content"></div>
+        <div class="tut-footer">
+            <button class="tut-footer-btn prev" id="tut-prev" onclick="tutPrev()">◀ 前へ</button>
+            <span class="tut-progress" id="tut-progress">1 / 7</span>
+            <button class="tut-footer-btn next" id="tut-next" onclick="tutNext()">次へ ▶</button>
+        </div>
+    </div>
+
+    <!-- 遊び方・ルール モーダル（既存） -->
     <div id="rules-modal-overlay" class="modal-overlay" onclick="if(event.target===this) toggleRulesModal()">
         <div class="modal-box" style="max-width: 660px; width: 95%; background: #fdf5e6; color: #3e2723;">
             <h2 style="margin-top:0; text-align: center; color: #c0392b;">📖 遊び方・ルール</h2>
@@ -698,7 +1068,8 @@
         <div class="modal-box">
             <h2 style="margin-top:0;">⚙️ メニュー</h2>
             
-            <button class="btn-large btn-blue" style="width:100%;margin-top:5px; margin-bottom:15px;" onclick="toggleRulesModal()">📖 遊び方・ルールを見る</button>
+            <button class="btn-large btn-blue" style="width:100%;margin-top:5px; margin-bottom:5px;" onclick="toggleRulesModal()">📖 遊び方・ルールを見る</button>
+            <button class="btn-large" style="width:100%;margin-bottom:15px;background:linear-gradient(135deg,#8e44ad,#2c3e50);border-color:#f1c40f;color:#f1c40f;" onclick="toggleSettingsModal();window.openTutorialInGame();">📚 チュートリアル</button>
             
             <div style="margin: 15px 0; text-align: left; background: var(--clay-panel); color: #fdf5e6; padding: 10px; border-radius: 8px; border: var(--clay-border);">
                 <label style="font-weight: bold; display: block; margin-bottom: 5px;">🔊 音量: <span id="vol-disp">100%</span></label>
@@ -803,6 +1174,16 @@
             <button class="btn-large" style="width:100%;margin-top:15px;background:#7f8c8d;border-color:#2c3e50;" onclick="closeAttackOverlay()">キャンセル</button>
         </div>
     </div>
+
+    <!-- チーム連携モーダル -->
+    <div id="team-action-overlay" class="modal-overlay" style="z-index:1004;" onclick="if(event.target===this) closeTeamAction()">
+        <div class="modal-box" style="background:#1a1a2e;color:#fdf5e6;max-width:480px;border:3px solid #f1c40f;">
+            <h2 style="margin-top:0;color:#f1c40f;">🤝 チーム連携</h2>
+            <p style="font-size:13px;color:#bdc3c7;">同じマスにいるチームメイトとカードの交換や使用ができます。</p>
+            <div id="team-action-content" style="display:flex;flex-direction:column;gap:10px;margin-top:10px;"></div>
+            <button class="btn-large" style="width:100%;margin-top:15px;background:#7f8c8d;border-color:#2c3e50;" onclick="closeTeamAction()">閉じる</button>
+        </div>
+    </div>
     
     <div id="card-get-overlay"><div class="card-get-anim-box"><h2 style="color:#f1c40f;margin-top:0;">✨ カードGET! ✨</h2><div id="card-get-icon" style="font-size:80px;">🃏</div><div id="card-get-name" style="font-size:28px;font-weight:bold;margin:15px 0;text-shadow:2px 2px 4px #000;">カード名</div><div id="card-get-desc" style="font-size:16px;font-weight:bold;">説明</div></div></div>
     
@@ -836,54 +1217,16 @@
         <!-- オフライン用プレイヤー設定 -->
         <div class="setup-section" id="setup-offline-players">
             <h3 style="margin-top:0;color:#f2c779;">🖥️ オフラインで遊ぶ (2〜8人)</h3>
-            <div class="setup-row" style="color:#e74c3c;">🔴 <input type="text" id="p1-name" value="P1" class="name-input" maxlength="8">
-                <select id="p1-type"><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p1-avatar"><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
-                <div id="p1-preview" class="avatar-preview" style="border-color:#e74c3c;">🏃</div>
-                <div id="p1-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">移動常1AP・雨無効/疾風ダッシュ</div>
+            <div id="offline-players-list"></div>
+            <div style="display:flex;gap:8px;margin-top:10px;justify-content:center;flex-wrap:wrap;">
+                <button class="btn-large btn-green" style="font-size:13px;padding:8px 14px;" onclick="addOfflinePlayer('human')">＋ プレイヤーを追加</button>
+                <button class="btn-large btn-blue" style="font-size:13px;padding:8px 14px;" onclick="addOfflinePlayer('cpu')">＋ CPUを追加</button>
             </div>
-            <div class="setup-row" style="color:#3498db;">🔵 <input type="text" id="p2-name" value="P2" class="name-input" maxlength="8">
-                <select id="p2-type"><option value="human">人間</option><option value="cpu" selected>CPU</option><option value="none">不参加</option></select>
-                <select id="p2-avatar"><option value="sales">💼元営業マン</option><option value="athlete">🏃元アスリート</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
-                <div id="p2-preview" class="avatar-preview" style="border-color:#3498db;">💼</div>
-                <div id="p2-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">バイト80%・ショップ割引/訪問販売</div>
+            <div style="display:flex;gap:8px;margin-top:8px;justify-content:center;flex-wrap:wrap;">
+                <button class="btn-large" style="font-size:12px;padding:6px 12px;background:#8e44ad;border-color:#6c3483;" onclick="randomTeamAssign()">🎲 ランダムチーム分け</button>
+                <button class="btn-large" style="font-size:12px;padding:6px 12px;background:#95a5a6;border-color:#7f8c8d;" onclick="clearAllTeams()">⚪ チームリセット</button>
             </div>
-            <div class="setup-row" style="color:#2ecc71;">🟢 <input type="text" id="p3-name" value="P3" class="name-input" maxlength="8">
-                <select id="p3-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p3-avatar"><option value="survivor">🌿サバイバー</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
-                <div id="p3-preview" class="avatar-preview" style="border-color:#2ecc71;">🌿</div>
-                <div id="p3-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ゴミ漁りペナ無効/野宿HP+15</div>
-            </div>
-            <div class="setup-row" style="color:#f1c40f;">🟡 <input type="text" id="p4-name" value="P4" class="name-input" maxlength="8">
-                <select id="p4-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p4-avatar"><option value="yankee">👊元ヤン</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
-                <div id="p4-preview" class="avatar-preview" style="border-color:#f1c40f;">👊</div>
-                <div id="p4-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">カツアゲ(2P上限)/殴る10ダメ</div>
-            </div>
-            <div class="setup-row" style="color:#e67e22;">🟠 <input type="text" id="p5-name" value="P5" class="name-input" maxlength="8">
-                <select id="p5-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p5-avatar"><option value="hacker">💻元ハッカー</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
-                <div id="p5-preview" class="avatar-preview" style="border-color:#e67e22;">💻</div>
-                <div id="p5-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">手札上限+2/遠隔ハッキング</div>
-            </div>
-            <div class="setup-row" style="color:#9b59b6;">🟣 <input type="text" id="p6-name" value="P6" class="name-input" maxlength="8">
-                <select id="p6-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p6-avatar"><option value="musician">🎸ミュージシャン</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="doctor">🩺闇医者</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
-                <div id="p6-preview" class="avatar-preview" style="border-color:#9b59b6;">🎸</div>
-                <div id="p6-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">隣接で銀行+3P/路上ライブ引き寄せ</div>
-            </div>
-            <div class="setup-row" style="color:#1abc9c;">🩵 <input type="text" id="p7-name" value="P7" class="name-input" maxlength="8">
-                <select id="p7-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p7-avatar"><option value="doctor">🩺闇医者</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="gambler">🎲ギャンブラー</option><option value="detective">🕵️元探偵</option></select>
-                <div id="p7-preview" class="avatar-preview" style="border-color:#1abc9c;">🩺</div>
-                <div id="p7-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ターン開始HP+5/闇診療5P徴収</div>
-            </div>
-            <div class="setup-row" style="color:#e91e8c;">🩷 <input type="text" id="p8-name" value="P8" class="name-input" maxlength="8">
-                <select id="p8-type"><option value="none" selected>不参加</option><option value="human">人間</option><option value="cpu">CPU</option></select>
-                <select id="p8-avatar"><option value="gambler">🎲ギャンブラー</option><option value="athlete">🏃元アスリート</option><option value="sales">💼元営業マン</option><option value="survivor">🌿サバイバー</option><option value="yankee">👊元ヤン</option><option value="hacker">💻元ハッカー</option><option value="musician">🎸ミュージシャン</option><option value="doctor">🩺闇医者</option><option value="detective">🕵️元探偵</option></select>
-                <div id="p8-preview" class="avatar-preview" style="border-color:#e91e8c;">🎲</div>
-                <div id="p8-desc" style="width:100%; font-size:11px; color:#fdf5e6; margin-top:2px;">ゾロ目HP+10/イカサマ勝負5P</div>
-            </div>
+            <div id="offline-player-count" style="text-align:center;font-size:12px;color:#bdc3c7;margin-top:6px;">2 / 8人</div>
         </div>
 
         <!-- ゲーム共通設定 -->
@@ -985,6 +1328,7 @@
                     <button id="btn-darkcure" class="btn-clay" style="border-color:#e74c3c;display:none;" onclick="actionDarkCure()">🩺 闇診療 [闇医者] (2AP)</button>
                     <button id="btn-gamble"   class="btn-clay" style="border-color:#f1c40f;display:none;" onclick="actionGamble()">🎲 イカサマ勝負 [ギャンブラー] (2AP)</button>
                     <button id="btn-npcmove"  class="btn-clay" style="border-color:#95a5a6;display:none;" onclick="actionNpcMove()">🕵️ 情報操作 [探偵] (3AP)</button>
+                    <button id="btn-teamaction" class="btn-clay" style="border-color:#f1c40f;display:none;background:#2c3e50;" onclick="openTeamActionModal()">🤝 チーム連携 (0AP)</button>
                     <div style="flex-grow:1;min-height:5px;"></div>
                     <button id="btn-end" class="btn btn-end-clay" onclick="endTurnClicked()">🛑 ターン終了</button>
                 </div>
@@ -1318,6 +1662,7 @@ window.extractGameState = function() {
             bonusAP: p.bonusAP, penaltyAP: p.penaltyAP, skipTurn: p.skipTurn, cannotMove: p.cannotMove,
             deaths: p.deaths||0, kills: p.kills||0, respawnShield: p.respawnShield||0,
             color: p.color, charType: p.charType, userId: p.userId,
+            teamColor: p.teamColor || 'none',
             equip: {...p.equip}
         })),
         turn, diceRolled, canPickedThisTurn, territories: {...territories}, gameOver,
@@ -1352,6 +1697,7 @@ window.applyGameState = function(state) {
         p.deaths = sp.deaths||0; p.kills = sp.kills||0;
         p.respawnShield = sp.respawnShield||0;
         p.userId = sp.userId;
+        p.teamColor = sp.teamColor || 'none';
         if (sp.equip) p.equip = {...sp.equip};
         return p;
     });
@@ -1386,7 +1732,7 @@ window.applyGameState = function(state) {
     updateUI();
 };
 
-function createPlayer(id, name, isCPU, charType) {
+function createPlayer(id, name, isCPU, charType, teamColor) {
     const baseMaxHand = charType === 'hacker' ? 9 : 7;
     return {
         id, name, isCPU, pos: 0, hp: 100, p: 0, ap: 0, hand: [], maxHand: baseMaxHand,
@@ -1394,14 +1740,53 @@ function createPlayer(id, name, isCPU, charType) {
         bonusAP: 0, penaltyAP: 0, skipTurn: false, cannotMove: false,
         deaths: 0, kills: 0,
         reaction: null,
-        respawnShield: 0, // 復活後の無敵ターン数（0で無効）
+        respawnShield: 0,
         color: pIdColors[id % 8], charType,
+        teamColor: teamColor || 'none', // 'none' = ソロ, or color key
         equip: { bicycle: false, shoes: false, cart: false, shield: false, helmet: false, doll: false, backpack: false }
     };
 }
 
+// ========== TEAM SYSTEM ==========
+const teamColors = {
+    none:   { label:'ソロ',  color:'transparent', icon:'⚪' },
+    red:    { label:'赤',    color:'#e74c3c',     icon:'🔴' },
+    blue:   { label:'青',    color:'#3498db',     icon:'🔵' },
+    green:  { label:'緑',    color:'#2ecc71',     icon:'🟢' },
+    yellow: { label:'黄',    color:'#f1c40f',     icon:'🟡' },
+    orange: { label:'橙',    color:'#e67e22',     icon:'🟠' },
+    purple: { label:'紫',    color:'#9b59b6',     icon:'🟣' },
+    cyan:   { label:'水',    color:'#1abc9c',     icon:'🩵' },
+    pink:   { label:'桃',    color:'#e91e8c',     icon:'🩷' },
+};
+
+function isSameTeam(p1, p2) {
+    if (!p1 || !p2) return false;
+    if (p1.id === p2.id) return false; // 自分自身は「同チーム」扱いしない
+    if (!p1.teamColor || !p2.teamColor) return false;
+    if (p1.teamColor === 'none' || p2.teamColor === 'none') return false;
+    return p1.teamColor === p2.teamColor;
+}
+
+function getTeammates(player) {
+    if (!player || !player.teamColor || player.teamColor === 'none') return [];
+    return players.filter(p => p.id !== player.id && isSameTeam(player, p) && p.hp > 0);
+}
+
+function teamColorOptions(selected) {
+    return Object.keys(teamColors).map(k => {
+        const sel = k === selected ? ' selected' : '';
+        return `<option value="${k}"${sel}>${teamColors[k].icon} ${teamColors[k].label}</option>`;
+    }).join('');
+}
+
 // ========== DAMAGE SYSTEM ==========
 function dealDamage(target, dmg, source, attacker = null) {
+    // チームメイトへのダメージを無効化
+    if (attacker && isSameTeam(attacker, target)) {
+        log(`🤝 ${target.name}はチームメイトなのでダメージ無効！`);
+        return 0;
+    }
     // 復活無敵中はすべてのダメージを無効
     if (target.respawnShield > 0) {
         log(`🛡️ ${target.name}は復活無敵中！ダメージ無効（残${target.respawnShield}ターン）`);
@@ -1568,7 +1953,7 @@ function executeReturnToTitleBase() {
     
     document.getElementById("log").innerHTML = "";
     
-    const overlays = ['turn-banner-overlay','dice-overlay','round-summary-overlay','card-get-overlay','minigame-overlay','branch-prompt','end-turn-prompt','shop-overlay','win-overlay','mg-result-overlay','story-event-overlay','attack-overlay'];
+    const overlays = ['turn-banner-overlay','dice-overlay','round-summary-overlay','card-get-overlay','minigame-overlay','branch-prompt','end-turn-prompt','shop-overlay','win-overlay','mg-result-overlay','story-event-overlay','attack-overlay','team-action-overlay'];
     overlays.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.style.display = 'none';
@@ -1580,16 +1965,98 @@ function executeReturnToTitleBase() {
     document.getElementById("setup-screen").style.display = "block";
 }
 
-document.querySelectorAll('[id$="-avatar"]').forEach(selector => {
-    selector.addEventListener('change', function() {
-        let num = this.id.replace('-avatar', '');
-        let preview = document.getElementById(num + '-preview');
-        if (preview) preview.innerText = charEmoji[this.value] || '🏃';
-        
-        let desc = document.getElementById(num + '-desc');
-        if (desc && charInfo[this.value]) desc.innerText = charInfo[this.value].desc;
+// ========== DYNAMIC OFFLINE PLAYER SETUP ==========
+const _offlineColors = ["#e74c3c","#3498db","#2ecc71","#f1c40f","#e67e22","#9b59b6","#1abc9c","#e91e8c"];
+const _offlineColorIcons = ["🔴","🔵","🟢","🟡","🟠","🟣","🩵","🩷"];
+const _charKeys = Object.keys(charEmoji);
+let offlinePlayers = []; // {name, isCPU, charType}
+
+function _avatarOptions(selected) {
+    return _charKeys.map(k => {
+        const sel = k === selected ? ' selected' : '';
+        return `<option value="${k}"${sel}>${charEmoji[k]}${charInfo[k].name}</option>`;
+    }).join('');
+}
+
+function renderOfflinePlayerList() {
+    const container = document.getElementById('offline-players-list');
+    if (!container) return;
+    container.innerHTML = offlinePlayers.map((p, i) => {
+        const color = _offlineColors[i % 8];
+        const icon = _offlineColorIcons[i % 8];
+        const emoji = charEmoji[p.charType] || '🏃';
+        const desc = charInfo[p.charType] ? charInfo[p.charType].desc : '';
+        const tc = p.teamColor || 'none';
+        const teamBorder = tc !== 'none' && teamColors[tc] ? `border-left:5px solid ${teamColors[tc].color};` : '';
+        return `<div class="setup-row" style="color:${color};position:relative;${teamBorder}" id="ofl-row-${i}">
+            ${icon} <input type="text" value="${p.name}" class="name-input" maxlength="8" onchange="offlinePlayers[${i}].name=this.value">
+            <select onchange="offlinePlayers[${i}].isCPU=(this.value==='cpu');renderOfflinePlayerList()">
+                <option value="human"${!p.isCPU?' selected':''}>人間</option>
+                <option value="cpu"${p.isCPU?' selected':''}>CPU</option>
+            </select>
+            <select onchange="offlinePlayers[${i}].charType=this.value;renderOfflinePlayerList()">
+                ${_avatarOptions(p.charType)}
+            </select>
+            <div class="avatar-preview" style="border-color:${color};">${emoji}</div>
+            <select style="font-size:12px;padding:3px;border-radius:4px;border:2px solid #8d6e63;" onchange="offlinePlayers[${i}].teamColor=this.value;renderOfflinePlayerList()">
+                ${teamColorOptions(tc)}
+            </select>
+            ${offlinePlayers.length > 2 ? `<button class="cpu-del-btn" onclick="removeOfflinePlayer(${i})" style="position:absolute;top:4px;right:4px;">✕</button>` : ''}
+            <div style="width:100%;font-size:11px;color:#fdf5e6;margin-top:2px;">${desc}</div>
+        </div>`;
+    }).join('');
+    const countEl = document.getElementById('offline-player-count');
+    if (countEl) countEl.textContent = `${offlinePlayers.length} / 8人`;
+}
+
+function addOfflinePlayer(type) {
+    if (offlinePlayers.length >= 8) { showToast("最大8人です！"); return; }
+    const idx = offlinePlayers.length;
+    const charType = _charKeys[idx % _charKeys.length];
+    offlinePlayers.push({
+        name: type === 'cpu' ? `CPU${idx + 1}` : `P${idx + 1}`,
+        isCPU: type === 'cpu',
+        charType: charType,
+        teamColor: 'none'
     });
-});
+    renderOfflinePlayerList();
+}
+
+function removeOfflinePlayer(idx) {
+    if (offlinePlayers.length <= 2) { showToast("最低2人必要です！"); return; }
+    offlinePlayers.splice(idx, 1);
+    renderOfflinePlayerList();
+}
+
+function initOfflinePlayerDefaults() {
+    offlinePlayers = [
+        { name: 'P1', isCPU: false, charType: 'athlete', teamColor: 'none' },
+        { name: 'CPU', isCPU: true, charType: 'sales', teamColor: 'none' },
+    ];
+    renderOfflinePlayerList();
+}
+
+function randomTeamAssign() {
+    if (offlinePlayers.length < 2) return;
+    const availableColors = Object.keys(teamColors).filter(k => k !== 'none');
+    const numTeams = Math.min(Math.max(2, Math.floor(offlinePlayers.length / 2)), availableColors.length);
+    const teamPool = availableColors.slice(0, numTeams);
+    const shuffled = [...offlinePlayers.keys()].sort(() => Math.random() - 0.5);
+    shuffled.forEach((idx, i) => {
+        offlinePlayers[idx].teamColor = teamPool[i % numTeams];
+    });
+    renderOfflinePlayerList();
+    showToast(`🎲 ${numTeams}チームにランダム分けしました！`);
+}
+
+function clearAllTeams() {
+    offlinePlayers.forEach(p => p.teamColor = 'none');
+    renderOfflinePlayerList();
+    showToast('⚪ 全員ソロモードに戻しました');
+}
+
+// ページ読み込み後に初期化
+document.addEventListener('DOMContentLoaded', initOfflinePlayerDefaults);
 
 let offlineCharAssign = 'choose'; // 'choose' | 'random'
 function setOfflineCharAssign(mode) {
@@ -1609,20 +2076,20 @@ function setOfflineCharAssign(mode) {
 }
 
 async function startOfflineGame() {
-    let config = [
-        { name: document.getElementById("p1-name").value || "P1", type: document.getElementById("p1-type").value, avatar: document.getElementById("p1-avatar").value },
-        { name: document.getElementById("p2-name").value || "P2", type: document.getElementById("p2-type").value, avatar: document.getElementById("p2-avatar").value },
-        { name: document.getElementById("p3-name").value || "P3", type: document.getElementById("p3-type").value, avatar: document.getElementById("p3-avatar").value },
-        { name: document.getElementById("p4-name").value || "P4", type: document.getElementById("p4-type").value, avatar: document.getElementById("p4-avatar").value },
-        { name: document.getElementById("p5-name").value || "P5", type: document.getElementById("p5-type").value, avatar: document.getElementById("p5-avatar").value },
-        { name: document.getElementById("p6-name").value || "P6", type: document.getElementById("p6-type").value, avatar: document.getElementById("p6-avatar").value },
-        { name: document.getElementById("p7-name").value || "P7", type: document.getElementById("p7-type").value, avatar: document.getElementById("p7-avatar").value },
-        { name: document.getElementById("p8-name").value || "P8", type: document.getElementById("p8-type").value, avatar: document.getElementById("p8-avatar").value },
-    ];
-    
+    if (offlinePlayers.length < 2) { showToast("最低2人必要です！"); return; }
+
+    // DOM入力から最新のname値を読み取る
+    offlinePlayers.forEach((p, i) => {
+        const row = document.getElementById(`ofl-row-${i}`);
+        if (row) {
+            const nameInput = row.querySelector('.name-input');
+            if (nameInput) p.name = nameInput.value || `P${i+1}`;
+        }
+    });
+
     players = [];
-    config.forEach(c => {
-        if (c.type !== "none") players.push(createPlayer(players.length, c.name, c.type === "cpu", c.avatar));
+    offlinePlayers.forEach((c, i) => {
+        players.push(createPlayer(i, c.name, c.isCPU, c.charType, c.teamColor || 'none'));
     });
     
     if (players.length < 2) { showToast("最低2人必要です！"); return; }
@@ -2609,16 +3076,19 @@ function updateUI() {
     players.forEach((otherPlayer, index) => {
         let activeStyle = (index === turn) ? `box-shadow:0 0 12px #f1c40f;border-color:#f1c40f;background:#5c4a44;` : `border-color:${otherPlayer.color};opacity:0.9;`;
         let cpuTag = otherPlayer.isCPU ? "<span style='color:#bdc3c7;'>(CPU)</span>" : "";
+        const tcInfo = teamColors[otherPlayer.teamColor] || teamColors.none;
+        const teamTag = otherPlayer.teamColor && otherPlayer.teamColor !== 'none' ? `<span style="color:${tcInfo.color};font-size:9px;">●${tcInfo.label}</span>` : '';
         let pointsFormat = otherPlayer.p < 0 ? `<span style="color:#e74c3c;">${otherPlayer.p}P</span>` : `${otherPlayer.p}P`;
         const div = document.createElement('div');
         div.className = 'mini-player-clay';
-        div.style.cssText = activeStyle + 'cursor:pointer;';
+        const teamBorderStyle = otherPlayer.teamColor && otherPlayer.teamColor !== 'none' ? `border-left:4px solid ${tcInfo.color};` : '';
+        div.style.cssText = activeStyle + teamBorderStyle + 'cursor:pointer;';
         div.title = `${otherPlayer.name}のキャラ詳細を表示`;
         div.onclick = () => showCharInfoModal(otherPlayer);
         div.innerHTML = `
             <div class="avatar-small-clay" style="border-color:${otherPlayer.color};">${charEmoji[otherPlayer.charType]}</div>
             <div style="font-size:10px;font-weight:bold;line-height:1.3;overflow:hidden;">
-                <div style="color:${otherPlayer.color};white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${otherPlayer.name}${cpuTag}${otherPlayer.respawnShield > 0 ? ` <span style="color:#f1c40f;">🛡️${otherPlayer.respawnShield}</span>` : ''}</div>
+                <div style="color:${otherPlayer.color};white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${otherPlayer.name}${cpuTag}${teamTag}${otherPlayer.respawnShield > 0 ? ` <span style="color:#f1c40f;">🛡️${otherPlayer.respawnShield}</span>` : ''}</div>
                 <div style="color:#fdf5e6;">❤️${otherPlayer.hp} 💰${pointsFormat} 🎴${otherPlayer.hand.length}</div>
             </div>`;
         listContainer.appendChild(div);
@@ -2718,6 +3188,10 @@ function updateUI() {
     setBtn("btn-darkcure", ct==='doctor'  && playersOnSameTile.length>0, ct==='doctor'   && baseAct && currentPlayer.ap>=2 && playersOnSameTile.length>0);
     setBtn("btn-gamble",   ct==='gambler' && playersOnSameTile.length>0, ct==='gambler'  && baseAct && currentPlayer.ap>=2 && playersOnSameTile.length>0);
     setBtn("btn-npcmove",  ct==='detective',                            ct==='detective'&& baseAct && currentPlayer.ap>=3);
+    
+    // チーム連携ボタン（同マスにチームメイトがいれば表示）
+    const teammatesOnTile = players.filter(op => op.id !== currentPlayer.id && op.pos === currentPlayer.pos && op.hp > 0 && isSameTeam(currentPlayer, op));
+    setBtn("btn-teamaction", teammatesOnTile.length > 0, baseAct && teammatesOnTile.length > 0);
 
     // ターン終了プロンプト
     const promptEl = document.getElementById("end-turn-prompt");
@@ -3074,10 +3548,9 @@ function actionMove() {
 
 // 元ヤン: 同マスでも隣接マスでもカツアゲ発動（すれ違い対応）
 function checkYankee(movedPlayer, prevPos) {
-    // 同じマス にいる相手 + 移動前マス にいた相手（すれ違い）
-    const sameTile = players.filter(op => op.id !== movedPlayer.id && op.pos === movedPlayer.pos && op.p > 0 && op.hp > 0);
+    const sameTile = players.filter(op => op.id !== movedPlayer.id && op.pos === movedPlayer.pos && op.p > 0 && op.hp > 0 && !isSameTeam(movedPlayer, op));
     const passingTile = prevPos !== undefined
-        ? players.filter(op => op.id !== movedPlayer.id && op.pos === prevPos && op.p > 0 && op.hp > 0)
+        ? players.filter(op => op.id !== movedPlayer.id && op.pos === prevPos && op.p > 0 && op.hp > 0 && !isSameTeam(movedPlayer, op))
         : [];
     const targets = [...new Set([...sameTile, ...passingTile])];
 
@@ -3111,8 +3584,8 @@ function checkYankee(movedPlayer, prevPos) {
 function actionPunch() {
     let currentPlayer = players[turn];
     if (currentPlayer.ap < 2) { showToast("AP不足！"); return; }
-    let targets = players.filter(op => op.id !== currentPlayer.id && op.pos === currentPlayer.pos && op.hp > 0);
-    if (targets.length === 0) { showToast("同じマスに相手がいない！"); return; }
+    let targets = players.filter(op => op.id !== currentPlayer.id && op.pos === currentPlayer.pos && op.hp > 0 && !isSameTeam(currentPlayer, op));
+    if (targets.length === 0) { showToast("同じマスに敵がいない！"); return; }
     currentPlayer.ap -= 2;
     let target = targets[Math.floor(Math.random() * targets.length)];
     dealDamage(target, 10, "殴る", currentPlayer);
@@ -3157,8 +3630,8 @@ function actionSalesVisit() {
     const cp = players[turn];
     if (cp.ap < 2) { showToast("AP不足！"); return; }
     if (cp.hand.length === 0) { showToast("手札がありません！"); return; }
-    const targets = players.filter(op => op.id !== cp.id && op.pos === cp.pos && op.hp > 0);
-    if (targets.length === 0) { showToast("同じマスに相手がいません！"); return; }
+    const targets = players.filter(op => op.id !== cp.id && op.pos === cp.pos && op.hp > 0 && !isSameTeam(cp, op));
+    if (targets.length === 0) { showToast("同じマスに敵がいません！"); return; }
     cp.ap -= 2;
     const target = targets[Math.floor(Math.random() * targets.length)];
     const ci = Math.floor(Math.random() * cp.hand.length);
@@ -3232,11 +3705,18 @@ function actionDarkCure() {
     const target = targets[Math.floor(Math.random() * targets.length)];
     const h = Math.min(30, 100 - target.hp);
     target.hp = Math.min(100, target.hp + 30);
-    const fee = Math.min(5, Math.max(0, target.p));
-    target.p -= fee; cp.p += fee;
-    log(`🩺 ${cp.name}【闇診療】${target.name}HP+${h}→診療費${fee}P徴収！`);
-    triggerEventPopup(cp.id, "🩺", "闇診療！", `${target.name}から+${fee}P`, "good");
-    triggerEventPopup(target.id, "🩺", "闇診療された！", `HP+${h}・診療費-${fee}P`, fee > 0 ? "bad" : "good");
+    if (isSameTeam(cp, target)) {
+        // チームメイトは無料で治療
+        log(`🩺 ${cp.name}【闇診療】${target.name}をHP+${h}回復！(チームメイト無料)`);
+        triggerEventPopup(cp.id, "🩺", "チーム治療！", `${target.name}をHP+${h}回復`, "good");
+        triggerEventPopup(target.id, "🩺", "治療された！", `HP+${h}回復(無料)`, "good");
+    } else {
+        const fee = Math.min(5, Math.max(0, target.p));
+        target.p -= fee; cp.p += fee;
+        log(`🩺 ${cp.name}【闇診療】${target.name}HP+${h}→診療費${fee}P徴収！`);
+        triggerEventPopup(cp.id, "🩺", "闇診療！", `${target.name}から+${fee}P`, "good");
+        triggerEventPopup(target.id, "🩺", "闇診療された！", `HP+${h}・診療費-${fee}P`, fee > 0 ? "bad" : "good");
+    }
     playSfx('coin'); syncOnline(); updateUI();
 }
 
@@ -3244,8 +3724,8 @@ function actionDarkCure() {
 function actionGamble() {
     const cp = players[turn];
     if (cp.ap < 2) { showToast("AP不足！"); return; }
-    const targets = players.filter(op => op.id !== cp.id && op.pos === cp.pos && op.hp > 0);
-    if (targets.length === 0) { showToast("同じマスに相手がいません！"); return; }
+    const targets = players.filter(op => op.id !== cp.id && op.pos === cp.pos && op.hp > 0 && !isSameTeam(cp, op));
+    if (targets.length === 0) { showToast("同じマスに敵がいません！"); return; }
     cp.ap -= 2;
     const target = targets[Math.floor(Math.random() * targets.length)];
     const myR = Math.floor(Math.random() * 6) + 1;
@@ -3309,6 +3789,148 @@ function actionNpcMove() {
     cancel.onclick = () => ov.remove();
     box.appendChild(cancel);
     ov.appendChild(box); document.body.appendChild(ov);
+}
+
+// ========== TEAM ACTION SYSTEM ==========
+function openTeamActionModal() {
+    const cp = players[turn];
+    const teammates = players.filter(op => op.id !== cp.id && op.pos === cp.pos && op.hp > 0 && isSameTeam(cp, op));
+    if (teammates.length === 0) { showToast("同マスにチームメイトがいません！"); return; }
+    
+    const content = document.getElementById('team-action-content');
+    let html = '';
+    
+    // チームメイト一覧
+    teammates.forEach(tm => {
+        const emoji = charEmoji[tm.charType] || '🏃';
+        const tcInfo = teamColors[tm.teamColor] || teamColors.none;
+        html += `<div style="background:rgba(255,255,255,0.06);border:2px solid ${tcInfo.color};border-radius:10px;padding:12px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                <span style="font-size:24px;">${emoji}</span>
+                <b style="font-size:15px;">${tm.name}</b>
+                <span style="font-size:12px;color:#95a5a6;">HP:${tm.hp} P:${tm.p} 🎴${tm.hand.length}</span>
+            </div>`;
+        
+        // 自分のカードを仲間に渡す
+        if (cp.hand.length > 0) {
+            html += `<div style="margin-bottom:6px;font-size:12px;color:#f1c40f;font-weight:bold;">📤 カードを渡す:</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">`;
+            cp.hand.forEach((cardId, idx) => {
+                const cd = deckData[cardId];
+                if (!cd) return;
+                html += `<button style="padding:4px 8px;font-size:11px;border-radius:6px;border:2px solid ${cd.color};background:rgba(255,255,255,0.1);color:#fdf5e6;cursor:pointer;font-weight:bold;" 
+                    onclick="teamGiveCard(${cp.id},${tm.id},${idx});closeTeamAction();">${cd.icon}${cd.name}</button>`;
+            });
+            html += `</div>`;
+        }
+        
+        // 仲間のカードを受け取る
+        if (tm.hand.length > 0 && cp.hand.length < cp.maxHand) {
+            html += `<div style="margin-bottom:6px;font-size:12px;color:#2ecc71;font-weight:bold;">📥 カードを貰う:</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">`;
+            tm.hand.forEach((cardId, idx) => {
+                const cd = deckData[cardId];
+                if (!cd) return;
+                html += `<button style="padding:4px 8px;font-size:11px;border-radius:6px;border:2px solid ${cd.color};background:rgba(255,255,255,0.1);color:#fdf5e6;cursor:pointer;font-weight:bold;" 
+                    onclick="teamTakeCard(${cp.id},${tm.id},${idx});closeTeamAction();">${cd.icon}${cd.name}</button>`;
+            });
+            html += `</div>`;
+        }
+        
+        // 回復カードを仲間に使う
+        const healCards = cp.hand.map((cid, idx) => ({cid, idx, cd: deckData[cid]})).filter(x => x.cd && x.cd.type === 'heal');
+        const buffCards = cp.hand.map((cid, idx) => ({cid, idx, cd: deckData[cid]})).filter(x => x.cd && (x.cd.type === 'equip' || [0,1,2,6,7,8,10,15,16].includes(x.cid)));
+        const useOnAlly = [...healCards, ...buffCards];
+        if (useOnAlly.length > 0 && cp.ap >= 2) {
+            html += `<div style="margin-bottom:6px;font-size:12px;color:#e67e22;font-weight:bold;">💊 カード効果を仲間に使う (2AP):</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">`;
+            useOnAlly.forEach(x => {
+                html += `<button style="padding:4px 8px;font-size:11px;border-radius:6px;border:2px solid ${x.cd.color};background:rgba(255,255,255,0.15);color:#fdf5e6;cursor:pointer;font-weight:bold;" 
+                    onclick="teamUseCardOnAlly(${cp.id},${tm.id},${x.idx});closeTeamAction();">${x.cd.icon}${x.cd.name}</button>`;
+            });
+            html += `</div>`;
+        }
+        
+        html += `</div>`;
+    });
+    
+    content.innerHTML = html;
+    document.getElementById('team-action-overlay').style.display = 'flex';
+}
+
+function closeTeamAction() {
+    document.getElementById('team-action-overlay').style.display = 'none';
+}
+
+function teamGiveCard(fromId, toId, cardIdx) {
+    const from = players.find(p => p.id === fromId);
+    const to = players.find(p => p.id === toId);
+    if (!from || !to || cardIdx >= from.hand.length) return;
+    if (to.hand.length >= to.maxHand) { showToast(`${to.name}の手札が上限！`); return; }
+    const cardId = from.hand.splice(cardIdx, 1)[0];
+    to.hand.push(cardId);
+    const cd = deckData[cardId];
+    log(`🤝 ${from.name}が${to.name}に「${cd?.name}」を渡した！`);
+    triggerEventPopup(from.id, "📤", "カード譲渡！", `「${cd?.name}」を${to.name}へ`, "card");
+    triggerEventPopup(to.id, "📥", "カード受領！", `${from.name}から「${cd?.name}」`, "card");
+    playSfx('card'); syncOnline(); updateUI();
+}
+
+function teamTakeCard(myId, fromId, cardIdx) {
+    const me = players.find(p => p.id === myId);
+    const from = players.find(p => p.id === fromId);
+    if (!me || !from || cardIdx >= from.hand.length) return;
+    if (me.hand.length >= me.maxHand) { showToast('手札が上限！'); return; }
+    const cardId = from.hand.splice(cardIdx, 1)[0];
+    me.hand.push(cardId);
+    const cd = deckData[cardId];
+    log(`🤝 ${me.name}が${from.name}から「${cd?.name}」を受け取った！`);
+    triggerEventPopup(me.id, "📥", "カード受領！", `${from.name}から「${cd?.name}」`, "card");
+    triggerEventPopup(from.id, "📤", "カード譲渡！", `「${cd?.name}」を${me.name}へ`, "card");
+    playSfx('card'); syncOnline(); updateUI();
+}
+
+function teamUseCardOnAlly(userId, targetId, cardIdx) {
+    const user = players.find(p => p.id === userId);
+    const target = players.find(p => p.id === targetId);
+    if (!user || !target || cardIdx >= user.hand.length) return;
+    if (user.ap < 2) { showToast('AP不足！(2AP必要)'); return; }
+    
+    const cardId = user.hand.splice(cardIdx, 1)[0];
+    const cd = deckData[cardId];
+    user.ap -= 2;
+    
+    if (cd.type === 'heal') {
+        const heal = cd.heal || 10;
+        const risk = cd.risk || 0;
+        const apBonus = cd.apBonus || 0;
+        if (risk > 0 && Math.random() < 0.5) {
+            target.hp = Math.max(0, target.hp - risk);
+            log(`💊 ${user.name}が${target.name}に「${cd.name}」→食中毒！${risk}ダメージ`);
+            triggerEventPopup(target.id, "🤢", "食中毒！", `-${risk}HP`, "bad");
+        } else {
+            const h = Math.min(heal, 100 - target.hp);
+            target.hp = Math.min(100, target.hp + heal);
+            log(`💊 ${user.name}が${target.name}に「${cd.name}」→HP+${h}回復！`);
+            triggerEventPopup(target.id, "💊", `${cd.name}！`, `HP+${h}回復`, "good");
+        }
+        if (apBonus > 0) { target.ap += apBonus; log(`⚡ ${target.name}のAP+${apBonus}！`); }
+    } else {
+        // バフ系カードを仲間に使用
+        switch(cardId) {
+            case 0: target.stealth = true; log(`🔵 ${target.name}にステルス付与！`); triggerEventPopup(target.id, "💨", "ステルス！", `${user.name}から付与`, "card"); break;
+            case 1: target.rainGear = true; log(`🌂 ${target.name}に雨具装備！`); triggerEventPopup(target.id, "🌂", "雨具！", `${user.name}から付与`, "card"); break;
+            case 2: target.hasID = true; target.p += 1; log(`🪪 ${target.name}に身分証！+1P`); triggerEventPopup(target.id, "🪪", "身分証！", "+1P", "card"); break;
+            case 6: target.p += 5; target.bonusAP += 2; log(`🤝 ${target.name}に支援面談！+5P＆AP+2`); triggerEventPopup(target.id, "🤝", "支援面談！", "+5P＆AP+2", "good"); break;
+            case 7: target.p += 3; log(`🍲 ${target.name}に炊き出し！+3P`); triggerEventPopup(target.id, "🍲", "炊き出し！", "+3P", "good"); break;
+            case 8: target.maxHand += 2; target.equip.backpack = true; log(`🎒 ${target.name}にリュック装備！`); triggerEventPopup(target.id, "🎒", "リュック！", `手札上限${target.maxHand}枚`, "card"); break;
+            case 10: target.p += 2; log(`🐱 ${target.name}に野良猫の導き！+2P`); triggerEventPopup(target.id, "🐱", "野良猫！", "+2P", "good"); break;
+            case 15: target.ap += 5; log(`⚡ ${target.name}にエナジードリンク！AP+5`); triggerEventPopup(target.id, "⚡", "エナドリ！", "AP+5", "good"); break;
+            case 16: target.bonusAP += 5; log(`🛹 ${target.name}にスケボー！次回AP+5`); triggerEventPopup(target.id, "🛹", "スケボー！", "次回AP+5", "card"); break;
+            default: log(`🤝 ${user.name}が${target.name}に「${cd.name}」を使用！`); break;
+        }
+    }
+    playSfx('success'); syncOnline(); updateUI();
 }
 
 function executeMove(targetTileId) {
@@ -3470,11 +4092,11 @@ function executeMove(targetTileId) {
         }
     });
 
-    // 【探偵: 張り込み】自分の陣地に敵が止まったら手札1枚没収
+    // 【探偵: 張り込み】自分の陣地に敵が止まったら手札1枚没収（チームメイトは除外）
     const landedOnTerritoryOf = territories[currentPlayer.pos];
     if (landedOnTerritoryOf !== undefined && landedOnTerritoryOf !== currentPlayer.id) {
         const det = players.find(p => p.id === landedOnTerritoryOf && p.charType === 'detective' && p.hp > 0);
-        if (det && currentPlayer.hand.length > 0) {
+        if (det && currentPlayer.hand.length > 0 && !isSameTeam(det, currentPlayer)) {
             const si = Math.floor(Math.random() * currentPlayer.hand.length);
             const stolen = deckData[currentPlayer.hand[si]];
             det.hand.push(currentPlayer.hand.splice(si, 1)[0]);
@@ -3938,8 +4560,8 @@ function useCard(index, cardId) {
     
     // 武器カードの処理 → 弧型UIを使用
     if (cardData.type === 'weapon') {
-        // 射程内に関係なく全プレイヤーを潜在ターゲットとして弧型UIを表示
-        let allTargets = players.filter(op => op.id !== currentPlayer.id && op.hp > 0);
+        // 射程内の敵をターゲット（チームメイト除外）
+        let allTargets = players.filter(op => op.id !== currentPlayer.id && op.hp > 0 && !isSameTeam(currentPlayer, op));
         // 弧型UIに「前後Nマス以内」の情報を渡す（射程はgetDistanceで判定）
         showWeaponArcUI(cardData, allTargets, currentPlayer);
         return;
@@ -3951,7 +4573,8 @@ function useCard(index, cardId) {
         case 1: currentPlayer.rainGear = true; log(`🔵 雨具装備！`); triggerEventPopup(currentPlayer.id, "🌂", "雨具装備！", "雨の日のペナルティを無効化", "card"); break;
         case 2: currentPlayer.hasID = true; currentPlayer.p += 1; log(`🔵 身分証+1P！`); triggerEventPopup(currentPlayer.id, "🪪", "身分証明書！", "+1P・次の警察を回避", "card"); break;
         case 3: 
-            let others1 = players.filter(t => t.id !== currentPlayer.id);
+            let others1 = players.filter(t => t.id !== currentPlayer.id && !isSameTeam(currentPlayer, t));
+            if (others1.length === 0) { log('🔴 通報する敵がいない...'); break; }
             let target1 = others1[Math.floor(Math.random() * others1.length)];
             target1.penaltyAP += 2; 
             log(`🔴 通報！${target1.name}に次回AP-2！`);
@@ -3959,7 +4582,7 @@ function useCard(index, cardId) {
             triggerEventPopup(target1.id, "🚨", "通報された！", `${currentPlayer.name}に通報され次回AP-2`, "bad");
             break;
         case 4:
-            let others2 = players.filter(t => t.id !== currentPlayer.id && t.p > 0);
+            let others2 = players.filter(t => t.id !== currentPlayer.id && t.p > 0 && !isSameTeam(currentPlayer, t));
             if (others2.length > 0) {
                 let target2 = others2[Math.floor(Math.random() * others2.length)];
                 let stolen = Math.min(2, target2.p);
@@ -4003,6 +4626,7 @@ function useCard(index, cardId) {
             break;
         case 12:
             players.forEach(op => {
+                if (isSameTeam(currentPlayer, op)) return; // チームメイトは除外
                 if (op.reaction === 'reflect') {
                     op.reaction = null;
                     log(`🤝 ${op.name}の裏取引で大暴落を反射！${currentPlayer.name}が10P失った！`);
@@ -4016,7 +4640,7 @@ function useCard(index, cardId) {
             players.forEach(op => triggerEventPopup(op.id, "📉", "大暴落！", "全員-5P！", "bad"));
             break;
         case 13:
-            let richerPlayers = players.filter(op => op.id !== currentPlayer.id && op.p > currentPlayer.p);
+            let richerPlayers = players.filter(op => op.id !== currentPlayer.id && op.p > currentPlayer.p && !isSameTeam(currentPlayer, op));
             if (richerPlayers.length > 0) {
                 let topPlayer = richerPlayers.reduce((a, b) => a.p > b.p ? a : b);
                 if (topPlayer.reaction === 'reflect') {
@@ -4800,7 +5424,7 @@ async function processCPUTurn() {
         let weaponCards = cpuPlayer.hand.map((cardId, index) => ({ cardId, index, cardData: deckData[cardId] })).filter(x => x.cardData.type === 'weapon');
         if (weaponCards.length > 0 && cpuPlayer.ap >= 2 && Math.random() > 0.5) {
             let wc = weaponCards[0];
-            let targetPlayers = players.filter(op => op.id !== cpuPlayer.id && op.hp > 0 && getDistance(cpuPlayer.pos, op.pos) <= wc.cardData.range);
+            let targetPlayers = players.filter(op => op.id !== cpuPlayer.id && op.hp > 0 && getDistance(cpuPlayer.pos, op.pos) <= wc.cardData.range && !isSameTeam(cpuPlayer, op));
             if (targetPlayers.length > 0) {
                 cpuPlayer.ap -= 2;
                 cpuPlayer.hand.splice(wc.index, 1);
@@ -5005,6 +5629,20 @@ async function processCPUTurn() {
                     </select>
                 </div>
                 <div id="my-online-desc" style="width:100%; text-align:center; font-size:11px; color:#bdc3c7; margin-top:5px;">移動常に1AP/雨ペナ無効</div>
+                <div style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:8px;">
+                    <label style="font-weight:bold;font-size:13px;">チーム:</label>
+                    <select id="my-online-team" onchange="window.updateMyLobbyInfo();" style="padding:5px;font-size:13px;border-radius:5px;border:2px solid #8d6e63;">
+                        <option value="none">⚪ ソロ</option>
+                        <option value="red">🔴 赤</option>
+                        <option value="blue">🔵 青</option>
+                        <option value="green">🟢 緑</option>
+                        <option value="yellow">🟡 黄</option>
+                        <option value="orange">🟠 橙</option>
+                        <option value="purple">🟣 紫</option>
+                        <option value="cyan">🩵 水</option>
+                        <option value="pink">🩷 桃</option>
+                    </select>
+                </div>
             </div>
             
             <!-- ホスト用設定 -->
@@ -5213,7 +5851,7 @@ function startFirebaseRoomListener() {
                     <span style="font-size:12px; color:#555;">👑 ホスト: ${room.hostName}</span>
                 </div>
                 <div style="text-align:right; flex-shrink:0;">
-                    <span style="font-size:14px; font-weight:bold; color:#e74c3c;">👥 ${room.players}/4 人</span><br>
+                    <span style="font-size:14px; font-weight:bold; color:#e74c3c;">👥 ${room.players}/8 人</span><br>
                     <span style="font-size:11px; background:#3498db; color:white; padding:3px 8px; border-radius:10px;">参加する 👉</span>
                 </div>
             `;
@@ -5266,7 +5904,7 @@ function handleNetworkData(data, senderPeerId = null, conn = null) {
             if (conn) conn.send({ type: 'join_error', message: '合言葉(パスワード)が間違っています' });
             return;
         }
-        if (lobbyPlayers.length >= 4) {
+        if (lobbyPlayers.length >= 8) {
             if (conn) conn.send({ type: 'join_error', message: '部屋が満員です' });
             return;
         }
@@ -5507,6 +6145,7 @@ window.executeCreateRoom = function() {
         userId: myUserId,
         name: document.getElementById("my-online-name").value || "Player" + Math.floor(Math.random()*100),
         charType: document.getElementById("my-online-avatar").value || "athlete",
+        teamColor: document.getElementById("my-online-team")?.value || "none",
         isCPU: false
     }];
     
@@ -5627,6 +6266,7 @@ function executeJoin(roomId, password) {
                     userId: myUserId,
                     name: document.getElementById("my-online-name").value || "Player",
                     charType: document.getElementById("my-online-avatar").value || "sales",
+                    teamColor: document.getElementById("my-online-team")?.value || "none",
                     isCPU: false
                 }
             });
@@ -5713,6 +6353,7 @@ window.updateMyLobbyInfo = function() {
         userId: myUserId,
         name: document.getElementById("my-online-name").value || "Player",
         charType: document.getElementById("my-online-avatar").value || "athlete",
+        teamColor: document.getElementById("my-online-team")?.value || "none",
         isCPU: false
     };
     
@@ -5733,7 +6374,7 @@ window.updateMyLobbyInfo = function() {
 };
 
 window.addCpuPlayer = function() {
-    if (lobbyPlayers.length >= 4) {
+    if (lobbyPlayers.length >= 8) {
         showToast("部屋が満員です！");
         return;
     }
@@ -5741,17 +6382,19 @@ window.addCpuPlayer = function() {
         userId: "cpu-" + Math.random().toString(36).substring(2, 8),
         name: "CPU" + (lobbyPlayers.length + 1),
         charType: "athlete",
+        teamColor: "none",
         isCPU: true
     });
     broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId, roomName: hostRoomName });
     updateLobbyUI(lobbyPlayers, myUserId);
 };
 
-window.updateCpuInfo = function(cpuId, newName, newCharType) {
+window.updateCpuInfo = function(cpuId, newName, newCharType, newTeamColor) {
     const idx = lobbyPlayers.findIndex(p => p.userId === cpuId);
     if (idx !== -1) {
         lobbyPlayers[idx].name = newName || "CPU";
         lobbyPlayers[idx].charType = newCharType;
+        if (newTeamColor !== undefined) lobbyPlayers[idx].teamColor = newTeamColor;
         broadcastNetworkData({ type: 'lobby_update', players: lobbyPlayers, hostId: myUserId, roomName: hostRoomName });
         updateLobbyUI(lobbyPlayers, myUserId);
     }
@@ -5801,42 +6444,46 @@ function updateLobbyUI(lobbyPlayersList, hostId) {
         const isMe = (p.userId === myUserId);
         const isHostPlayer = (p.userId === hostId);
         const isCPU = p.isCPU;
-        const emoji = (typeof charEmoji !== 'undefined' && charEmoji[p.charType]) ? charEmoji[p.charType] : '🏃';
+        const emoji = (typeof charEmoji !== 'undefined' && charEmoji[p.charType]) ? charEmoji[p.charType] : '\u{1F3C3}';
+        const tc = p.teamColor || 'none';
+        const tcInfo = (typeof teamColors !== 'undefined' && teamColors[tc]) ? teamColors[tc] : {label:'ソロ',color:'transparent',icon:'⚪'};
         
         const div = document.createElement("div");
-        div.style.cssText = "margin:5px 0; padding:10px; border-radius:8px; background:#4a3b32; display:flex; align-items:center; gap:8px; flex-wrap:wrap;";
+        const teamBorderCSS = tc !== 'none' ? 'border-left:5px solid '+tcInfo.color+';' : '';
+        div.style.cssText = "margin:5px 0; padding:10px; border-radius:8px; background:#4a3b32; display:flex; align-items:center; gap:8px; flex-wrap:wrap;" + teamBorderCSS;
         
-        const numBadge = `<span style="background:${['#e74c3c','#3498db','#2ecc71','#f1c40f'][idx%4]};color:white;padding:2px 8px;border-radius:50%;font-size:12px;font-weight:bold;">${idx+1}</span>`;
+        const numBadge = '<span style="background:'+['#e74c3c','#3498db','#2ecc71','#f1c40f','#e67e22','#9b59b6','#1abc9c','#e91e8c'][idx%8]+';color:white;padding:2px 8px;border-radius:50%;font-size:12px;font-weight:bold;">'+(idx+1)+'</span>';
         
         let roleBadge = '';
         if (isHostPlayer) roleBadge = '<span style="background:#e74c3c;color:white;padding:2px 6px;border-radius:3px;font-size:10px;">HOST</span>';
         else if (isCPU) roleBadge = '<span style="background:#95a5a6;color:white;padding:2px 6px;border-radius:3px;font-size:10px;">CPU</span>';
         else roleBadge = '<span style="background:#3498db;color:white;padding:2px 6px;border-radius:3px;font-size:10px;">PLAYER</span>';
+
+        const teamBadge = tc !== 'none' ? '<span style="color:'+tcInfo.color+';font-size:10px;font-weight:bold;">'+tcInfo.icon+tcInfo.label+'</span>' : '';
         
         if (isCPU && isHost) {
-            div.innerHTML = `
-                ${numBadge} ${roleBadge}
-                <div class="cpu-row" style="flex:1;">
-                    <input type="text" value="${p.name}" class="name-input" style="width:80px; padding:4px;" 
-                        onchange="window.updateCpuInfo('${p.userId}', this.value, this.parentElement.querySelector('select').value)">
-                    <select onchange="window.updateCpuInfo('${p.userId}', this.parentElement.querySelector('input').value, this.value)" style="padding:4px; font-size:12px;">
-                        <option value="athlete"   ${p.charType==='athlete'  ?'selected':''}>🏃 アスリート</option>
-                        <option value="sales"     ${p.charType==='sales'   ?'selected':''}>💼 営業マン</option>
-                        <option value="survivor"  ${p.charType==='survivor'?'selected':''}>🌿 サバイバー</option>
-                        <option value="yankee"    ${p.charType==='yankee'  ?'selected':''}>👊 元ヤン</option>
-                        <option value="hacker"    ${p.charType==='hacker'  ?'selected':''}>💻 ハッカー</option>
-                        <option value="musician"  ${p.charType==='musician'?'selected':''}>🎸 ミュージシャン</option>
-                        <option value="doctor"    ${p.charType==='doctor'  ?'selected':''}>🩺 闇医者</option>
-                        <option value="gambler"   ${p.charType==='gambler' ?'selected':''}>🎲 ギャンブラー</option>
-                        <option value="detective" ${p.charType==='detective'?'selected':''}>🕵️ 元探偵</option>
-                    </select>
-                    <button class="cpu-del-btn" onclick="window.removeCpu('${p.userId}')">✕ 削除</button>
-                </div>
-            `;
+            const _tco = typeof teamColors !== 'undefined' ? teamColors : {};
+            const teamOpts = Object.keys(_tco).map(k => '<option value="'+k+'" '+(tc===k?'selected':'')+'>'+_tco[k].icon+' '+_tco[k].label+'</option>').join('');
+            div.innerHTML = numBadge + ' ' + roleBadge + ' ' + teamBadge +
+                '<div class="cpu-row" style="flex:1;">' +
+                '<input type="text" value="'+p.name+'" class="name-input" style="width:70px; padding:4px;" onchange="window.updateCpuInfo(\''+p.userId+'\', this.value, this.parentElement.querySelector(\'.cpu-char-sel\').value, this.parentElement.querySelector(\'.cpu-team-sel\').value)">' +
+                '<select class="cpu-char-sel" onchange="window.updateCpuInfo(\''+p.userId+'\', this.parentElement.querySelector(\'input\').value, this.value, this.parentElement.querySelector(\'.cpu-team-sel\').value)" style="padding:4px; font-size:11px;">' +
+                '<option value="athlete" '+(p.charType==='athlete'?'selected':'')+'>\u{1F3C3} アスリート</option>' +
+                '<option value="sales" '+(p.charType==='sales'?'selected':'')+'>💼 営業マン</option>' +
+                '<option value="survivor" '+(p.charType==='survivor'?'selected':'')+'>🌿 サバイバー</option>' +
+                '<option value="yankee" '+(p.charType==='yankee'?'selected':'')+'>👊 元ヤン</option>' +
+                '<option value="hacker" '+(p.charType==='hacker'?'selected':'')+'>💻 ハッカー</option>' +
+                '<option value="musician" '+(p.charType==='musician'?'selected':'')+'>🎸 ミュージシャン</option>' +
+                '<option value="doctor" '+(p.charType==='doctor'?'selected':'')+'>🩺 闇医者</option>' +
+                '<option value="gambler" '+(p.charType==='gambler'?'selected':'')+'>🎲 ギャンブラー</option>' +
+                '<option value="detective" '+(p.charType==='detective'?'selected':'')+'>🕵️ 元探偵</option>' +
+                '</select>' +
+                '<select class="cpu-team-sel" onchange="window.updateCpuInfo(\''+p.userId+'\', this.parentElement.querySelector(\'input\').value, this.parentElement.querySelector(\'.cpu-char-sel\').value, this.value)" style="padding:4px;font-size:11px;">' + teamOpts + '</select>' +
+                '<button class="cpu-del-btn" onclick="window.removeCpu(\''+p.userId+'\')">✕</button></div>';
         } else if (isCPU && !isHost) {
-            div.innerHTML = `${numBadge} <span style="font-size:18px;">${emoji}</span> ${roleBadge} <span style="font-weight:bold;">${p.name}</span>`;
+            div.innerHTML = numBadge+' <span style="font-size:18px;">'+emoji+'</span> '+roleBadge+' '+teamBadge+' <span style="font-weight:bold;">'+p.name+'</span>';
         } else {
-            div.innerHTML = `${numBadge} <span style="font-size:18px;">${emoji}</span> ${roleBadge} <span style="font-weight:bold;">${p.name}</span> ${isMe ? '<span style="color:#f1c40f;font-size:11px;">(あなた)</span>' : ''}`;
+            div.innerHTML = numBadge+' <span style="font-size:18px;">'+emoji+'</span> '+roleBadge+' '+teamBadge+' <span style="font-weight:bold;">'+p.name+'</span> '+(isMe ? '<span style="color:#f1c40f;font-size:11px;">(あなた)</span>' : '');
         }
         
         list.appendChild(div);
@@ -5846,11 +6493,12 @@ function updateLobbyUI(lobbyPlayersList, hostId) {
     if (me) {
         const nameField = document.getElementById("my-online-name");
         const avatarField = document.getElementById("my-online-avatar");
+        const teamField = document.getElementById("my-online-team");
         if (nameField && document.activeElement !== nameField) nameField.value = me.name;
         if (avatarField) avatarField.value = me.charType;
+        if (teamField && document.activeElement !== teamField) teamField.value = me.teamColor || 'none';
     }
     
-    // ホストの場合、人数の変更をFirebaseに同期
     if (isHost && currentHostRoomRef) {
         currentHostRoomRef.update({ players: lobbyPlayers.length });
     }
@@ -5893,7 +6541,7 @@ window.startOnlineGame = async function() {
     destTile = pickDestTile();
     
     players = lobbyPlayers.map((lp, idx) => {
-        let p = createPlayer(idx, lp.name, lp.isCPU === true, lp.charType);
+        let p = createPlayer(idx, lp.name, lp.isCPU === true, lp.charType, lp.teamColor || 'none');
         p.userId = lp.userId;
         return p;
     });
@@ -5992,6 +6640,10 @@ window.startOfflineMode = function() {
     document.getElementById('setup-offline-players').style.display = 'block';
     document.getElementById('setup-game-settings').style.display = 'block';
     
+    // プレイヤーリストの初期化・描画
+    if (offlinePlayers.length === 0) initOfflinePlayerDefaults();
+    renderOfflinePlayerList();
+    
     stopFirebaseRoomListener();
 };
 
@@ -6007,6 +6659,1130 @@ window.startOnlineModeMenu = function() {
     backToOnlineMenu();
     startFirebaseRoomListener(); // Firebaseリスナー起動
 };
+
+// ==========================================
+// TUTORIAL MODE
+// ==========================================
+(function() {
+    const tutPages = [
+        {
+            tab: '🎯 目的',
+            title: 'ゲームの目的を理解しよう',
+            render: () => `
+                <div class="tut-card">
+                    <h3>🏆 勝利条件</h3>
+                    <p>このゲームは<b>指定ラウンド数</b>が終わった時点で、<em>最も高い総合スコア</em>を持つプレイヤーの勝利です。</p>
+                    <div class="tut-highlight">
+                        <p><strong>スコア計算式</strong><br>
+                        スコア ＝ 所持P × 2 ＋ 陣地の価値 ＋ 資源価値 ＋ キル×3 − デス×5</p>
+                    </div>
+                    <p>つまり、<b>お金（P）</b>を稼ぐだけでなく、<b>陣地の確保</b>や<b>他プレイヤーとの戦闘</b>も重要です。死亡回数が多いと大きく減点されるので注意！</p>
+                </div>
+                <div class="tut-card">
+                    <h3>💡 基本の稼ぎ方</h3>
+                    <ul>
+                        <li>🥫 <b>空き缶拾い</b> → 買取所で換金してPを稼ぐ（最も安定）</li>
+                        <li>💼 <b>バイト</b> → バイトマスで働いてPを直接獲得</li>
+                        <li>🚩 <b>陣地占領</b> → マスを占領して毎ターン家賃収入をゲット</li>
+                        <li>🃏 <b>カード</b> → ミニゲームやイベントで手に入るカードを活用</li>
+                        <li>⚔️ <b>PvP</b> → 武器カードで他プレイヤーを倒してPを奪う</li>
+                    </ul>
+                </div>
+                <div class="tut-card">
+                    <h3>⚠️ よくある負けパターン</h3>
+                    <ul>
+                        <li>💀 死亡を繰り返してデス数が増えすぎる（−5P/回）</li>
+                        <li>🗑️ 缶やゴミを大量に持ったまま倒されてドロップする</li>
+                        <li>🚩 陣地を取らず固定収入がないまま後半に入る</li>
+                        <li>🃏 手札を使わずに腐らせる（手札上限に注意）</li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            tab: '🎮 ターンの流れ',
+            title: 'ターンの進め方',
+            render: () => `
+                <div class="tut-card">
+                    <h3>🔄 1ターンの流れ</h3>
+                    <p>各プレイヤーは1ターンに以下の流れでプレイします。</p>
+                    <div class="tut-steps">
+                        <div class="tut-step">
+                            <div class="tut-step-num">1</div>
+                            <div class="tut-step-body">
+                                <div class="tut-step-title">🎲 サイコロを振る</div>
+                                <div class="tut-step-desc">2つのサイコロの合計が<b>AP（行動力）</b>になります。<br>
+                                <em>ゾロ目</em>が出るとAPが2倍！自転車装備なら+2AP追加。</div>
+                            </div>
+                        </div>
+                        <div class="tut-step">
+                            <div class="tut-step-num">2</div>
+                            <div class="tut-step-body">
+                                <div class="tut-step-title">🚶 移動＆アクション</div>
+                                <div class="tut-step-desc">APを消費して自由に行動します。<br>
+                                移動は1AP（雨の日は2AP）、各マスのアクション（缶拾い、バイト等）を実行できます。<br>
+                                <em>APが続く限り何度でも行動OK！</em></div>
+                            </div>
+                        </div>
+                        <div class="tut-step">
+                            <div class="tut-step-num">3</div>
+                            <div class="tut-step-body">
+                                <div class="tut-step-title">🃏 カード使用</div>
+                                <div class="tut-step-desc">手札のカードを<b>2AP</b>で使用可能。回復、攻撃、バフなど多彩。<br>
+                                APがあれば1ターンに何枚でも使えます。</div>
+                            </div>
+                        </div>
+                        <div class="tut-step">
+                            <div class="tut-step-num">4</div>
+                            <div class="tut-step-body">
+                                <div class="tut-step-title">🛑 ターン終了</div>
+                                <div class="tut-step-desc">やることが終わったら「ターン終了」ボタンを押します。<br>
+                                <em>残ったAPは持ち越せません！</em>なるべく使い切りましょう。</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>🔁 ラウンドと環境変化</h3>
+                    <p>全員が1ターンずつ終えると<b>1ラウンド</b>終了です。ラウンド切替時に：</p>
+                    <ul>
+                        <li>🌤️ <b>天候が変化</b>する場合がある（晴れ→曇り→雨）</li>
+                        <li>🌙 <b>昼夜が切り替わる</b>ことがある（夜は視界制限あり）</li>
+                        <li>📈 <b>缶・ゴミの相場</b>がランダムに変動</li>
+                        <li>🛻 <b>ゴミ収集車</b>が通過する可能性（エリアにいるとダメージ！）</li>
+                        <li>🎯 <b>目的地</b>が新しい場所に移動</li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            tab: '📊 画面の見方',
+            title: '画面UIの見方',
+            render: () => `
+                <div class="tut-card">
+                    <h3>📊 ステータスパネル（左上）</h3>
+                    <p>現在のターンプレイヤーの情報が表示されます。タップするとキャラの詳細スキルが見れます。</p>
+                    <div class="tut-ui-mock">
+                        <div class="tut-ui-label">ステータス表示</div>
+                        <div class="tut-ui-mock-row" style="margin-top:12px;">
+                            <div class="tut-mock-stat">❤️ HP: 100</div>
+                            <div class="tut-mock-stat" style="background:#4a6b5d;">⚡ AP: 8</div>
+                        </div>
+                        <div class="tut-ui-mock-row">
+                            <div class="tut-mock-stat">💰 P: 15</div>
+                            <div class="tut-mock-stat">🚩 領土: 3</div>
+                        </div>
+                        <div class="tut-ui-mock-row">
+                            <div class="tut-mock-stat" style="background:#4a3b32;">⚔️ 2K / 💀1D</div>
+                        </div>
+                        <div class="tut-ui-mock-row">
+                            <div class="tut-mock-stat" style="background:#6d5c4e;">🥫3 🗑️2 🎴4/7</div>
+                        </div>
+                    </div>
+                    <div class="tut-arrow-label">👆 各項目の意味</div>
+                    <ul>
+                        <li><b>❤️ HP</b> — 体力。0になると死亡（病院に戻される）</li>
+                        <li><b>⚡ AP</b> — 行動力。移動やアクションに消費。サイコロで獲得</li>
+                        <li><b>💰 P</b> — ポイント（お金）。スコア計算のメイン要素</li>
+                        <li><b>🚩 領土</b> — 占領中のマス数。毎ターン家賃収入が入る</li>
+                        <li><b>⚔️ K/💀D</b> — キル数とデス数。スコアに加減算される</li>
+                        <li><b>🥫🗑️🎴</b> — 缶の数、ゴミの数、手札数/上限</li>
+                    </ul>
+                </div>
+                <div class="tut-card">
+                    <h3>🌤️ 環境パネル（左上）</h3>
+                    <div class="tut-ui-mock">
+                        <div class="tut-ui-label">環境情報</div>
+                        <div style="text-align:center;padding:8px;margin-top:10px;">
+                            <div style="background:#3498db;padding:6px;border-radius:6px;font-weight:bold;color:#fff;font-size:14px;">☀️ 晴れ</div>
+                            <div style="font-size:11px;color:#bdc3c7;margin-top:4px;">R: 3/20</div>
+                            <div style="font-size:11px;color:#bdc3c7;">☀️ 昼</div>
+                            <div style="font-size:10px;color:#f1c40f;margin-top:4px;background:#3e2f2a;padding:3px;border-radius:4px;">缶:1P ゴミ:2P</div>
+                        </div>
+                    </div>
+                    <ul>
+                        <li><b>天候</b> — 雨の日は移動コスト2倍＆缶拾い/ゴミ漁り不可</li>
+                        <li><b>ラウンド</b> — 現在のラウンド / 最大ラウンド</li>
+                        <li><b>昼夜</b> — 夜は視界が前後3マスに制限される</li>
+                        <li><b>相場</b> — 缶とゴミの換金レート。毎ラウンド変動</li>
+                    </ul>
+                </div>
+                <div class="tut-card">
+                    <h3>🎮 アクションボタン（右側）</h3>
+                    <div class="tut-ui-mock">
+                        <div class="tut-ui-label">アクション</div>
+                        <div style="display:flex;flex-direction:column;gap:4px;padding:8px;margin-top:10px;">
+                            <div class="tut-mock-btn highlight">🎲 サイコロを振る</div>
+                            <div class="tut-mock-btn disabled">🚶 移動 (1AP)</div>
+                            <div class="tut-mock-btn disabled">🥫 缶拾い (1AP)</div>
+                            <div class="tut-mock-btn disabled">🗑️ ゴミ漁り (2AP)</div>
+                            <div class="tut-mock-btn disabled">🚩 陣地占領 (3P)</div>
+                            <div class="tut-mock-btn disabled">💼 バイト (3AP)</div>
+                        </div>
+                    </div>
+                    <div class="tut-highlight">
+                        <p><strong>ポイント：</strong>ボタンが明るく光っている＝今使えるアクション。<br>
+                        灰色の半透明＝条件未達（APが足りない、現在のマスでは使えない等）。<br>
+                        まずサイコロを振り、APを確保してから他のアクションを行います。</p>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>🃏 手札エリア（上部中央〜右）</h3>
+                    <p>取得したカードが並びます。カード上の「使う」ボタンで<b>2AP</b>消費して使用、「捨てる」で破棄します。</p>
+                    <div class="tut-highlight">
+                        <p><strong>手札上限に注意！</strong>上限（通常7枚）を超えるとカードを捨てるまで行動できません。<br>不要なカードは早めに使うか捨てましょう。</p>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>🗺️ マップエリア（中央）</h3>
+                    <p>ゲームボードが表示されます。丸いタイル上にプレイヤーのコマやNPCが配置されています。</p>
+                    <ul>
+                        <li>🔍 <b>ズーム</b> — 左上のボタン（＋/−/⟳）またはマウスホイール/ピンチ操作</li>
+                        <li>🖐️ <b>スクロール</b> — ドラッグまたは1本指スワイプで視点移動</li>
+                        <li>👆 <b>タイルタップ</b> — 分岐点で進む方向を選択する時に使用</li>
+                        <li>⚡ <b>右上のAP表示</b> — マップ上でも残りAPが常に見える</li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            tab: '🗺️ マスの種類',
+            title: 'マス（タイル）の種類と効果',
+            render: () => `
+                <div class="tut-card">
+                    <h3>🗺️ マスの種類一覧</h3>
+                    <p>マップ上の各タイルは色と形で種類を判別できます。</p>
+                    <div class="tut-tile-grid">
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#78c6ff,#1565c0);">🔵</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">道（通常マス）</div><div class="tut-tile-desc">通過するだけ。分岐点になることも</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#4dd0e1,#006064);">🥫</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">空き缶マス</div><div class="tut-tile-desc">1APで缶を拾える（1ターン3回まで）</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#ef9a9a,#b71c1c);">🗑️</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">ゴミ山マス</div><div class="tut-tile-desc">2APでゴミ漁り。失敗リスクあり</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#ce93d8,#6a1b9a);">❓</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">イベントマス</div><div class="tut-tile-desc">到着時にランダムイベント発生</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#81c784,#1b5e20);">💼</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">バイトマス</div><div class="tut-tile-desc">3APで働いてPを稼ぐ</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#ffee58,#f9a825);">🛒</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">ショップマス</div><div class="tut-tile-desc">Pを払ってカードを購入・売却</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#ffa726,#bf360c);">💱</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">買取所マス</div><div class="tut-tile-desc">缶やゴミを換金できる（0AP）</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#80deea,#00838f);">🏠</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">避難所マス</div><div class="tut-tile-desc">通過時にHP回復</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#ff7043,#b71c1c);">🚓</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">交番マス</div><div class="tut-tile-desc">通過で補導リスク（次AP-2）</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#90a4ae,#263238);border-color:rgba(150,220,255,0.75);">🕳️</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">マンホール</div><div class="tut-tile-desc">1APで別のマンホールへワープ</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:radial-gradient(circle,#fff59d,#f9a825);border:2px solid #f1c40f;box-shadow:0 0 8px #f1c40f;">🏥</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">病院（中央）</div><div class="tut-tile-desc">死亡時のリスポーン地点</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>🌍 エリアと陣地の価値</h3>
+                    <p>マップは3つのエリアに分かれています。占領時の<b>収入とコスト</b>が異なります。</p>
+                    <div class="tut-tile-grid">
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:#796859;">🏚️</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">スラム街</div><div class="tut-tile-desc">占領コスト低め。収入1P/ターン</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:#a89481;">🏢</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">商業地区</div><div class="tut-tile-desc">中間コスト。収入2P/ターン</div></div>
+                        </div>
+                        <div class="tut-tile-item">
+                            <div class="tut-tile-dot" style="background:#d1c4b9;color:#333;">💎</div>
+                            <div class="tut-tile-info"><div class="tut-tile-name">高級住宅街</div><div class="tut-tile-desc">占領コスト高め。収入3P/ターン</div></div>
+                        </div>
+                    </div>
+                    <div class="tut-highlight">
+                        <p><strong>定石：</strong>序盤はスラム街の安いマスを2〜3個確保し、安定した固定収入を作ることが重要です。<br>
+                        リヤカー装備を取得すると陣地収入が<em>2倍</em>になるため非常に強力。</p>
+                    </div>
+                </div>
+            `
+        },
+        {
+            tab: '🃏 カード＆装備',
+            title: 'カードシステムと装備品',
+            render: () => `
+                <div class="tut-card">
+                    <h3>🃏 カードの入手方法</h3>
+                    <ul>
+                        <li>❓ <b>イベントマス</b>に止まるとミニゲーム発生。勝つとカード入手</li>
+                        <li>🛒 <b>ショップ</b>でPを払って購入</li>
+                        <li>🗑️ <b>ゴミ漁り</b>で低確率ドロップ</li>
+                        <li>特定のイベントやキャラスキルによる獲得</li>
+                    </ul>
+                    <div class="tut-highlight">
+                        <p><strong>使用コスト：</strong>すべてのカード使用に<em>2AP</em>必要。カード自体の効果は無料。</p>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>🟢 バフ・収入系カード</h3>
+                    <p>安全にPやAPを増やすカード。序盤〜中盤で活躍します。</p>
+                    <ul>
+                        <li><b>支援面談</b> — +5P ＆ 次回AP+2。最も安定した収入カード</li>
+                        <li><b>炊き出し</b> — +3P確定。リスクゼロ</li>
+                        <li><b>エナジードリンク</b> — 即座にAP+5。追加行動に</li>
+                        <li><b>スケボー</b> — 次回ダイス+5AP。大型ターンを作れる</li>
+                    </ul>
+                </div>
+                <div class="tut-card">
+                    <h3>🔴 攻撃・妨害系カード</h3>
+                    <p>他プレイヤーを攻撃したり妨害するカード。</p>
+                    <ul>
+                        <li><b>レンガ（射程2）</b> — 10ダメージ。序盤の牽制に</li>
+                        <li><b>バット（射程1）</b> — 20ダメージ。同マス/隣接で</li>
+                        <li><b>拳銃（射程3）</b> — 40ダメージ。遠距離攻撃の主力</li>
+                        <li><b>ショットガン（射程2）</b> — 範囲内全員に30ダメ。逆転要素</li>
+                        <li><b>缶泥棒</b> — 他人から最大2P強奪</li>
+                        <li><b>通報</b> — 相手の次AP-2。地味に強い妨害</li>
+                    </ul>
+                    <div class="tut-highlight">
+                        <p><strong>武器の射程について：</strong>射程はマス数です。射程2なら2マス離れた相手まで攻撃可能。<br>
+                        使用すると<em>扇形の照準UI</em>が出るので、スライダーで角度を調整して攻撃します。</p>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>🛡️ 装備品カード（永続効果）</h3>
+                    <p>使用すると永続的な効果が付きます。一度装備したら外れません。</p>
+                    <ul>
+                        <li>🚲 <b>ボロボロの自転車</b> — 毎ターンAP+2。最重要装備</li>
+                        <li>👟 <b>安全靴</b> — ゴミ漁りのAPコストが2→1に</li>
+                        <li>🛒 <b>大きなリヤカー</b> — 陣地収入2倍。不動産プレイの核</li>
+                        <li>🎒 <b>リュック</b> — 手札上限+2</li>
+                        <li>☂️ <b>雨具</b> — 雨の日のペナルティを完全無効化</li>
+                    </ul>
+                </div>
+                <div class="tut-card">
+                    <h3>⚖️ リアクションカード</h3>
+                    <p>使用すると「予約」され、特定の攻撃を受けた時に自動発動します。</p>
+                    <ul>
+                        <li><b>弁護士の盾</b> — 次の攻撃/カツアゲを完全無効化</li>
+                        <li><b>裏取引</b> — 「下剋上」「大暴落」を使った相手に効果を反射</li>
+                        <li><b>反撃の一撃</b> — 受けたダメージをそのまま相手に返す</li>
+                    </ul>
+                    <div class="tut-highlight">
+                        <p><strong>定石：</strong>トップに立った時は「弁護士の盾」や「裏取引」を予約しておくと、<br>
+                        逆転カードからの防御が可能。1位の防衛に必須。</p>
+                    </div>
+                </div>
+            `
+        },
+        {
+            tab: '👥 NPCと危険',
+            title: 'NPCと環境の危険',
+            render: () => `
+                <div class="tut-card">
+                    <h3>👥 マップ上のNPC</h3>
+                    <p>マップには複数のNPCが巡回しています。近づくと自動的にイベントが発生します。</p>
+                    <div class="tut-npc-list">
+                        <div class="tut-npc-item">
+                            <div class="tut-npc-icon">🚓</div>
+                            <div class="tut-npc-info"><div class="tut-npc-name">警察</div><div class="tut-npc-desc">同マスに止まると補導。次のターンAP-2ペナルティ。<br>「身分証明書」カードや「ステルス行動」で回避可能。</div></div>
+                        </div>
+                        <div class="tut-npc-item">
+                            <div class="tut-npc-icon">🛻</div>
+                            <div class="tut-npc-info"><div class="tut-npc-name">ゴミ収集車</div><div class="tut-npc-desc">ラウンド開始時に一定確率で出現し、エリアを走り抜ける。<br>通過マスにいるとダメージ！事前にどのエリアが危険か告知されます。</div></div>
+                        </div>
+                        <div class="tut-npc-item">
+                            <div class="tut-npc-icon">🐕</div>
+                            <div class="tut-npc-info"><div class="tut-npc-name">野良犬</div><div class="tut-npc-desc">同マスにいると缶拾い・ゴミ漁りができなくなる。<br>避けて通るか、追い払うまで待つ。</div></div>
+                        </div>
+                        <div class="tut-npc-item">
+                            <div class="tut-npc-icon">👴</div>
+                            <div class="tut-npc-info"><div class="tut-npc-name">おじさん</div><div class="tut-npc-desc">同マスにいると陣地占領ができない。<br>タイミングを見て避ける必要あり。</div></div>
+                        </div>
+                        <div class="tut-npc-item">
+                            <div class="tut-npc-icon">😎</div>
+                            <div class="tut-npc-info"><div class="tut-npc-name">ヤクザ</div><div class="tut-npc-desc">同マスに止まるとPを強奪される。<br>「身代わり人形」装備で1回無効化可能。</div></div>
+                        </div>
+                        <div class="tut-npc-item">
+                            <div class="tut-npc-icon">💰</div>
+                            <div class="tut-npc-info"><div class="tut-npc-name">闇金</div><div class="tut-npc-desc">同マスに止まるとP没収のリスク。<br>借金状態になることも。</div></div>
+                        </div>
+                        <div class="tut-npc-item">
+                            <div class="tut-npc-icon">🤝</div>
+                            <div class="tut-npc-info"><div class="tut-npc-name">仲間</div><div class="tut-npc-desc">同マスに止まるとHP回復やPボーナスなど良い効果。<br>見つけたら積極的に寄ろう。</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>🌧️ 天候と昼夜の影響</h3>
+                    <ul>
+                        <li>🌧️ <b>雨</b> — 移動コスト2AP、缶拾い/ゴミ漁り不可。雨具で無効化</li>
+                        <li>🌙 <b>夜</b> — 自分の前後3マスしか見えない。ゴミ漁りにボーナスあり</li>
+                        <li>🚧 <b>道路工事</b> — 一定確率で発生。該当マスが2ラウンド通行不可</li>
+                    </ul>
+                    <div class="tut-highlight">
+                        <p><strong>定石：</strong>雨の日は移動が重いので、ショップやバイトマスに留まってカードを買ったり働いたりするのが効率的。<br>
+                        元アスリートなら雨でも移動1APなので大チャンス！</p>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>💀 死亡とリスポーン</h3>
+                    <p>HPが0になると<b>死亡</b>します。死亡時の影響：</p>
+                    <ul>
+                        <li>病院マス（中央）に強制転送</li>
+                        <li>所持Pの約1/3を没収（最大15P）</li>
+                        <li>装備品をランダムで1つ落とす</li>
+                        <li>持っていた缶・ゴミをその場にドロップ（他人が拾える）</li>
+                        <li>デス数+1（スコアに−5）</li>
+                        <li>復活後<em>2ターン無敵</em></li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            tab: '🎯 ミニゲーム',
+            title: 'ミニゲームの種類と攻略',
+            render: () => `
+                <div class="tut-card">
+                    <h3>🎲 ミニゲームとは</h3>
+                    <p>イベントマスに止まると、ランダムでミニゲームが発生します。<br>
+                    <em>勝つとカードが確定で手に入ります！</em></p>
+                    <div class="tut-highlight">
+                        <p><strong>逆転要素：</strong>順位が低いプレイヤーほど、ミニゲーム勝利時に<em>強力なカード</em>が出やすくなります。<br>
+                        負けている時こそイベントマスに積極的に止まりましょう！</p>
+                    </div>
+                </div>
+                <div class="tut-card">
+                    <h3>📊 ハイ＆ロー</h3>
+                    <p>基準の数字（0〜13）が表示され、次に出る数字がHighかLowかを当てます。</p>
+                    <ul>
+                        <li>基準が<b>0〜5</b>の時 → Highを選ぶのが有利</li>
+                        <li>基準が<b>8〜13</b>の時 → Lowを選ぶのが有利</li>
+                        <li>基準が<b>6〜7</b>の時 → ほぼ半々。直感で！</li>
+                    </ul>
+                </div>
+                <div class="tut-card">
+                    <h3>📦 宝箱ゲーム</h3>
+                    <p>3つの宝箱から1つを選びます。1つが当たり。</p>
+                    <ul>
+                        <li>単純な1/3の運ゲーです</li>
+                        <li>どれを選んでも確率は同じなので、直感で選びましょう</li>
+                    </ul>
+                </div>
+                <div class="tut-card">
+                    <h3>🎰 スロット</h3>
+                    <p>3つのリールをSTOPして、絵柄を揃えます。</p>
+                    <ul>
+                        <li>各リールを1つずつ止めていきます</li>
+                        <li>3つ揃えば大当たり（確率は低め）</li>
+                        <li>2つ揃いでも小当たりになることがあります</li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            tab: '🏆 キャラ攻略',
+            title: 'キャラクター別の定石と立ち回り',
+            render: () => `
+                <div class="tut-card">
+                    <h3>🏆 キャラクター選びのコツ</h3>
+                    <p>各キャラクターには<b>パッシブスキル</b>（常時発動）と<b>アクションスキル</b>（APを消費して任意発動）があります。<br>
+                    プレイスタイルに合ったキャラを選びましょう。カードをタップすると定石が表示されます。</p>
+                </div>
+                <div class="tut-char-grid">
+                    ${renderCharCard('athlete','🏃','元アスリート','機動力特化型',
+                        '移動が常に1AP＆雨の影響なし','疾風ダッシュ（3AP）:3マス先へジャンプ',
+                        '序盤から積極的に動き回り、缶拾い→換金のサイクルを素早く回すのが基本。雨の日は他プレイヤーが動けない中で独走できるため、雨の日にイベントマスや遠方の買取所を狙う。疾風ダッシュは危険なNPCからの脱出にも有効。陣地は通り道沿いに確保し、高回転の移動で稼ぐスタイル。','#e74c3c')}
+                    ${renderCharCard('sales','💼','元営業マン','金策特化型',
+                        'バイト成功率80%＆ショップ1P割引','訪問販売（2AP）:相手にカードを押し付けて3P徴収',
+                        'バイトマスに居座って安定収入を稼ぐのが基本。ショップも割引で使えるため、装備品を早めに揃えやすい。訪問販売は「不要カード→3P」に変換するスキルとして非常に強力。手札をあえて多く持ち、不要カードを押し付けて稼ぐ「カード回転型」の立ち回りが強い。','#3498db')}
+                    ${renderCharCard('survivor','🌿','サバイバー','耐久型',
+                        'ゴミ漁り失敗のペナルティ無効','野宿（2AP）:HP+15回復',
+                        'ゴミ山マスでノーリスクにゴミを集めて換金する。ゴミ漁りは通常リスクがあるが、サバイバーなら失敗してもダメージなし。野宿でHP管理も容易なので、前線に出続けられる。安全靴を装備するとゴミ漁り1APになり、効率が劇的に向上。序盤はゴミ漁り→換金→陣地確保のルートが安定。','#2ecc71')}
+                    ${renderCharCard('yankee','👊','元ヤン','PvP特化型',
+                        '同マス/すれ違いで自動1Pカツアゲ（1ターン2P上限）','殴る（2AP）:同マスの相手に10ダメージ',
+                        '他プレイヤーの多いルートを歩き回り、すれ違いカツアゲで稼ぐ。序盤は移動しながらカツアゲ→中盤以降は武器カードで本格PvP。殴るスキルは低コストで使えるため、HPの減った相手を仕留めてキルポイントを稼ぐのも有効。ただし集中攻撃されやすいため、段ボールの盾やヘルメットの装備が重要。','#e67e22')}
+                    ${renderCharCard('hacker','💻','元ハッカー','戦略型',
+                        '手札上限+2（9枚）','遠隔ハッキング（3AP）:どこからでもショップ入替え＆1枚購入',
+                        '手札上限9枚を活かし、多種多様なカードをストック。遠隔ハッキングでショップ品を吟味し、最適なカードだけ購入する。大量のカードを持てるため、攻撃カード+リアクションカード+装備を同時に保持可能。状況に応じたカードを選んで使い分ける戦略的プレイが求められる。','#3498db')}
+                    ${renderCharCard('musician','🎸','ストリートミュージシャン','支援＆制圧型',
+                        '他者が同マスor隣接にいると銀行+3P','路上ライブ（4AP）:周囲2マスの全員を自分のマスに引き寄せ',
+                        '人が集まりやすい交差点や中央付近に陣取り、投げ銭パッシブで稼ぐのが基本。路上ライブで強制的にプレイヤーを集めることで、投げ銭の機会を作りつつ、元ヤンなどの戦闘キャラと組み合わせると凶悪。ただしAPコストが重いので、自転車装備やスケボーカードとの併用が重要。','#9b59b6')}
+                    ${renderCharCard('doctor','🩺','闇医者','持久＆金策型',
+                        '毎ターン開始時HP+5自動回復','闇診療（2AP）:同マスの相手HP+30→5P強制徴収',
+                        '自己回復で常にHP満タン近くを維持し、長期戦に強い。闇診療は「相手を回復させて5P奪う」という独特なスキル。HPの減った味方を見つけたら近寄って闇診療→5P稼ぎつつ、お互いにWin-Win（相手はHP回復するが金は失う）。前線で戦う元ヤンの近くに居座ると、診療の機会が増える。','#1abc9c')}
+                    ${renderCharCard('gambler','🎲','ギャンブラー','ハイリスク・ハイリターン型',
+                        'ゾロ目でAP2倍＋HP+10回復','イカサマ勝負（2AP）:1d6対決・勝者が5P奪取',
+                        'ゾロ目パッシブが発動すると爆発的なAPで一気に行動可能。イカサマ勝負は期待値的にはイーブンだが、スキルとして常時使えるため、Pが少ない相手に仕掛けるとローリスク。ゾロ目が出た時にスケボーやエナドリを合わせて超大型ターンを作るのがロマン。安定感には欠けるが爆発力はNo.1。','#f1c40f')}
+                    ${renderCharCard('detective','🕵️','元探偵','防衛＆コントロール型',
+                        '自陣地に侵入した相手の手札を1枚没収','情報操作（3AP）:NPC1体を任意のマスへ移動',
+                        '陣地を多めに確保し、張り込みパッシブで他プレイヤーのカードを奪う防衛型。人気ルート上の陣地を取ると、通過する相手から次々とカードを没収できる。情報操作はヤクザや警察を他プレイヤーのマスに送り込む妨害技。守りを固めつつ、NPCで遠隔から嫌がらせする陰湿プレイが真骨頂。','#95a5a6')}
+                </div>
+            `
+        }
+    ];
+
+    function renderCharCard(key, emoji, name, role, passive, action, strategy, color) {
+        return `
+            <div class="tut-char-card" onclick="this.classList.toggle('expanded')">
+                <div class="tut-char-head">
+                    <div class="tut-char-emoji" style="border-color:${color};">${emoji}</div>
+                    <div class="tut-char-meta">
+                        <div class="tut-char-name">${name}</div>
+                        <div class="tut-char-role">${role}</div>
+                    </div>
+                </div>
+                <div class="tut-char-skills">
+                    <div class="tut-skill-row">
+                        <span class="tut-skill-badge passive">パッシブ</span>
+                        <span>${passive}</span>
+                    </div>
+                    <div class="tut-skill-row">
+                        <span class="tut-skill-badge action">アクション</span>
+                        <span>${action}</span>
+                    </div>
+                </div>
+                <div class="tut-char-strategy">
+                    <div class="tut-strat-title">📋 攻略・定石</div>
+                    <div class="tut-strat-text">${strategy}</div>
+                </div>
+                <div class="tut-char-expand">▼ タップして定石を表示</div>
+            </div>`;
+    }
+
+    let currentTutPage = 0;
+
+    function renderTabs() {
+        const container = document.getElementById('tut-tabs');
+        container.innerHTML = tutPages.map((p, i) =>
+            `<button class="tut-tab${i === currentTutPage ? ' active' : ''}" onclick="window._tutGoTo(${i})">${p.tab}</button>`
+        ).join('');
+    }
+
+    const sandboxLabels = [
+        '🎮 スコア計算を体験する',
+        '🎮 1ターンをプレイしてみる',
+        '🎮 画面の各要素を確認する',
+        '🎮 いろんなマスを巡ってみる',
+        '🎮 カードを使ってみる',
+        '🎮 NPCに遭遇してみる',
+        '🎮 ミニゲームを遊んでみる',
+        '🎮 キャラスキルを試す',
+    ];
+
+    function renderPage() {
+        const container = document.getElementById('tut-content');
+        let html = '';
+        // 体験ボタンをタブの一番上に配置
+        if (currentTutPage < sandboxLabels.length) {
+            html += `<div style="text-align:center;padding:0 0 16px;">
+                <button class="tut-try-btn" onclick="window.startTutorialSandbox(${currentTutPage})">
+                    ${sandboxLabels[currentTutPage]}
+                </button>
+            </div>`;
+        }
+        html += tutPages[currentTutPage].render();
+        container.innerHTML = html;
+        container.scrollTop = 0;
+
+        // Update footer
+        document.getElementById('tut-progress').textContent = `${currentTutPage + 1} / ${tutPages.length}`;
+        document.getElementById('tut-prev').disabled = currentTutPage === 0;
+        const nextBtn = document.getElementById('tut-next');
+        if (currentTutPage === tutPages.length - 1) {
+            nextBtn.textContent = '✕ 閉じる';
+            nextBtn.onclick = closeTutorial;
+        } else {
+            nextBtn.textContent = '次へ ▶';
+            nextBtn.onclick = tutNext;
+        }
+
+        renderTabs();
+        // Scroll active tab into view
+        const activeTab = document.querySelector('.tut-tab.active');
+        if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    window._tutGoTo = function(idx) {
+        currentTutPage = idx;
+        renderPage();
+    };
+
+    window.tutNext = function() {
+        if (currentTutPage < tutPages.length - 1) {
+            currentTutPage++;
+            renderPage();
+        }
+    };
+
+    window.tutPrev = function() {
+        if (currentTutPage > 0) {
+            currentTutPage--;
+            renderPage();
+        }
+    };
+
+    window.openTutorial = function() {
+        window._tutReturnTo = 'mode';
+        currentTutPage = 0;
+        const overlay = document.getElementById('tutorial-overlay');
+        overlay.classList.add('active');
+        document.getElementById('mode-select-overlay').style.display = 'none';
+        renderTabs();
+        renderPage();
+    };
+
+    window.closeTutorial = function() {
+        document.getElementById('tutorial-overlay').classList.remove('active');
+        if (window._tutReturnTo === 'title') {
+            document.getElementById('title-screen-overlay').style.display = 'flex';
+        } else if (window._tutReturnTo === 'game') {
+            // ゲーム中から開いた場合は何もしない（ゲーム画面に戻る）
+        } else {
+            document.getElementById('mode-select-overlay').style.display = 'flex';
+        }
+    };
+
+    window.openTutorialFromTitle = function() {
+        window._tutReturnTo = 'title';
+        currentTutPage = 0;
+        const overlay = document.getElementById('tutorial-overlay');
+        overlay.classList.add('active');
+        document.getElementById('title-screen-overlay').style.display = 'none';
+        renderTabs();
+        renderPage();
+    };
+
+    window.openTutorialInGame = function() {
+        window._tutReturnTo = 'game';
+        currentTutPage = 0;
+        const overlay = document.getElementById('tutorial-overlay');
+        overlay.classList.add('active');
+        renderTabs();
+        renderPage();
+    };
+})();
+
+// ==========================================
+// TUTORIAL SANDBOX — 体験モード
+// ==========================================
+(function() {
+    let sandboxActive = false;
+    let sandboxScenario = -1;
+    let sandboxStep = 0;
+    let sandboxSteps = [];
+    let sandboxReturnPage = 0;
+    let sandboxWatcher = null; // MutationObserver or interval for auto-advance
+
+    // --- ゲーム初期化ヘルパー ---
+    function initSandboxGame(opts = {}) {
+        // ゲームステートの完全リセット
+        gameOver = false; cpuActing = false;
+        mgActive = false; isBranchPicking = false; currentBranchOptions = [];
+        clearInterval(mgTimer); if(slotAnimInterval) clearInterval(slotAnimInterval);
+        if (afkTimer) { clearTimeout(afkTimer); afkTimer = null; }
+        shopStock = []; shopStockTurn = -1;
+        isRainy = false; weatherState = "sunny"; roundCount = opts.round || 1;
+        constructionPos = -1; constructionTimer = 0; currentDisplayTurn = -1;
+        isNight = opts.night || false;
+        territories = {};
+        canPrice = opts.canPrice || 1;
+        trashPrice = opts.trashPrice || 2;
+        maxRounds = opts.maxRounds || 5;
+
+        mapData = genSmallMap();
+        destTile = 4; // 固定
+
+        // NPC 位置（デフォルトは遠く）
+        truckPos = opts.truckPos ?? 99;
+        policePos = opts.policePos ?? 99;
+        unclePos = opts.unclePos ?? 99;
+        animalPos = opts.animalPos ?? 99;
+        yakuzaPos = opts.yakuzaPos ?? 99;
+        loansharkPos = opts.loansharkPos ?? 99;
+        friendPos = opts.friendPos ?? 99;
+
+        // プレイヤー作成
+        players = [];
+        const p1char = opts.p1char || 'athlete';
+        players.push(createPlayer(0, 'あなた', false, p1char));
+        players.push(createPlayer(1, 'CPU', true, opts.p2char || 'yankee'));
+        
+        players[0].pos = opts.p1pos ?? 0;
+        players[0].hp = opts.p1hp ?? 100;
+        players[0].p = opts.p1p ?? 10;
+        players[0].ap = opts.p1ap ?? 0;
+        players[0].cans = opts.p1cans ?? 0;
+        players[0].trash = opts.p1trash ?? 0;
+        if (opts.p1hand) players[0].hand = [...opts.p1hand];
+        if (opts.p1equip) Object.assign(players[0].equip, opts.p1equip);
+
+        players[1].pos = opts.p2pos ?? 6;
+        players[1].hp = opts.p2hp ?? 80;
+        players[1].p = opts.p2p ?? 5;
+
+        if (opts.territories) territories = {...opts.territories};
+
+        turn = 0;
+        diceRolled = opts.diceRolled ?? false;
+        canPickedThisTurn = 0;
+        isOnlineMode = false;
+
+        // UI表示
+        document.getElementById("setup-screen").style.display = "none";
+        document.getElementById("main-title").style.display = "none";
+        document.getElementById("game-screen").style.display = "flex";
+        document.body.className = isNight ? "night" : (isRainy ? "rainy" : "sunny");
+
+        document.getElementById("log").innerHTML = "";
+        initBoard();
+        updateUI();
+        setTimeout(() => autoFitMap && autoFitMap(), 300);
+    }
+
+    // --- UIハイライト ---
+    let _highlightTarget = null;
+    let _highlightRaf = null;
+
+    function _updateRingPosition() {
+        const ring = document.getElementById('tut-highlight-ring');
+        if (!ring || !_highlightTarget || !ring.classList.contains('active')) {
+            _highlightRaf = null;
+            return;
+        }
+        const el = typeof _highlightTarget === 'string'
+            ? document.querySelector(_highlightTarget)
+            : _highlightTarget;
+        if (!el || !el.getBoundingClientRect) {
+            _highlightRaf = null;
+            return;
+        }
+        const rect = el.getBoundingClientRect();
+        ring.style.top = (rect.top - 6) + 'px';
+        ring.style.left = (rect.left - 6) + 'px';
+        ring.style.width = (rect.width + 12) + 'px';
+        ring.style.height = (rect.height + 12) + 'px';
+        _highlightRaf = requestAnimationFrame(_updateRingPosition);
+    }
+
+    function showHighlight(selector) {
+        hideHighlight();
+        const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
+        if (!el) return;
+        _highlightTarget = selector;
+        const ring = document.getElementById('tut-highlight-ring');
+        const rect = el.getBoundingClientRect();
+        ring.style.top = (rect.top - 6) + 'px';
+        ring.style.left = (rect.left - 6) + 'px';
+        ring.style.width = (rect.width + 12) + 'px';
+        ring.style.height = (rect.height + 12) + 'px';
+        ring.classList.add('active');
+        _highlightRaf = requestAnimationFrame(_updateRingPosition);
+    }
+
+    function hideHighlight() {
+        const ring = document.getElementById('tut-highlight-ring');
+        if (ring) ring.classList.remove('active');
+        _highlightTarget = null;
+        if (_highlightRaf) { cancelAnimationFrame(_highlightRaf); _highlightRaf = null; }
+    }
+
+    // --- ガイドUI ---
+    function showGuide(title, icon, text, nextLabel, waitMode) {
+        const guide = document.getElementById('tut-sandbox-guide');
+        document.getElementById('tsg-title').textContent = title;
+        document.getElementById('tsg-icon').textContent = icon;
+        document.getElementById('tsg-text').innerHTML = text;
+        document.getElementById('tsg-step-counter').textContent = `${sandboxStep + 1} / ${sandboxSteps.length}`;
+
+        const nextBtn = document.getElementById('tsg-next-btn');
+        if (waitMode) {
+            nextBtn.className = 'tsg-btn wait';
+            nextBtn.textContent = waitMode;
+            nextBtn.onclick = null;
+        } else {
+            nextBtn.className = 'tsg-btn next-step';
+            nextBtn.textContent = nextLabel || '次へ ▶';
+            nextBtn.onclick = tutSandboxNextStep;
+        }
+        guide.classList.add('active');
+    }
+
+    function hideGuide() {
+        document.getElementById('tut-sandbox-guide').classList.remove('active');
+    }
+
+    // --- ステップ進行 ---
+    window.tutSandboxNextStep = function() {
+        sandboxStep++;
+        if (sandboxStep < sandboxSteps.length) {
+            runCurrentStep();
+        } else {
+            // 全ステップ完了
+            showGuide('✅ 体験完了！', '🎉',
+                '<b>お疲れ様でした！</b><br>チュートリアルに戻って続きを読むか、このまま自由にプレイできます。',
+                '📚 チュートリアルに戻る', false);
+            document.getElementById('tsg-next-btn').onclick = exitTutorialSandbox;
+            hideHighlight();
+        }
+    };
+
+    function runCurrentStep() {
+        if (sandboxStep >= sandboxSteps.length) return;
+        const step = sandboxSteps[sandboxStep];
+        if (step.setup) step.setup();
+        showGuide(
+            step.title || '📚 体験モード',
+            step.icon || '👆',
+            step.text,
+            step.nextLabel,
+            step.waitMode
+        );
+        if (step.highlight) {
+            setTimeout(() => showHighlight(step.highlight), 200);
+        } else {
+            hideHighlight();
+        }
+        // 自動進行ウォッチャー
+        if (sandboxWatcher) { clearInterval(sandboxWatcher); sandboxWatcher = null; }
+        if (step.watchCondition) {
+            sandboxWatcher = setInterval(() => {
+                if (step.watchCondition()) {
+                    clearInterval(sandboxWatcher);
+                    sandboxWatcher = null;
+                    setTimeout(() => tutSandboxNextStep(), 600);
+                }
+            }, 300);
+        }
+    }
+
+    // --- シナリオ定義 ---
+    function getScenarioSteps(id) {
+        switch(id) {
+            case 0: return getScenario_Goal();
+            case 1: return getScenario_TurnFlow();
+            case 2: return getScenario_UIGuide();
+            case 3: return getScenario_Tiles();
+            case 4: return getScenario_Cards();
+            case 5: return getScenario_NPCs();
+            case 6: return getScenario_Minigame();
+            case 7: return getScenario_CharSkills();
+            default: return [];
+        }
+    }
+
+    // === シナリオ0: スコア計算を体験 ===
+    function getScenario_Goal() {
+        return [
+            { title:'🏆 スコア計算', icon:'📊',
+              text:'ゲームが始まりました。<b>あなた</b>は10P持っていて、陣地も確保済みです。<br>画面左上の<b>ステータスパネル</b>を見てみましょう。',
+              setup: () => {
+                  initSandboxGame({ p1p:10, p1cans:3, p1trash:1, p1pos:2, territories:{3:0, 4:0}, maxRounds:5, round:5 });
+                  players[0].kills = 2; players[0].deaths = 1;
+                  players[1].p = 8; players[1].kills = 1; players[1].deaths = 0;
+                  territories[6] = 1;
+                  updateUI();
+              },
+              highlight: '#portrait-active' },
+            { title:'🏆 スコア計算', icon:'🧮',
+              text:'あなたのスコアを計算してみましょう：<br><br>' +
+                '• <b>所持P × 2</b> = 10 × 2 = <em>20点</em><br>' +
+                '• <b>陣地の価値</b> = 商業2マス(各4P) = <em>8点</em><br>' +
+                '• <b>資源価値</b> = 缶3個(各1P) + ゴミ1個(2P) = <em>5点</em><br>' +
+                '• <b>キル×3</b> = 2 × 3 = <em>+6点</em><br>' +
+                '• <b>デス×5</b> = 1 × 5 = <em>−5点</em><br>' +
+                '• <b>合計: 34点</b>',
+              highlight: '#portrait-active' },
+            { title:'🏆 スコア計算', icon:'💡',
+              text:'<b>高スコアのコツ：</b><br>' +
+                '• Pを稼ぐのが最優先（2倍でスコアに反映）<br>' +
+                '• 陣地は毎ターン家賃収入も生むので一石二鳥<br>' +
+                '• むやみに死なない（デスは−5と重い）<br>' +
+                '• 缶やゴミは早めに換金してPに変換しよう' },
+        ];
+    }
+
+    // === シナリオ1: ターンの流れ ===
+    function getScenario_TurnFlow() {
+        return [
+            { title:'🎮 ターンの流れ', icon:'🎲',
+              text:'1ターンの流れを体験します。<br>まず<b>「サイコロを振る」</b>ボタンを押してAPを獲得しましょう！',
+              setup: () => {
+                  initSandboxGame({ p1pos:0, p1p:5, p1ap:0 });
+                  diceRolled = false;
+                  updateUI();
+              },
+              highlight: '#btn-roll',
+              waitMode: '👆 サイコロを振ってください',
+              watchCondition: () => diceRolled === true },
+            { title:'🎮 ターンの流れ', icon:'⚡',
+              text:`APを獲得しました！<b>AP(行動力)</b>が画面に表示されています。<br>` +
+                `APを消費して<b>「移動」</b>ボタンを押してみましょう。<br>` +
+                `移動は通常<em>1AP</em>消費します。`,
+              highlight: '#btn-move',
+              waitMode: '👆 移動してください',
+              watchCondition: () => players[0].pos !== 0 },
+            { title:'🎮 ターンの流れ', icon:'🚶',
+              text:'移動できました！マップ上のコマが動いたのが分かりますか？<br>' +
+                'APが残っている限り、<b>何度でも行動</b>できます。<br>' +
+                'もう一度移動するか、他のアクションを試してみてください。',
+              nextLabel: '理解した ▶' },
+            { title:'🎮 ターンの流れ', icon:'🛑',
+              text:'やることが終わったら<b>「ターン終了」</b>ボタンを押します。<br>' +
+                '<em>残ったAPは次のターンに持ち越せません！</em><br>' +
+                '使い切ってからターンを終えましょう。',
+              highlight: '#btn-end' },
+        ];
+    }
+
+    // === シナリオ2: 画面UIガイド ===
+    function getScenario_UIGuide() {
+        return [
+            { title:'📊 画面ガイド', icon:'🌤️',
+              text:'まず左上の<b>環境パネル</b>です。<br>天候（晴/曇/雨）、現在のラウンド数、昼夜、そして<b>缶・ゴミの相場</b>がここに表示されます。',
+              setup: () => {
+                  initSandboxGame({ p1pos:2, p1p:15, p1cans:5, p1trash:2, p1ap:8, p1hand:[6,17,24], diceRolled:true, territories:{3:0} });
+                  players[0].kills = 1;
+                  updateUI();
+              },
+              highlight: '#weather-panel' },
+            { title:'📊 画面ガイド', icon:'👤',
+              text:'その右側が<b>プレイヤーステータス</b>です。<br>HP、AP、所持P、領土数、キル/デス、缶/ゴミ/手札数が一覧できます。<br><b>タップするとキャラのスキル詳細</b>が見れます。',
+              highlight: '#portrait-active' },
+            { title:'📊 画面ガイド', icon:'🃏',
+              text:'上部中央〜右に<b>手札カード</b>が並びます。<br>各カードの「使う」「捨てる」ボタンで操作します。<br>現在3枚持っていますね。',
+              highlight: '#card-panel-clay' },
+            { title:'📊 画面ガイド', icon:'🎮',
+              text:'右側の<b>アクションパネル</b>です。<br>明るいボタン＝今使える、暗いボタン＝条件未達です。<br>マスの種類に応じて使えるアクションが変わります。',
+              highlight: '#action-panel' },
+            { title:'📊 画面ガイド', icon:'👥',
+              text:'アクションパネルの下に<b>プレイヤー一覧</b>があります。<br>全プレイヤーの現在位置・HP・所持Pが確認できます。',
+              highlight: '#player-list-panel' },
+            { title:'📊 画面ガイド', icon:'🗺️',
+              text:'中央の<b>マップエリア</b>です。<br>左上のボタンでズーム操作、ドラッグで視点移動できます。<br>自由に操作してみてください！',
+              highlight: '#game-board-container' },
+        ];
+    }
+
+    // === シナリオ3: マスの種類 ===
+    function getScenario_Tiles() {
+        return [
+            { title:'🗺️ マス体験', icon:'🥫',
+              text:'あなたは<b>空き缶マス</b>にいます。<br>「🥫 缶拾い」ボタンを押して缶を拾ってみましょう！<br>（1AP消費、1ターン3回まで）',
+              setup: () => {
+                  initSandboxGame({ p1pos:2, p1ap:10, p1p:3, diceRolled:true });
+                  updateUI();
+              },
+              highlight: '#btn-can',
+              waitMode: '👆 缶拾いしてください',
+              watchCondition: () => players[0].cans > 0 },
+            { title:'🗺️ マス体験', icon:'✅',
+              text:'缶を拾いました！缶は<b>買取所マス</b>で換金できます。<br>次は移動して<b>バイトマス</b>(💼)を目指しましょう。<br>「移動」ボタンで進んでください（id:3 → id:4方向）。',
+              nextLabel: '次へ ▶' },
+            { title:'🗺️ マス体験', icon:'💼',
+              text:'<b>バイトマス</b>では3APを使って働けます。<br>成功すると<b>12P</b>獲得！（成功率は60〜80%）<br>バイトマスまで移動して「💼 バイト」ボタンを試してみてください。',
+              waitMode: '👆 バイトマスで「バイト」を実行',
+              watchCondition: () => {
+                  const tile = mapData.find(t => t.id === players[0].pos);
+                  return tile && tile.type === 'job' && players[0].p > 3;
+              }},
+            { title:'🗺️ マス体験', icon:'🚩',
+              text:'マスを<b>陣地として占領</b>することもできます。<br>占領にはPが必要（3P〜）ですが、占領後は毎ターン<b>家賃収入</b>が入ります。<br>近くのマスで「🚩 陣地占領」を試してみてください。',
+              nextLabel: '理解した ▶' },
+        ];
+    }
+
+    // === シナリオ4: カードを使う ===
+    function getScenario_Cards() {
+        return [
+            { title:'🃏 カード体験', icon:'🃏',
+              text:'手札に<b>3枚のカード</b>を持った状態でスタートです。<br>上部のカードエリアを確認してください。<br>カードの使用には<b>2AP</b>必要です。',
+              setup: () => {
+                  initSandboxGame({
+                      p1pos:1, p1ap:12, p1p:10, p1hp:60,
+                      p1hand:[7, 15, 17], // 炊き出し, エナドリ, レンガ
+                      diceRolled:true,
+                      p2pos:3 // CPUを射程2に配置
+                  });
+                  updateUI();
+              },
+              highlight: '#card-panel-clay' },
+            { title:'🃏 カード体験', icon:'🟢',
+              text:'まず<b>「炊き出し」</b>カードを使ってみましょう。<br>カードの「使う」ボタンを押すと<b>+3P</b>が確定で入ります。<br>安定した収入カードです。',
+              waitMode: '👆 炊き出しカードを使用',
+              watchCondition: () => !players[0].hand.includes(7) },
+            { title:'🃏 カード体験', icon:'⚡',
+              text:'次は<b>「エナジードリンク」</b>です。<br>使うと即座に<b>AP+5</b>！行動量を増やせます。<br>サイコロの目が悪かった時の救済カードです。',
+              waitMode: '👆 エナジードリンクを使用',
+              watchCondition: () => !players[0].hand.includes(15) },
+            { title:'🃏 カード体験', icon:'🔴',
+              text:'最後は<b>「レンガ」</b>（武器カード・射程2）です。<br>使うと<b>照準UI</b>が出て、角度を調整して攻撃できます。<br>CPUが射程2以内にいるので試してみてください。',
+              waitMode: '👆 レンガカードを使用',
+              watchCondition: () => !players[0].hand.includes(17) },
+            { title:'🃏 カード体験', icon:'💡',
+              text:'カードを全て使い切りました！<br><b>ポイント：</b><br>• バフカードは早めに使って効果を得る<br>• 武器カードは敵が近くにいる時に<br>• 回復カードはHPが減ってから使う',
+            },
+        ];
+    }
+
+    // === シナリオ5: NPC遭遇 ===
+    function getScenario_NPCs() {
+        return [
+            { title:'👥 NPC体験', icon:'🗺️',
+              text:'マップ上にNPCが配置されています。<br>移動してNPCがいるマスに入ると<b>自動でイベント</b>が発生します。<br>まずはマップを確認してみましょう。',
+              setup: () => {
+                  initSandboxGame({
+                      p1pos:0, p1ap:10, p1p:8, p1hp:80,
+                      p1hand:[0], // ステルス
+                      diceRolled:true,
+                      policePos:5, friendPos:4, p2pos:9
+                  });
+                  updateUI();
+              },
+              highlight: '#game-board-container' },
+            { title:'👥 NPC体験', icon:'🤝',
+              text:'マス4に<b>🤝 仲間NPC</b>がいます。<br>仲間のマスに止まると<b>良い効果</b>（HP回復やPボーナス）が得られます。<br>移動してマス4まで行ってみてください。',
+              waitMode: '👆 仲間NPCのマスへ移動',
+              watchCondition: () => players[0].pos === 4 },
+            { title:'👥 NPC体験', icon:'🚓',
+              text:'マス5に<b>🚓 警察</b>がいます。<br>警察のマスに止まると<b>補導</b>されて次ターンAP-2ペナルティ。<br>「ステルス行動」カードを先に使えば回避できます！<br>試しに近づいてみましょう。',
+              nextLabel: '理解した ▶' },
+            { title:'👥 NPC体験', icon:'🛻',
+              text:'<b>ゴミ収集車</b>はラウンド切替時にエリアを走り抜けます。<br>事前に「どのエリアが危険か」が告知されるので、<b>危険エリアからは逃げましょう</b>。<br>避難所マスにいると安全です。' },
+        ];
+    }
+
+    // === シナリオ6: ミニゲーム ===
+    function getScenario_Minigame() {
+        return [
+            { title:'🎯 ミニゲーム', icon:'❓',
+              text:'<b>イベントマスに止まる</b>とミニゲームが発生します。<br>勝つとカードが手に入ります！<br>マップ上のイベントマス(紫色)まで移動してみましょう。',
+              setup: () => {
+                  initSandboxGame({ p1pos:3, p1ap:8, p1p:5, diceRolled:true, p2pos:9 });
+                  updateUI();
+              },
+              nextLabel: 'イベントマスへ移動 ▶' },
+            { title:'🎯 ミニゲーム', icon:'🎲',
+              text:'イベントマス(id:4)に移動して止まると、<b>ミニゲーム</b>が自動的に始まります。<br>移動ボタンでマス4へ進んでください。<br><b>3種類</b>のミニゲームがランダムで出現します。',
+              highlight: '#btn-move',
+              waitMode: '👆 イベントマスへ移動',
+              watchCondition: () => players[0].pos === 4 || mgActive },
+            { title:'🎯 ミニゲーム', icon:'🎮',
+              text:'ミニゲームが始まったら、画面の指示に従ってプレイしてください！<br><br>' +
+                '• <b>ハイ&ロー</b>：数字の大小を当てる<br>' +
+                '• <b>宝箱</b>：3つから1つ選ぶ<br>' +
+                '• <b>スロット</b>：リールを止めて揃える',
+              waitMode: '🎮 ミニゲームをプレイ中...',
+              watchCondition: () => !mgActive && players[0].pos === 4 },
+        ];
+    }
+
+    // === シナリオ7: キャラスキル ===
+    function getScenario_CharSkills() {
+        return [
+            { title:'🏆 キャラスキル', icon:'🏃',
+              text:'<b>元アスリート</b>でプレイ中です。<br>パッシブ：移動が常に<em>1AP</em>（雨でも！）<br>アクションスキル：<b>💨 疾風ダッシュ（3AP）</b>で3マス先へジャンプ！<br>「疾風ダッシュ」ボタンを試してみましょう。',
+              setup: () => {
+                  initSandboxGame({
+                      p1pos:0, p1ap:12, p1p:8, p1char:'athlete',
+                      diceRolled:true, p2pos:9
+                  });
+                  updateUI();
+              },
+              highlight: '#btn-dash',
+              waitMode: '👆 疾風ダッシュを使用',
+              watchCondition: () => players[0].pos !== 0 },
+            { title:'🏆 キャラスキル', icon:'👊',
+              text:'次は<b>元ヤン</b>のスキルを試します。<br>パッシブ：同マスの相手から<b>自動で1Pカツアゲ</b>！<br>アクション：<b>👊 殴る（2AP）</b>で10ダメージ。<br>CPUのいるマスへ移動してみましょう。',
+              setup: () => {
+                  initSandboxGame({
+                      p1pos:0, p1ap:12, p1p:5, p1char:'yankee',
+                      diceRolled:true, p2pos:1, p2p:10
+                  });
+                  updateUI();
+              },
+              waitMode: '👆 CPUのマスへ移動→殴る',
+              watchCondition: () => players[0].pos === players[1].pos },
+            { title:'🏆 キャラスキル', icon:'✅',
+              text:'カツアゲが発動しましたか？同じマスにいるので「👊 殴る」も試してみてください。<br><br>' +
+                '他のキャラも個性的なスキルを持っています：<br>' +
+                '• 💼 <b>営業マン</b>：カードを押し付けて3P稼ぐ<br>' +
+                '• 🌿 <b>サバイバー</b>：ゴミ漁りノーリスク<br>' +
+                '• 💻 <b>ハッカー</b>：遠隔ショップ購入<br>' +
+                '• 🎸 <b>ミュージシャン</b>：人を集めて投げ銭',
+              nextLabel: '理解した！ ▶' },
+        ];
+    }
+
+    // --- メイン起動 ---
+    window.startTutorialSandbox = function(scenarioId) {
+        sandboxScenario = scenarioId;
+        sandboxReturnPage = scenarioId;
+        sandboxStep = 0;
+        sandboxActive = true;
+
+        // チュートリアルオーバーレイを閉じる
+        document.getElementById('tutorial-overlay').classList.remove('active');
+        document.getElementById('mode-select-overlay').style.display = 'none';
+        document.getElementById('title-screen-overlay').style.display = 'none';
+
+        sandboxSteps = getScenarioSteps(scenarioId);
+        if (sandboxSteps.length === 0) return;
+
+        runCurrentStep();
+    };
+
+    window.exitTutorialSandbox = function() {
+        sandboxActive = false;
+        if (sandboxWatcher) { clearInterval(sandboxWatcher); sandboxWatcher = null; }
+        hideGuide();
+        hideHighlight();
+
+        // ゲームを片付け
+        executeReturnToTitleBase();
+        document.getElementById("setup-screen").style.display = "none";
+        document.getElementById("main-title").style.display = "none";
+
+        // チュートリアルに戻る
+        window._tutReturnTo = 'mode';
+        const overlay = document.getElementById('tutorial-overlay');
+        overlay.classList.add('active');
+        window._tutGoTo(sandboxReturnPage);
+    };
+
+    // ゲームの endTurnLogic を監視して、体験モード中のCPUターンを高速スキップ
+    const origEndTurnClicked = window.endTurnClicked;
+    // sandbox中のCPU操作後に自動で元に戻す
+    let _sandboxCpuWatch = null;
+    function watchForPlayerTurn() {
+        if (_sandboxCpuWatch) clearInterval(_sandboxCpuWatch);
+        _sandboxCpuWatch = setInterval(() => {
+            if (sandboxActive && players.length > 0 && turn === 0 && !cpuActing) {
+                clearInterval(_sandboxCpuWatch);
+                _sandboxCpuWatch = null;
+                // プレイヤーのターンに戻った
+                diceRolled = false;
+                updateUI();
+            }
+        }, 300);
+    }
+})();
 </script>
 </body>
 </html>
