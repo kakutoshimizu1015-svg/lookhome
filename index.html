@@ -194,31 +194,31 @@
 
         /* ===== PATH PREVIEW GLOW (after tile types for correct override) ===== */
         .tile.tile-path-1 {
-            box-shadow:0 0 22px rgba(255,220,50,0.95), 0 0 44px rgba(255,220,50,0.4), 0 4px 8px rgba(0,0,0,0.55) !important;
-            border-color:rgba(255,220,50,0.95) !important;
+            box-shadow:0 0 22px rgba(50,205,50,0.95), 0 0 44px rgba(50,205,50,0.4), 0 4px 8px rgba(0,0,0,0.55) !important;
+            border-color:rgba(50,205,50,0.95) !important;
             animation: path-pulse-1 1.2s ease-in-out infinite alternate !important;
         }
         .tile.tile-path-2 {
-            box-shadow:0 0 14px rgba(255,200,30,0.6), 0 0 28px rgba(255,200,30,0.2), 0 4px 8px rgba(0,0,0,0.55) !important;
-            border-color:rgba(255,200,30,0.6) !important;
+            box-shadow:0 0 14px rgba(46,204,113,0.6), 0 0 28px rgba(46,204,113,0.2), 0 4px 8px rgba(0,0,0,0.55) !important;
+            border-color:rgba(46,204,113,0.6) !important;
             animation: path-pulse-2 1.4s ease-in-out infinite alternate !important;
         }
         .tile.tile-path-3 {
-            box-shadow:0 0 8px rgba(255,180,20,0.3), 0 0 16px rgba(255,180,20,0.1), 0 4px 8px rgba(0,0,0,0.55) !important;
-            border-color:rgba(255,180,20,0.3) !important;
+            box-shadow:0 0 8px rgba(39,174,96,0.3), 0 0 16px rgba(39,174,96,0.1), 0 4px 8px rgba(0,0,0,0.55) !important;
+            border-color:rgba(39,174,96,0.3) !important;
             animation: path-pulse-3 1.6s ease-in-out infinite alternate !important;
         }
         @keyframes path-pulse-1 {
-            0%   { box-shadow:0 0 18px rgba(255,220,50,0.8),  0 0 36px rgba(255,220,50,0.3), 0 4px 8px rgba(0,0,0,0.55); }
-            100% { box-shadow:0 0 28px rgba(255,220,50,1),    0 0 56px rgba(255,220,50,0.5), 0 4px 8px rgba(0,0,0,0.55); }
+            0%   { box-shadow:0 0 18px rgba(50,205,50,0.8),  0 0 36px rgba(50,205,50,0.3), 0 4px 8px rgba(0,0,0,0.55); }
+            100% { box-shadow:0 0 28px rgba(50,205,50,1),    0 0 56px rgba(50,205,50,0.5), 0 4px 8px rgba(0,0,0,0.55); }
         }
         @keyframes path-pulse-2 {
-            0%   { box-shadow:0 0 10px rgba(255,200,30,0.45), 0 0 22px rgba(255,200,30,0.15), 0 4px 8px rgba(0,0,0,0.55); }
-            100% { box-shadow:0 0 18px rgba(255,200,30,0.7),  0 0 34px rgba(255,200,30,0.25), 0 4px 8px rgba(0,0,0,0.55); }
+            0%   { box-shadow:0 0 10px rgba(46,204,113,0.45), 0 0 22px rgba(46,204,113,0.15), 0 4px 8px rgba(0,0,0,0.55); }
+            100% { box-shadow:0 0 18px rgba(46,204,113,0.7),  0 0 34px rgba(46,204,113,0.25), 0 4px 8px rgba(0,0,0,0.55); }
         }
         @keyframes path-pulse-3 {
-            0%   { box-shadow:0 0 5px  rgba(255,180,20,0.2),  0 0 12px rgba(255,180,20,0.08), 0 4px 8px rgba(0,0,0,0.55); }
-            100% { box-shadow:0 0 10px rgba(255,180,20,0.35), 0 0 20px rgba(255,180,20,0.12), 0 4px 8px rgba(0,0,0,0.55); }
+            0%   { box-shadow:0 0 5px  rgba(39,174,96,0.2),  0 0 12px rgba(39,174,96,0.08), 0 4px 8px rgba(0,0,0,0.55); }
+            100% { box-shadow:0 0 10px rgba(39,174,96,0.35), 0 0 20px rgba(39,174,96,0.12), 0 4px 8px rgba(0,0,0,0.55); }
         }
         /* ===== END PATH PREVIEW GLOW ===== */
         @keyframes pulse-dest { 0%{transform:translateX(-50%) scale(1);} 100%{transform:translateX(-50%) scale(1.3);} }
@@ -269,13 +269,13 @@
             z-index: 15 !important;
             border-width: 4px !important;
         }
-        .npc-token { width:16px; height:16px; border-radius:50%; position:absolute; z-index:6; display:flex; align-items:center; justify-content:center; font-size:10px; box-shadow:0 2px 4px rgba(0,0,0,0.8); border:2px solid white; transition:all 0.4s; }
-        .npc-police { background-color:#2980b9; top:-2px; right:-2px; }
-        .npc-uncle { background-color:#8d6e63; top:-2px; left:-2px; }
-        .npc-animal { background-color:#7f8c8d; bottom:0; left:50%; transform:translateX(-50%); }
-        .npc-yakuza { background-color:#2c3e50; bottom:-2px; right:-2px; }
-        .npc-loanshark { background-color:#8e44ad; top:50%; left:-2px; transform:translateY(-50%); }
-        .npc-friend { background-color:#27ae60; bottom:-2px; left:-2px; }
+        .npc-token { width:30px; height:30px; border-radius:50%; position:absolute; z-index:6; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 2px 6px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.4); border:2px solid white; transition:all 0.4s; }
+        .npc-police { background-color:#2980b9; top:-8px; right:-8px; }
+        .npc-uncle { background-color:#8d6e63; top:-8px; left:-8px; }
+        .npc-animal { background-color:#7f8c8d; bottom:-6px; left:50%; transform:translateX(-50%); }
+        .npc-yakuza { background-color:#2c3e50; bottom:-8px; right:-8px; }
+        .npc-loanshark { background-color:#8e44ad; top:50%; left:-8px; transform:translateY(-50%); }
+        .npc-friend { background-color:#27ae60; bottom:-8px; left:-8px; }
         /* 通常時でも存在が分かる程度に表示 */
         .truck-token { width:40px; height:40px; border-radius:8px; position:absolute; z-index:30; border:2px solid rgba(255,34,0,0.55); box-shadow:0 0 8px rgba(255,0,0,0.25); transition:opacity 0.4s,box-shadow 0.4s,border-color 0.4s; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; justify-content:center; align-items:center; font-size:24px; background:rgba(90,0,0,0.45); animation:none; opacity:0.55; }
         /* horror-mode 中だけフル表示 */
@@ -890,7 +890,7 @@
                         <li><span class="rule-icon">⚡</span><b>AP:</b> 行動力。移動・アクション・カード使用に消費。ターン終了で0になる。</li>
                         <li><span class="rule-icon">❤️</span><b>HP:</b> 体力。0になると病院送り → 所持Pから最大15P没収、装備1つランダム喪失、缶・ゴミをその場にドロップ。復活後HP100で再開。</li>
                         <li><span class="rule-icon">💰</span><b>P:</b> お金。陣地化・カード購入などに使用。スコアの最大比重。</li>
-                        <li><span class="rule-icon">🚩</span><b>陣地:</b> 占領したマスから毎ターンのダイスロール時に収入。3ラウンドに1回、維持費（1P/マス）が徴収される。</li>
+                        <li><span class="rule-icon">🚩</span><b>陣地:</b> 占領したマスから毎ターンのダイスロール時に収入（スラム1P/商業2P/高級3P）。3ラウンドに1回、維持費が徴収される（スラム0P/商業1P/高級2P）。</li>
                     </ul>
                 </div>
 
@@ -1113,10 +1113,20 @@
     </div>
     
     <div id="shop-overlay" class="modal-overlay" onclick="if(event.target===this) closeShop()">
-        <div class="modal-box" style="max-width:500px;">
+        <div class="modal-box" style="max-width:520px;">
             <h2 style="margin-top:0;">🛒 闇市ショップ</h2>
-            <p>所持P: <span id="shop-p-display" style="font-size:24px;font-weight:bold;color:#f1c40f;">0</span></p>
+            <p>所持P: <span id="shop-p-display" style="font-size:24px;font-weight:bold;color:#f1c40f;">0</span>
+               <span id="shop-cart-total" style="font-size:14px;color:#e74c3c;margin-left:10px;"></span>
+            </p>
             <div id="shop-items-list" style="display:flex;flex-direction:column;gap:8px;text-align:left;"></div>
+            <div id="shop-cart-area" style="margin-top:12px;padding:10px;background:#f0e6d2;border:3px dashed #8d6e63;border-radius:10px;display:none;">
+                <h4 style="margin:0 0 8px 0;color:#3e2723;">🛒 カート</h4>
+                <div id="shop-cart-items" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+                <div style="display:flex;gap:8px;justify-content:center;">
+                    <button class="btn-large btn-green" style="font-size:14px;padding:10px 20px;" onclick="shopCartBuy()">💰 一括購入</button>
+                    <button class="btn-large" style="font-size:12px;padding:8px 14px;background:#e74c3c;border-color:#c0392b;" onclick="shopCartClear()">🗑️ カートを空にする</button>
+                </div>
+            </div>
             <hr style="border:1px dashed #5b2c6f;margin:15px 0;">
             <h3 style="margin:5px 0;color:#333;text-align:center;">🃏 手札を売る (+2P)</h3>
             <div id="shop-sell-list" style="display:flex;flex-wrap:wrap;justify-content:center;gap:5px;"></div>
@@ -1236,6 +1246,13 @@
             <h3 style="margin-top:0;color:#fdf5e6;">🗺️ ゲーム設定</h3>
             <div class="setup-row" style="color:#fdf5e6;">マップ: <select id="map-size"><option value="small">スモール(12マス)</option><option value="medium" selected>ミディアム(48マス)</option><option value="large">ラージ(75マス)</option></select></div>
             <div class="setup-row" style="color:#fdf5e6;">ラウンド: <select id="max-rounds"><option value="1">1ラウンド</option><option value="5">5ラウンド</option><option value="10">10ラウンド</option><option value="15">15ラウンド</option><option value="20" selected>20ラウンド</option><option value="30">30ラウンド</option></select></div>
+            <div class="setup-row" style="color:#fdf5e6;">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="skip-turn-dice" style="width:18px;height:18px;cursor:pointer;">
+                    🎲 順番決めダイスをスキップ
+                </label>
+                <span style="font-size:11px;color:#bdc3c7;margin-left:4px;">設定順でそのまま開始</span>
+            </div>
             <div class="setup-row" style="color:#f1c40f;">
                 <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
                     <input type="checkbox" id="creative-mode" style="width:18px;height:18px;cursor:pointer;">
@@ -1243,10 +1260,34 @@
                 </label>
                 <span style="font-size:11px;color:#fdf5e6;margin-left:4px;">全カードを最初から所持</span>
             </div>
+            <!-- ランダムマップ設定 -->
+            <div style="margin-top:10px;padding:10px;background:rgba(0,0,0,0.15);border-radius:8px;border:2px solid #5c4a44;">
+                <div style="font-size:13px;font-weight:bold;color:#f1c40f;margin-bottom:8px;text-align:center;">🎲 ランダムマップ設定</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
+                    <label class="rmap-toggle" style="display:flex;align-items:center;gap:5px;cursor:pointer;background:#4a3b32;padding:6px 10px;border-radius:6px;border:2px solid #8d6e63;font-size:12px;color:#fdf5e6;font-weight:bold;transition:all 0.2s;">
+                        <input type="checkbox" id="rmap-tile-type" style="width:16px;height:16px;cursor:pointer;" onchange="updateRmapStyle(this)">
+                        🔀 マス種類
+                    </label>
+                    <label class="rmap-toggle" style="display:flex;align-items:center;gap:5px;cursor:pointer;background:#4a3b32;padding:6px 10px;border-radius:6px;border:2px solid #8d6e63;font-size:12px;color:#fdf5e6;font-weight:bold;transition:all 0.2s;">
+                        <input type="checkbox" id="rmap-layout" style="width:16px;height:16px;cursor:pointer;" onchange="updateRmapStyle(this)">
+                        📐 マス配置
+                    </label>
+                    <label class="rmap-toggle" style="display:flex;align-items:center;gap:5px;cursor:pointer;background:#4a3b32;padding:6px 10px;border-radius:6px;border:2px solid #8d6e63;font-size:12px;color:#fdf5e6;font-weight:bold;transition:all 0.2s;">
+                        <input type="checkbox" id="rmap-start" style="width:16px;height:16px;cursor:pointer;" onchange="updateRmapStyle(this)">
+                        🏁 開始位置
+                    </label>
+                    <label class="rmap-toggle" style="display:flex;align-items:center;gap:5px;cursor:pointer;background:#4a3b32;padding:6px 10px;border-radius:6px;border:2px solid #8d6e63;font-size:12px;color:#fdf5e6;font-weight:bold;transition:all 0.2s;">
+                        <input type="checkbox" id="rmap-scatter" style="width:16px;height:16px;cursor:pointer;" onchange="updateRmapStyle(this)">
+                        🧭 バラバラ配置
+                    </label>
+                </div>
+                <div id="rmap-desc" style="text-align:center;font-size:10px;color:#bdc3c7;margin-top:6px;">各項目をONにするとランダム化されます</div>
+            </div>
             <!-- ランダム配布設定 -->
-            <div class="setup-row" style="justify-content:center;gap:8px;margin-top:8px;">
-                <button id="offline-assign-choose-btn" class="btn-large btn-green" style="flex:1;max-width:200px;font-size:13px;padding:8px;" onclick="setOfflineCharAssign('choose')">🎭 各自キャラ選択</button>
-                <button id="offline-assign-random-btn" class="btn-large" style="flex:1;max-width:200px;font-size:13px;padding:8px;background:#8e44ad;border-color:#6c3483;opacity:0.6;" onclick="setOfflineCharAssign('random')">🎲 ランダム配布</button>
+            <div class="setup-row" style="justify-content:center;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                <button id="offline-assign-choose-btn" class="btn-large btn-green" style="flex:1;max-width:160px;font-size:12px;padding:8px;" onclick="setOfflineCharAssign('choose')">🎭 各自選択</button>
+                <button id="offline-assign-cpurandom-btn" class="btn-large" style="flex:1;max-width:160px;font-size:12px;padding:8px;background:#e67e22;border-color:#d35400;opacity:0.6;" onclick="setOfflineCharAssign('cpu_random')">🤖 CPUのみ🎲</button>
+                <button id="offline-assign-random-btn" class="btn-large" style="flex:1;max-width:160px;font-size:12px;padding:8px;background:#8e44ad;border-color:#6c3483;opacity:0.6;" onclick="setOfflineCharAssign('random')">🎲 全員ランダム</button>
             </div>
             <div id="offline-assign-desc" style="text-align:center;font-size:11px;color:#fdf5e6;margin-top:4px;">現在: 各自がキャラを選択します</div>
             <button class="btn-large btn-brown" style="margin-top:15px;border-color:#2c1e16;" onclick="startOfflineGame()">🎲 ゲームを開始する</button>
@@ -1257,14 +1298,6 @@
     <div id="game-screen">
         <div id="top-bar">
             <div id="left-status-area">
-                <div id="weather-panel" class="panel">
-                    <h3 style="margin:0 0 6px 0;font-size:13px;border-bottom:2px dashed #8d7b68;padding-bottom:5px;text-align:center;">🌤️ 環境</h3>
-                    <div id="weather-indicator">☀️ 晴れ</div>
-                    <div id="weather-desc" style="font-size:10px;text-align:center;margin-top:4px;font-weight:bold;">通常</div>
-                    <div id="round-display" style="font-size:12px;text-align:center;margin-top:6px;font-weight:bold;color:#f1c40f;background:#3e2f2a;padding:3px;border-radius:5px;">R: 0/20</div>
-                    <div id="daynight-display" style="font-size:11px;text-align:center;margin-top:4px;font-weight:bold;">☀️ 昼</div>
-                    <div id="market-display" style="font-size:10px;text-align:center;margin-top:4px;font-weight:bold;background:#3e2f2a;padding:3px;border-radius:5px;">缶:1P ゴミ:2P</div>
-                </div>
                 <div id="portrait-active" class="panel" onclick="showCharInfoModal(players[turn])" style="cursor:pointer;" title="クリックでキャラ詳細を表示">
                     <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
                         <div id="active-p-id" class="active-id-clay">P1</div>
@@ -1296,11 +1329,22 @@
                 <div id="map-ap-hud" style="position:absolute;top:8px;right:8px;z-index:50;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);border:2px solid rgba(255,220,50,0.5);border-radius:10px;padding:6px 12px;color:#f1c40f;font-weight:bold;font-size:18px;text-shadow:0 0 8px #f1c40f;pointer-events:none;transition:all 0.3s;">
                     ⚡ <span id="map-ap-display">0</span>
                 </div>
-                <!-- ズームボタン -->
-                <div id="zoom-controls">
-                    <button class="zoom-btn" onclick="mapZoom(0.2)" title="ズームイン">＋</button>
-                    <button class="zoom-btn" onclick="mapZoom(-0.2)" title="ズームアウト">－</button>
-                    <button class="zoom-btn" onclick="mapZoomReset()" title="リセット" style="font-size:12px;">⟳</button>
+                <!-- 環境情報HUD (マップ左上) -->
+                <div id="map-env-hud" style="position:absolute;top:8px;left:8px;z-index:55;display:flex;flex-direction:column;gap:4px;pointer-events:none;">
+                    <div style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:bold;color:#fdf5e6;line-height:1.6;white-space:nowrap;">
+                        <span id="hud-round" style="color:#f1c40f;">R:0/20</span>
+                        <span id="hud-weather" style="margin-left:6px;">☀️晴</span>
+                        <span id="hud-daynight" style="margin-left:6px;">☀️昼</span>
+                        <br>
+                        <span style="color:#bdc3c7;">缶:<span id="hud-can-price">1</span>P</span>
+                        <span style="color:#bdc3c7;margin-left:6px;">ゴミ:<span id="hud-trash-price">2</span>P</span>
+                    </div>
+                    <!-- ズームボタン (環境HUDの下) -->
+                    <div style="display:flex;gap:4px;pointer-events:auto;">
+                        <button class="zoom-btn" onclick="mapZoom(0.2)" title="ズームイン">＋</button>
+                        <button class="zoom-btn" onclick="mapZoom(-0.2)" title="ズームアウト">－</button>
+                        <button class="zoom-btn" onclick="mapZoomReset()" title="リセット" style="font-size:12px;">⟳</button>
+                    </div>
                 </div>
                 <div id="game-board-container" class="panel">
                     <div id="game-board-wrapper">
@@ -1956,7 +2000,7 @@ function closeConfirmModal() { document.getElementById('confirm-modal-overlay').
 function executeReturnToTitleBase() {
     closeConfirmModal();
     gameOver = false; players = []; turn = 0; diceRolled = false; canPickedThisTurn = 0; territories = {}; cpuActing = false;
-    shopStock = []; shopStockTurn = -1;
+    shopStock = []; shopStockTurn = -1; shopCart = [];
     isRainy = false; weatherState = "sunny"; roundCount = 0; constructionPos = -1; constructionTimer = 0; currentDisplayTurn = -1;
     mgActive = false; isBranchPicking = false; currentBranchOptions = [];
     clearInterval(mgTimer); if(slotAnimInterval) clearInterval(slotAnimInterval);
@@ -2069,21 +2113,244 @@ function clearAllTeams() {
 // ページ読み込み後に初期化
 document.addEventListener('DOMContentLoaded', initOfflinePlayerDefaults);
 
-let offlineCharAssign = 'choose'; // 'choose' | 'random'
+let offlineCharAssign = 'choose'; // 'choose' | 'random' | 'cpu_random'
 function setOfflineCharAssign(mode) {
     offlineCharAssign = mode;
     const desc = document.getElementById('offline-assign-desc');
     const cb   = document.getElementById('offline-assign-choose-btn');
     const rb   = document.getElementById('offline-assign-random-btn');
+    const crb  = document.getElementById('offline-assign-cpurandom-btn');
+    // Reset all
+    [cb, rb, crb].forEach(b => { if(b) { b.style.opacity = '0.6'; } });
     if (mode === 'random') {
         if (desc) desc.innerText = '現在: ゲーム開始時に全員へランダムでキャラを配布します';
-        if (cb) { cb.style.background = ''; cb.style.opacity = '0.6'; }
-        if (rb) { rb.style.background = '#8e44ad'; rb.style.opacity = '1'; }
+        if (rb) { rb.style.opacity = '1'; }
+    } else if (mode === 'cpu_random') {
+        if (desc) desc.innerText = '現在: CPUのみランダム配布（人間は選択通り）';
+        if (crb) { crb.style.opacity = '1'; }
     } else {
         if (desc) desc.innerText = '現在: 各自がキャラを選択します';
-        if (cb) { cb.style.background = '#2ecc71'; cb.style.opacity = '1'; }
-        if (rb) { rb.style.background = ''; rb.style.opacity = '0.6'; }
+        if (cb) { cb.style.opacity = '1'; }
     }
+}
+
+// ========== RANDOM MAP OPTIONS ==========
+function updateRmapStyle(cb) {
+    const label = cb.closest('label');
+    if (label) {
+        label.style.borderColor = cb.checked ? '#f1c40f' : '#8d6e63';
+        label.style.background = cb.checked ? '#6d5c00' : '#4a3b32';
+    }
+    // 説明テキスト更新
+    const checks = ['rmap-tile-type','rmap-layout','rmap-start','rmap-scatter'];
+    const labels = ['マス種類','マス配置','開始位置','バラバラ配置'];
+    const active = checks.map((id,i) => document.getElementById(id)?.checked ? labels[i] : '').filter(Boolean);
+    const descEl = document.getElementById('rmap-desc');
+    if (descEl) descEl.textContent = active.length > 0 ? `ON: ${active.join('・')}` : '各項目をONにするとランダム化されます';
+}
+
+// マス種類をランダム化（center=病院は保持、それ以外の種類をシャッフル）
+function randomizeTileTypes(md) {
+    const tileTypes = ['normal','can','trash','event','job','shop','exchange','shelter','manhole','koban'];
+    const tileNames = {
+        normal:'道', can:'空き缶', trash:'ゴミ山', event:'イベント',
+        job:'バイト', shop:'ショップ', exchange:'買取所', shelter:'避難所',
+        manhole:'ﾏﾝﾎｰﾙ', koban:'交番'
+    };
+    md.forEach(tile => {
+        if (tile.type === 'center') return; // 病院は変更しない
+        const newType = tileTypes[Math.floor(Math.random() * tileTypes.length)];
+        tile.type = newType;
+        // エリアに応じた名前
+        if (tile.area === 'luxury') {
+            tile.name = newType === 'shop' ? '高級店' : newType === 'normal' ? '高級住宅' : tileNames[newType] || newType;
+        } else {
+            tile.name = tileNames[newType] || newType;
+        }
+    });
+    // マンホールが最低2つあることを保証
+    const manholes = md.filter(t => t.type === 'manhole');
+    if (manholes.length < 2) {
+        const nonSpecial = md.filter(t => t.type !== 'center' && t.type !== 'manhole');
+        for (let i = manholes.length; i < 2 && nonSpecial.length > 0; i++) {
+            const pick = nonSpecial.splice(Math.floor(Math.random() * nonSpecial.length), 1)[0];
+            pick.type = 'manhole';
+            pick.name = 'ﾏﾝﾎｰﾙ';
+        }
+    }
+    return md;
+}
+
+// マス配置ランダム化：エリア別にランダムウォークで配置し、隣接マス間を接続
+// スラム→商業→高級の順に左から右へ配置。矢印交差を防ぐため隣接セルのみ接続。
+function randomizeTileLayout(md) {
+    const center = md.find(t => t.type === 'center') || md[0];
+    const byArea = { slum:[], commercial:[], luxury:[] };
+    md.forEach(t => { if (t.id !== center.id && byArea[t.area]) byArea[t.area].push(t); });
+    Object.values(byArea).forEach(a => a.sort(() => Math.random() - 0.5));
+
+    // --- グリッド管理 ---
+    const grid = {};                        // "col,row" → tile object
+    const tPos = {};                        // tileId → [col, row]
+    const K = (c,r) => c + ',' + r;
+    const DIRS = [[1,0],[0,1],[-1,0],[0,-1]];
+    const shuffle = arr => { for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; };
+
+    function put(tile, c, r) {
+        tile.col = c; tile.row = r; tile.next = [];
+        grid[K(c,r)] = tile; tPos[tile.id] = [c,r];
+    }
+
+    // 指定範囲内で隣接する空きマスを探す
+    function freeAdj(c, r, cMin, cMax) {
+        for (const [dc,dr] of shuffle([...DIRS])) {
+            const nc = c+dc, nr = r+dr;
+            if (nc >= cMin && nc <= cMax && nr >= 1 && nr <= 14 && !grid[K(nc,nr)])
+                return [nc, nr];
+        }
+        return null;
+    }
+
+    // --- エリアごとにランダムウォークで配置 → 内部接続を構築 ---
+    function placeArea(tiles, startC, startR, cMin, cMax) {
+        if (!tiles.length) return [];
+        const placed = [];
+        let c = startC, r = startR;
+
+        for (const tile of tiles) {
+            let spot = freeAdj(c, r, cMin, cMax);
+            // 行き詰まり → 配置済みタイルから分岐
+            if (!spot) {
+                for (const pt of shuffle([...placed])) {
+                    spot = freeAdj(tPos[pt.id][0], tPos[pt.id][1], cMin, cMax);
+                    if (spot) break;
+                }
+            }
+            // それでもダメなら範囲を広げる
+            if (!spot) spot = freeAdj(c, r, cMin - 2, cMax + 2);
+            if (!spot) spot = freeAdj(c, r, 1, cMax + 4);
+            if (!spot) continue;               // 最終手段：スキップ
+
+            put(tile, spot[0], spot[1]);
+            placed.push(tile);
+            c = spot[0]; r = spot[1];
+
+            // たまにカーソルを既存タイルに戻して分岐を作る
+            if (Math.random() < 0.28 && placed.length > 2) {
+                const bp = placed[Math.floor(Math.random() * placed.length)];
+                [c, r] = tPos[bp.id];
+            }
+        }
+
+        // ① 配置順に沿ったチェーン接続（メインパス）
+        for (let i = 0; i < placed.length - 1; i++) {
+            placed[i].next.push(placed[i + 1].id);
+        }
+        // ② 最後→最初のループバック
+        if (placed.length >= 3) {
+            placed[placed.length - 1].next.push(placed[0].id);
+        }
+        // ③ 隣接タイル間にランダム分岐を追加（全体の15〜20%程度）
+        const branches = Math.max(1, Math.floor(placed.length * 0.18));
+        for (let b = 0; b < branches; b++) {
+            const src = placed[Math.floor(Math.random() * placed.length)];
+            const [sc, sr] = tPos[src.id];
+            for (const [dc, dr] of shuffle([...DIRS])) {
+                const adj = grid[K(sc + dc, sr + dr)];
+                if (adj && adj.id !== src.id && !src.next.includes(adj.id)) {
+                    src.next.push(adj.id);
+                    break;
+                }
+            }
+        }
+        return placed;
+    }
+
+    // --- エリア列幅を算出（タイル数に比例） ---
+    const perArea = Math.ceil(Math.sqrt(md.length / 3)) + 2;
+
+    // --- 病院を左端付近に配置 ---
+    const cxCenter = perArea;
+    const ryCenter = 3 + Math.floor(Math.random() * 5);
+    put(center, cxCenter, ryCenter);
+
+    // --- スラムエリア ---
+    const slumP = placeArea(byArea.slum, cxCenter, ryCenter, 1, perArea * 2);
+
+    // --- 商業エリア（スラム右端から開始） ---
+    let bridgeC = cxCenter, bridgeR = ryCenter;
+    if (slumP.length) {
+        const rm = slumP.reduce((b, t) => tPos[t.id][0] > tPos[b.id][0] ? t : b, slumP[0]);
+        [bridgeC, bridgeR] = tPos[rm.id];
+    }
+    const commP = placeArea(byArea.commercial, bridgeC + 1, bridgeR, perArea, perArea * 3);
+
+    // --- 高級エリア（商業右端から開始） ---
+    let bridge2C = bridgeC + 1, bridge2R = bridgeR;
+    if (commP.length) {
+        const rm = commP.reduce((b, t) => tPos[t.id][0] > tPos[b.id][0] ? t : b, commP[0]);
+        [bridge2C, bridge2R] = tPos[rm.id];
+    }
+    const luxP = placeArea(byArea.luxury, bridge2C + 1, bridge2R, perArea * 2, perArea * 4 + 2);
+
+    // --- エリア間接続 ---
+    if (slumP.length > 0) center.next.push(slumP[0].id);
+    else if (commP.length > 0) center.next.push(commP[0].id);
+
+    // スラム → 商業
+    if (slumP.length && commP.length) {
+        const bridge = slumP.reduce((b, t) => tPos[t.id][0] > tPos[b.id][0] ? t : b, slumP[0]);
+        if (!bridge.next.includes(commP[0].id)) bridge.next.push(commP[0].id);
+    }
+    // 商業 → 高級
+    if (commP.length && luxP.length) {
+        const bridge = commP.reduce((b, t) => tPos[t.id][0] > tPos[b.id][0] ? t : b, commP[0]);
+        if (!bridge.next.includes(luxP[0].id)) bridge.next.push(luxP[0].id);
+    }
+    // 高級 → 商業（大ループ）
+    if (luxP.length && commP.length) {
+        const last = luxP[luxP.length - 1];
+        const tgt = commP[Math.floor(Math.random() * commP.length)];
+        if (!last.next.includes(tgt.id)) last.next.push(tgt.id);
+    }
+
+    // --- 行き止まり解消：全タイルに最低1つの接続を保証 ---
+    md.forEach(t => {
+        if (t.next.length === 0) {
+            const [c, r] = tPos[t.id] || [0, 0];
+            for (const [dc, dr] of DIRS) {
+                const adj = grid[K(c + dc, r + dr)];
+                if (adj && adj.id !== t.id) { t.next.push(adj.id); break; }
+            }
+            if (t.next.length === 0) t.next.push(center.id);
+        }
+    });
+
+    // --- 座標を正規化（左上を1,1に） ---
+    let minC = Infinity, minR = Infinity;
+    md.forEach(t => { minC = Math.min(minC, t.col); minR = Math.min(minR, t.row); });
+    md.forEach(t => { t.col -= minC - 1; t.row -= minR - 1; });
+
+    return md;
+}
+
+// 開始位置をランダム化（全員同じ位置だがcenter以外のマスから開始）
+function randomizeStartPosition(md) {
+    const nonCenter = md.filter(t => t.type !== 'center');
+    if (nonCenter.length === 0) return 0;
+    return nonCenter[Math.floor(Math.random() * nonCenter.length)].id;
+}
+
+// プレイヤーをバラバラに配置（全員異なるマスからスタート）
+function scatterPlayerPositions(md, playerCount) {
+    const candidates = md.filter(t => t.type !== 'center');
+    // Fisher-Yatesでシャッフルしてプレイヤー数分取る
+    const shuffled = [...candidates].sort(() => Math.random() - 0.5);
+    const positions = [];
+    for (let i = 0; i < playerCount; i++) {
+        positions.push(shuffled[i % shuffled.length].id);
+    }
+    return positions;
 }
 
 async function startOfflineGame() {
@@ -2114,6 +2381,18 @@ async function startOfflineGame() {
             p.maxHand  = p.charType === 'hacker' ? 9 : 7;
         });
         log('🎲 キャラクターをランダムに割り当てました！');
+    } else if (offlineCharAssign === 'cpu_random') {
+        const allChars = Object.keys(charEmoji);
+        const shuffled = [...allChars].sort(() => Math.random() - 0.5);
+        let cpuIdx = 0;
+        players.forEach((p) => {
+            if (p.isCPU) {
+                p.charType = shuffled[cpuIdx % shuffled.length];
+                p.maxHand  = p.charType === 'hacker' ? 9 : 7;
+                cpuIdx++;
+            }
+        });
+        log('🤖 CPUキャラクターをランダムに割り当てました！');
     }
     
     // クリエイティブモード：全カードを配布
@@ -2132,11 +2411,26 @@ async function startOfflineGame() {
     else if (size === "medium") mapData = genMediumMap();
     else mapData = genLargeMap();
 
-    // 収集車を商業・高級エリア寄りから開始（スラム偏りを防ぐ）
-    const _nonSlum = mapData.filter(t => t.area !== 'slum' && t.type !== 'center');
-    truckPos = _nonSlum.length > 0 ? _nonSlum[Math.floor(_nonSlum.length * 0.3)].id : Math.floor(mapData.length * 0.4);
+    // ランダムマップオプション適用
+    const rmapTileType = document.getElementById('rmap-tile-type')?.checked;
+    const rmapLayout   = document.getElementById('rmap-layout')?.checked;
+    const rmapStart    = document.getElementById('rmap-start')?.checked;
+    const rmapScatter  = document.getElementById('rmap-scatter')?.checked;
+    
+    if (rmapTileType) {
+        randomizeTileTypes(mapData);
+        log('🔀 マス種類をランダム化しました！');
+    }
+    if (rmapLayout) {
+        randomizeTileLayout(mapData);
+        log('📐 マス配置をランダム化しました！');
+    }
+
+    // 収集車を完全ランダムに配置（全エリア均等）
+    const _allNonCenter = mapData.filter(t => t.type !== 'center');
+    truckPos = _allNonCenter.length > 0 ? _allNonCenter[Math.floor(Math.random() * _allNonCenter.length)].id : 1;
     unclePos = Math.floor(mapData.length * 0.2);
-    animalPos = Math.floor(mapData.length * 0.3);
+    const _ctInit1 = mapData.filter(t => t.type==="can"||t.type==="trash"); animalPos = _ctInit1.length>0 ? _ctInit1[Math.floor(Math.random()*_ctInit1.length)].id : Math.floor(mapData.length*0.3);
     policePos = Math.floor(mapData.length * 0.8);
     yakuzaPos = Math.floor(mapData.length * 0.5);
     loansharkPos = Math.floor(mapData.length * 0.6);
@@ -2148,7 +2442,26 @@ async function startOfflineGame() {
     document.getElementById("game-screen").style.display = "flex";
     
     // 順番決めダイス
-    await determineTurnOrder();
+    const skipTurnDice = document.getElementById('skip-turn-dice')?.checked;
+    if (!skipTurnDice) {
+        await determineTurnOrder();
+    } else {
+        log('🎲 順番決めダイスをスキップ！設定順で開始します。');
+    }
+    
+    // 開始位置の設定（順番決め後にプレイヤー配置）
+    if (rmapScatter) {
+        // バラバラ配置：全員異なるマスからスタート
+        const scatterPositions = scatterPlayerPositions(mapData, players.length);
+        players.forEach((p, i) => { p.pos = scatterPositions[i]; });
+        log('🧭 プレイヤーをバラバラに配置しました！');
+    } else if (rmapStart) {
+        // 全員同じランダム開始位置
+        const startPos = randomizeStartPosition(mapData);
+        players.forEach(p => { p.pos = startPos; });
+        const tileName = mapData.find(t => t.id === startPos)?.name || startPos;
+        log(`🏁 開始位置を「${tileName}」(ID:${startPos})にランダム設定！`);
+    }
     
     initBoard();
     log("ゲームスタート！" + maxRounds + "ラウンドで総資産を競え！");
@@ -3007,34 +3320,29 @@ function updateUI() {
         }
     }
 
-    // 環境パネル更新
-    const weatherIndicator = document.getElementById("weather-indicator");
-    const weatherDesc = document.getElementById("weather-desc");
-    
+    // 環境パネル更新（マップ左上HUD）
     let bodyClass = weatherState;
     if (isNight) bodyClass += " night";
     document.body.className = bodyClass;
     
+    const hudWeather = document.getElementById("hud-weather");
+    const hudRound = document.getElementById("hud-round");
+    const hudDaynight = document.getElementById("hud-daynight");
+    const hudCanPrice = document.getElementById("hud-can-price");
+    const hudTrashPrice = document.getElementById("hud-trash-price");
+    
     if (isRainy) {
-        weatherIndicator.innerText = "🌧️ 雨";
-        weatherIndicator.style.background = "#7f8c8d";
-        weatherIndicator.style.borderColor = "#616161";
-        weatherDesc.innerText = "移動2AP/屋外漁り不可";
+        if (hudWeather) hudWeather.innerText = "🌧️雨";
     } else if (weatherState === "cloudy") {
-        weatherIndicator.innerText = "☁️ 曇り";
-        weatherIndicator.style.background = "#95a5a6";
-        weatherIndicator.style.borderColor = "#7f8c8d";
-        weatherDesc.innerText = "通常";
+        if (hudWeather) hudWeather.innerText = "☁️曇";
     } else {
-        weatherIndicator.innerText = "☀️ 晴れ";
-        weatherIndicator.style.background = "#3498db";
-        weatherIndicator.style.borderColor = "#2980b9";
-        weatherDesc.innerText = "通常";
+        if (hudWeather) hudWeather.innerText = "☀️晴";
     }
     
-    document.getElementById("round-display").innerText = `R: ${roundCount}/${maxRounds}`;
-    document.getElementById("daynight-display").innerText = isNight ? "🌙 夜" : "☀️ 昼";
-    document.getElementById("market-display").innerText = `缶:${canPrice}P ゴミ:${trashPrice}P`;
+    if (hudRound) hudRound.innerText = `R:${roundCount}/${maxRounds}`;
+    if (hudDaynight) hudDaynight.innerText = isNight ? "🌙夜" : "☀️昼";
+    if (hudCanPrice) hudCanPrice.innerText = canPrice;
+    if (hudTrashPrice) hudTrashPrice.innerText = trashPrice;
 
     // プレイヤーパネル更新
     let turnText = currentPlayer.isCPU ? `${currentPlayer.name}(CPU)のターン` : `${currentPlayer.name}のターン`;
@@ -3723,6 +4031,7 @@ function actionHack() {
     if (cp.ap < 3) { showToast("AP不足！"); return; }
     cp.ap -= 3;
     shopStock = [];
+    shopCart = [];
     const pool = [0,1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,24,25,26,27,28,29,30,31,32,33,34];
     for (let i = 0; i < 6; i++) shopStock.push(pool[Math.floor(Math.random() * pool.length)]);
     shopStockTurn = roundCount * 1000 + turn;
@@ -3809,7 +4118,7 @@ function actionGamble() {
     syncOnline(); updateUI();
 }
 
-// 【元探偵】情報操作 (3AP): NPC1体を任意マスへ移動
+// 【元探偵】情報操作 (3AP): NPC1体を任意マスへ移動（プレイヤーがマップ上で選択）
 function actionNpcMove() {
     const cp = players[turn];
     if (cp.ap < 3) { showToast("AP不足！"); return; }
@@ -3832,13 +4141,8 @@ function actionNpcMove() {
         btn.innerText = npc.label;
         btn.onclick = () => {
             ov.remove();
-            cp.ap -= 3;
-            const dest = mapData[Math.floor(Math.random() * mapData.length)].id;
-            const destName = mapData.find(t => t.id === dest)?.name || dest;
-            npc.set(dest);
-            log(`🕵️ ${cp.name}【情報操作】${npc.label}を「${destName}」へ移動！`);
-            triggerEventPopup(cp.id, "🕵️", "情報操作！", `${npc.label}を移動`, "card");
-            playSfx('card'); syncOnline(); updateUI();
+            // マップ上のタイルをクリックさせて移動先を選ばせる
+            startNpcMoveTargetPick(cp, npc);
         };
         box.appendChild(btn);
     });
@@ -3849,6 +4153,67 @@ function actionNpcMove() {
     cancel.onclick = () => ov.remove();
     box.appendChild(cancel);
     ov.appendChild(box); document.body.appendChild(ov);
+}
+
+// NPC移動先タイル選択モード
+let _npcMovePickActive = false;
+let _npcMovePickCleanup = null;
+function startNpcMoveTargetPick(cp, npc) {
+    _npcMovePickActive = true;
+    // バナー表示
+    const banner = document.getElementById('branch-prompt');
+    banner.style.display = 'block';
+    banner.style.background = 'rgba(149,165,166,0.95)';
+    banner.innerText = `🕵️ ${npc.label}の移動先マスをタップしてください`;
+
+    // 全タイルにクリックイベント追加・ハイライト
+    const handlers = [];
+    mapData.forEach(tile => {
+        const el = document.getElementById(`tile-${tile.id}`);
+        if (!el) return;
+        el.style.cursor = 'pointer';
+        el.classList.add('tile-highlight-branch');
+        const handler = (e) => {
+            e.stopPropagation();
+            finishNpcMovePick(cp, npc, tile.id);
+        };
+        el.addEventListener('click', handler);
+        handlers.push({ el, handler });
+    });
+
+    // キャンセル用（バナークリック）
+    const bannerCancel = () => {
+        cleanupNpcPick();
+        showToast('情報操作をキャンセルしました');
+    };
+    banner.style.pointerEvents = 'auto';
+    banner.style.cursor = 'pointer';
+    banner.addEventListener('click', bannerCancel);
+
+    function cleanupNpcPick() {
+        _npcMovePickActive = false;
+        banner.style.display = 'none';
+        banner.style.background = '';
+        banner.style.pointerEvents = '';
+        banner.style.cursor = '';
+        banner.removeEventListener('click', bannerCancel);
+        handlers.forEach(({ el, handler }) => {
+            el.removeEventListener('click', handler);
+            el.classList.remove('tile-highlight-branch');
+            el.style.cursor = '';
+        });
+    }
+    _npcMovePickCleanup = cleanupNpcPick;
+}
+
+function finishNpcMovePick(cp, npc, destId) {
+    if (_npcMovePickCleanup) _npcMovePickCleanup();
+    cp.ap -= 3;
+    const destName = mapData.find(t => t.id === destId)?.name || destId;
+    npc.set(destId);
+    log(`🕵️ ${cp.name}【情報操作】${npc.label}を「${destName}」(ID:${destId})へ移動！`);
+    triggerEventPopup(cp.id, "🕵️", "情報操作！", `${npc.label}を「${destName}」へ`, "card");
+    playSfx('card'); syncOnline(); updateUI();
 }
 
 // ========== TEAM ACTION SYSTEM ==========
@@ -4490,10 +4855,23 @@ function actionManhole() {
     let manholes = mapData.filter(t => t.type === "manhole" && t.id !== currentPlayer.pos);
     
     if (manholes.length > 0) {
-        currentPlayer.pos = manholes[Math.floor(Math.random() * manholes.length)].id;
-        log(`🕳️ ワープ！`);
-        triggerEventPopup(currentPlayer.id, "🕳️", "マンホールワープ！", `別のマンホールへ飛んだ`, "neutral");
+        // ワープ先を光らせる演出
+        const destManhole = manholes[Math.floor(Math.random() * manholes.length)];
+        
+        // ワープ先タイルに光る演出を追加
+        const destEl = document.getElementById(`tile-${destManhole.id}`);
+        if (destEl) {
+            destEl.classList.add('tile-manhole-linked');
+            setTimeout(() => destEl.classList.remove('tile-manhole-linked'), 3000);
+        }
+        
+        currentPlayer.pos = destManhole.id;
+        log(`🕳️ ワープ！→ ${destManhole.name}(ID:${destManhole.id})`);
+        triggerEventPopup(currentPlayer.id, "🕳️", "マンホールワープ！", `「${destManhole.name}」へ飛んだ`, "neutral");
         checkYankee(currentPlayer);
+        
+        // ワープ先に自動スクロール
+        setTimeout(() => scrollToTile(destManhole.id), 200);
     }
     playSfx('move');
     syncOnline();
@@ -4549,9 +4927,57 @@ function actionStealCard() {
 }
 
 // ========== SHOP ==========
+let shopCart = []; // [{cardId, price}]
+
+function shopCartAdd(cardId, price) {
+    const cp = players[turn];
+    const cartTotal = shopCart.reduce((s, c) => s + c.price, 0);
+    const slotsUsed = cp.hand.length + shopCart.length;
+    if (slotsUsed >= cp.maxHand) { showToast("手札上限！これ以上カートに追加できません"); return; }
+    if (cp.p < cartTotal + price) { showToast("ポイント不足！カート合計が所持Pを超えます"); return; }
+    shopCart.push({ cardId, price });
+    openShop(); // UIリフレッシュ
+}
+
+function shopCartRemove(index) {
+    shopCart.splice(index, 1);
+    openShop();
+}
+
+function shopCartClear() {
+    shopCart = [];
+    openShop();
+}
+
+function shopCartBuy() {
+    const cp = players[turn];
+    if (shopCart.length === 0) { showToast("カートが空です！"); return; }
+    const totalCost = shopCart.reduce((s, c) => s + c.price, 0);
+    if (cp.p < totalCost) { showToast(`ポイント不足！(必要:${totalCost}P / 所持:${cp.p}P)`); return; }
+    if (cp.hand.length + shopCart.length > cp.maxHand) { showToast("手札上限を超えます！"); return; }
+    
+    cp.p -= totalCost;
+    const names = [];
+    shopCart.forEach(item => {
+        cp.hand.push(item.cardId);
+        const cd = deckData[item.cardId];
+        names.push(cd.name);
+    });
+    log(`🛒 一括購入！${names.join('・')} (合計 -${totalCost}P)`);
+    playSfx('coin');
+    triggerEventPopup(cp.id, "🛒", `${shopCart.length}枚購入！`, `-${totalCost}P`, "card");
+    shopCart = [];
+    syncOnline();
+    openShop();
+    updateUI();
+}
+
 function openShop() {
     let currentPlayer = players[turn];
+    const cartTotal = shopCart.reduce((s, c) => s + c.price, 0);
     document.getElementById("shop-p-display").innerText = currentPlayer.p;
+    const cartTotalEl = document.getElementById("shop-cart-total");
+    if (cartTotalEl) cartTotalEl.innerText = shopCart.length > 0 ? `(カート: -${cartTotal}P / 残: ${currentPlayer.p - cartTotal}P)` : '';
 
     // ターン×ラウンドのキーで在庫を毎回刷新
     const shopStockKey = roundCount * 1000 + turn;
@@ -4560,37 +4986,50 @@ function openShop() {
         const pool = [0,1,2,3,4,5,6,7,8,9,10,11,15,16,17,18,19,20,24,25,26,27,28,29,30,31,32,33,34];
         for (let i = 0; i < 6; i++) shopStock.push(pool[Math.floor(Math.random() * pool.length)]);
         shopStockTurn = shopStockKey;
+        shopCart = []; // 在庫リセット時はカートもクリア
     }
     
     let itemList = document.getElementById("shop-items-list");
     itemList.innerHTML = "";
     
+    const slotsUsed = currentPlayer.hand.length + shopCart.length;
+    const remainP = currentPlayer.p - cartTotal;
+    
     shopStock.forEach((cardId) => {
         let cardData = deckData[cardId];
         let price = cardData.type === 'weapon' ? Math.max(5, cardData.dmg / 5) : cardData.type === 'equip' ? 6 : 4;
-        if (currentPlayer.charType === 'sales') price = Math.max(1, price - 1); // 【コミュ力】1P割引
+        if (currentPlayer.charType === 'sales') price = Math.max(1, price - 1);
         
         let btn = document.createElement("button");
         btn.className = "btn-clay";
         btn.style.borderColor = cardData.color;
-        const canAfford = currentPlayer.p >= price;
-        const handFull = currentPlayer.hand.length >= currentPlayer.maxHand;
+        const canAfford = remainP >= price;
+        const handFull = slotsUsed >= currentPlayer.maxHand;
+        // カートに既にある同一商品もOK（在庫は複数追加可能）
         btn.disabled = !canAfford || handFull;
         btn.innerHTML = `${cardData.icon} ${cardData.name} (<span style="color:${canAfford ? '#2ecc71' : '#e74c3c'}">${price}P</span>)<br><span style="font-size:10px;">${cardData.desc}</span>${handFull ? '<br><span style="font-size:9px;color:#e74c3c;">手札上限！</span>' : ''}`;
-        btn.onclick = () => {
-            if (currentPlayer.p < price) { showToast("ポイント不足！"); return; }
-            if (currentPlayer.hand.length >= currentPlayer.maxHand) { showToast("手札が上限！"); return; }
-            currentPlayer.p -= price;
-            currentPlayer.hand.push(cardId);
-            log(`🛒 「${cardData.name}」を${price}Pで購入！`);
-            playSfx('coin');
-            triggerEventPopup(currentPlayer.id, cardData.icon, `「${cardData.name}」購入！`, `-${price}P`, "card");
-            syncOnline();
-            openShop(); // UIリフレッシュ
-            updateUI();
-        };
+        btn.onclick = () => shopCartAdd(cardId, price);
         itemList.appendChild(btn);
     });
+    
+    // カート表示
+    const cartArea = document.getElementById("shop-cart-area");
+    const cartItemsEl = document.getElementById("shop-cart-items");
+    if (shopCart.length > 0) {
+        cartArea.style.display = 'block';
+        cartItemsEl.innerHTML = '';
+        shopCart.forEach((item, idx) => {
+            const cd = deckData[item.cardId];
+            const tag = document.createElement('div');
+            tag.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:#fff;border:2px solid ' + cd.color + ';border-radius:6px;padding:4px 8px;font-size:12px;font-weight:bold;cursor:pointer;';
+            tag.title = 'クリックで取り消し';
+            tag.innerHTML = `${cd.icon} ${cd.name} (${item.price}P) <span style="color:#e74c3c;font-size:14px;">✕</span>`;
+            tag.onclick = () => shopCartRemove(idx);
+            cartItemsEl.appendChild(tag);
+        });
+    } else {
+        cartArea.style.display = 'none';
+    }
     
     let sellList = document.getElementById("shop-sell-list");
     sellList.innerHTML = "";
@@ -4618,6 +5057,7 @@ function openShop() {
 }
 
 function closeShop() {
+    shopCart = [];
     document.getElementById("shop-overlay").style.display = "none";
 }
 
@@ -5116,7 +5556,7 @@ const charDetailData = {
     musician: { tagline:'路上ライブで人々を引き寄せる、カリスマ流浪のアーティスト', passive:{name:'【投げ銭】',desc:'他のプレイヤーが自分と同じマスまたは隣接マスに止まる/通過するたびに、銀行から3Pを自動獲得。'}, action:{name:'【路上ライブ】 (4AP)',desc:'周囲2マス以内の全プレイヤーを自分のマスに強制引き寄せ。ヤクザ横や元ヤンのカツアゲコンボなどに応用可。'} },
     doctor:   { tagline:'闇の診療所を開く、危うい善意の医者', passive:{name:'【自己治癒】',desc:'毎ターン開始時に自動でHP5を回復。長期戦で確実に真価を発揮する持久型パッシブ。'}, action:{name:'【闇診療】 (2AP)',desc:'同マスの相手のHPを30回復する代わりに5Pを強制徴収。助けるフリをしたカツアゲ。'} },
     gambler:  { tagline:'運命を賭けることに喜びを感じる、無一文の賭博師', passive:{name:'【アドレナリン】',desc:'ゾロ目が出た時、APが倍になるだけでなくHPも10回復。高リスク高リターンの勝負師スタイル。'}, action:{name:'【イカサマ勝負】 (2AP)',desc:'同マスの相手と1〜6のサイコロ対決。勝者が負けた方から5Pを奪う。同点は仕掛けた側の負け。'} },
-    detective:{ tagline:'陰からすべてを見通す、元・辣腕探偵', passive:{name:'【張り込み】',desc:'自分の陣地に他プレイヤーが止まった時、通常の陣地収入に加えて相手の手札を1枚没収する。'}, action:{name:'【情報操作】 (3AP)',desc:'マップ上のNPC（警察・ヤクザなど）を1体選び、ランダムな別のマスへ瞬間移動させる。'} },
+    detective:{ tagline:'陰からすべてを見通す、元・辣腕探偵', passive:{name:'【張り込み】',desc:'自分の陣地に他プレイヤーが止まった時、通常の陣地収入に加えて相手の手札を1枚没収する。'}, action:{name:'【情報操作】 (3AP)',desc:'マップ上のNPC（警察・ヤクザなど）を1体選び、任意のマスへ瞬間移動させる。'} },
 };
 
 function showCharInfoModal(player) {
@@ -5256,14 +5696,19 @@ function getDestRandom(start, steps) {
         let validNextTiles = tile.next.filter(id => id !== constructionPos);
         if (validNextTiles.length === 0) break;
         
-        // スラムエリアへの偏りを減らす：非スラムタイルに重みを付ける
-        const weighted = [];
-        validNextTiles.forEach(id => {
-            const t = mapData.find(x => x.id === id);
-            const w = (t && t.area !== 'slum') ? 3 : 1; // 商業・高級エリアは3倍の確率
-            for (let j = 0; j < w; j++) weighted.push(id);
-        });
-        current = weighted[Math.floor(Math.random() * weighted.length)];
+        // 最初の3ラウンドのみスラムを少し避ける傾向（重み1:2）
+        // 4ラウンド目以降は完全均等ランダム（全エリア行き来する）
+        if (roundCount <= 3) {
+            const weighted = [];
+            validNextTiles.forEach(id => {
+                const t = mapData.find(x => x.id === id);
+                const w = (t && t.area === 'slum') ? 1 : 2;
+                for (let j = 0; j < w; j++) weighted.push(id);
+            });
+            current = weighted[Math.floor(Math.random() * weighted.length)];
+        } else {
+            current = validNextTiles[Math.floor(Math.random() * validNextTiles.length)];
+        }
         hitList.push(current);
     }
     return { finalPos: current, hitList: hitList };
@@ -5315,7 +5760,8 @@ async function processRoundEvents() {
     
     // NPC再配置
     let slumTiles = mapData.filter(t => t.area === "slum");
-    animalPos = slumTiles[Math.floor(Math.random() * slumTiles.length)].id;
+    const canTrashTiles = mapData.filter(t => t.type === 'can' || t.type === 'trash');
+    animalPos = canTrashTiles.length > 0 ? canTrashTiles[Math.floor(Math.random() * canTrashTiles.length)].id : slumTiles[Math.floor(Math.random() * slumTiles.length)].id;
     unclePos = mapData[Math.floor(Math.random() * mapData.length)].id;
     yakuzaPos = mapData[Math.floor(Math.random() * mapData.length)].id;
     loansharkPos = mapData[Math.floor(Math.random() * mapData.length)].id;
@@ -5338,19 +5784,40 @@ async function processRoundEvents() {
         broadcastNetworkData({ type: 'disaster_warning', message: nextRoundWarning });
     }
 
-    // 【陣地維持費】3ラウンドに1回、1マスにつき1P
-    const TAX_PER_TILE = 1;
+    // 【陣地維持費】3ラウンドに1回、エリア別維持費（スラム0P, 商業1P, 高級2P）
+    // 収入: スラム1P, 商業2P, 高級3P → 純利益: スラム1P, 商業1P, 高級1P（3R毎）
+    // ただし維持費は3Rに1回なので実質: スラム3P-0P=3P, 商業6P-1P=5P, 高級9P-2P=7P（3R分累計）
+    const AREA_TAX = { slum: 0, commercial: 1, luxury: 2 };
     if (roundCount % 3 === 0) {
         players.forEach(p => {
             const owned = Object.keys(territories).filter(k => territories[k] === p.id);
             if (owned.length === 0) return;
-            const tax = owned.length * TAX_PER_TILE;
+            let tax = 0;
+            owned.forEach(tileId => {
+                const t = mapData.find(x => x.id == tileId);
+                tax += AREA_TAX[t ? t.area : 'slum'] || 0;
+            });
+            if (tax === 0) {
+                log(`💸 ${p.name}の維持費: 0P (スラム陣地のみ・無料)`);
+                summaryDigest.push(`💸 ${p.name}: 維持費 0P（スラム無料）`);
+                return;
+            }
             if (p.p >= tax) {
                 p.p -= tax;
-                log(`💸 ${p.name}の維持費: -${tax}P (${owned.length}マス×${TAX_PER_TILE}P)`);
+                const breakdown = ['slum','commercial','luxury'].map(a => {
+                    const cnt = owned.filter(k => { const t = mapData.find(x => x.id == k); return t && t.area === a; }).length;
+                    return cnt > 0 ? `${areaNames[a]}${cnt}マス` : '';
+                }).filter(Boolean).join('・');
+                log(`💸 ${p.name}の維持費: -${tax}P (${breakdown})`);
                 summaryDigest.push(`💸 ${p.name}: 維持費 -${tax}P`);
             } else {
-                const lostId = owned[Math.floor(Math.random() * owned.length)];
+                // 維持費不足：最も維持費の高い陣地から1つ失う
+                const sortedOwned = [...owned].sort((a, b) => {
+                    const aArea = mapData.find(x => x.id == a)?.area || 'slum';
+                    const bArea = mapData.find(x => x.id == b)?.area || 'slum';
+                    return (AREA_TAX[bArea] || 0) - (AREA_TAX[aArea] || 0);
+                });
+                const lostId = sortedOwned[0];
                 delete territories[lostId];
                 p.p = 0;
                 const lostName = mapData.find(t => t.id == lostId)?.name || lostId;
@@ -6844,7 +7311,7 @@ window.startOnlineGame = async function() {
     const _nonSlum2 = mapData.filter(t => t.area !== 'slum' && t.type !== 'center');
     truckPos = _nonSlum2.length > 0 ? _nonSlum2[Math.floor(_nonSlum2.length * 0.3)].id : Math.floor(mapData.length * 0.4);
     unclePos = Math.floor(mapData.length * 0.2);
-    animalPos = Math.floor(mapData.length * 0.3);
+    const _ctInit2 = mapData.filter(t => t.type==="can"||t.type==="trash"); animalPos = _ctInit2.length>0 ? _ctInit2[Math.floor(Math.random()*_ctInit2.length)].id : Math.floor(mapData.length*0.3);
     policePos = Math.floor(mapData.length * 0.8);
     yakuzaPos = Math.floor(mapData.length * 0.5);
     loansharkPos = Math.floor(mapData.length * 0.6);
@@ -7640,7 +8107,7 @@ window.startOnlineModeMenu = function() {
         mgActive = false; isBranchPicking = false; currentBranchOptions = [];
         clearInterval(mgTimer); if(slotAnimInterval) clearInterval(slotAnimInterval);
         if (afkTimer) { clearTimeout(afkTimer); afkTimer = null; }
-        shopStock = []; shopStockTurn = -1;
+        shopStock = []; shopStockTurn = -1; if(typeof shopCart!=='undefined') shopCart = [];
         isRainy = false; weatherState = "sunny"; roundCount = opts.round || 1;
         constructionPos = -1; constructionTimer = 0; currentDisplayTurn = -1;
         isNight = opts.night || false;
