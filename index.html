@@ -359,7 +359,8 @@
         #win-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(circle,#f1c40f,#e67e22,#c0392b); z-index:9999; display:none; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; animation:win-bg-anim 2s infinite alternate; cursor:pointer; }
         @keyframes win-bg-anim { 0%{filter:hue-rotate(0deg);} 100%{filter:hue-rotate(360deg);} }
         
-        #settings-btn { position:fixed; top:10px; right:10px; background:var(--clay-panel); color:#fdf5e6; border:3px solid #8d6e63; border-radius:50%; width:45px; height:45px; font-size:20px; cursor:pointer; z-index:1000; box-shadow:var(--clay-shadow-out); display:flex; justify-content:center; align-items:center; padding:0; transition:transform 0.1s; }
+        #settings-btn { position:fixed; top:10px; left:10px; background:var(--clay-panel); color:#fdf5e6; border:3px solid #8d6e63; border-radius:50%; width:45px; height:45px; font-size:20px; cursor:pointer; z-index:1000; box-shadow:var(--clay-shadow-out); display:flex; justify-content:center; align-items:center; padding:0; transition:transform 0.1s, opacity 0.2s; opacity:0.7; }
+        #settings-btn:hover { opacity:1; }
         #settings-btn:active { transform:translate(2px,2px); box-shadow:none; }
         
         /* 夜の視界制限フォグ */
@@ -963,19 +964,19 @@
                         <li><b>スケボー:</b> 次回ダイスロールの結果にAP+5ボーナス</li>
                     </ul>
 
-                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#3498db; border-bottom:1px solid #ccc;">【装備品（永続 or 使い切り）】</h4>
+                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#3498db; border-bottom:1px solid #ccc;">【装備品（期間限定 or 使い切り）】</h4>
                     <ul style="font-size:12px; margin-top:0;">
-                        <li><b>ボロボロの自転車:</b> 毎ターン獲得AP+2（永続）</li>
-                        <li><b>安全靴:</b> ゴミ漁りのAPコストが1に（永続）</li>
-                        <li><b>大きなリヤカー:</b> 陣地収入が2倍に（永続）</li>
-                        <li><b>リュック:</b> 手札上限+2（永続）</li>
-                        <li><b>雨具ゲット:</b> 雨の日のペナルティを無効化（永続）</li>
-                        <li><b>段ボールの盾:</b> 次のダメージを半減（1回で消費）</li>
-                        <li><b>ヘルメット:</b> 次のダメージを完全無効化（1回で消費）</li>
-                        <li><b>身代わり人形:</b> NPC・収集車などの妨害を1回無効（1回で消費）</li>
+                        <li>🚲 <b>ボロボロの自転車:</b> 毎ターン獲得AP+2（<em>5ターン限定</em>）　←カード「ボロボロの自転車」</li>
+                        <li>👢 <b>安全靴:</b> ゴミ漁りのAPコストが1に（永続）　←カード「安全靴」</li>
+                        <li>🛒 <b>大きなリヤカー:</b> 陣地収入が2倍に（<em>5ターン限定</em>）　←カード「大きなリヤカー」</li>
+                        <li>🎒 <b>リュック:</b> 手札上限+2（永続）　←カード「リュック」</li>
+                        <li>☂️ <b>雨具ゲット:</b> 雨の日のペナルティを<em>1回だけ</em>無効化（1回消費）　←カード「雨具ゲット」</li>
+                        <li>🛡️ <b>段ボールの盾:</b> 次のダメージを<em>50%の確率で半減</em>（1回で消費）　←カード「段ボールの盾」</li>
+                        <li>🪖 <b>ヘルメット:</b> 次のダメージを<em>半減</em>（1回で消費）　←カード「ヘルメット」</li>
+                        <li>🎎 <b>身代わり人形:</b> NPC・収集車などの妨害を1回無効（1回で消費）　←カード「身代わり人形」</li>
                     </ul>
 
-                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#27ae60; border-bottom:1px solid #ccc;">【回復系】</h4>
+                    <h4 style="margin:12px 0 4px 0; font-size:14px; color:#27ae60; border-bottom:1px solid #ccc;">【回復系】<span style="font-size:11px;color:#2ecc71;"> ※すべて0AP</span></h4>
                     <ul style="font-size:12px; margin-top:0;">
                         <li><b>腐ったバーガー:</b> HP+20回復（50%で食中毒10ダメージのリスクあり）</li>
                         <li><b>落ちてたポテト:</b> HP+15確定回復</li>
@@ -985,32 +986,33 @@
                     </ul>
 
                     <h4 style="margin:12px 0 4px 0; font-size:14px; color:#e74c3c; border-bottom:1px solid #ccc;">【攻撃・妨害系】</h4>
+                    <p style="font-size:11px;color:#888;margin:0 0 4px 0;">※ 武器カードは使用に2AP必要。その他のカード（バフ・回復・装備・リアクション等）はAP消費なしで使用可能。</p>
                     <ul style="font-size:12px; margin-top:0;">
-                        <li><b>ステルス行動:</b> 次に遭遇する敵・NPCを回避</li>
-                        <li><b>身分証明書:</b> +1P ＆ 次の警察を回避</li>
-                        <li><b>通報:</b> 他のプレイヤー1人に次回AP-2</li>
-                        <li><b>缶泥棒:</b> 他人から最大2Pを奪う</li>
-                        <li><b>領土挑戦状:</b> サイコロ4以上で他人の陣地を乗っ取る</li>
-                        <li><b>レンガ(射程2):</b> 10ダメージ</li>
-                        <li><b>バット(射程1):</b> 20ダメージ</li>
-                        <li><b>釘バット(射程1):</b> 30ダメージ</li>
-                        <li><b>拳銃(射程3):</b> 40ダメージ</li>
-                        <li><b>ショットガン(射程2・広域):</b> 射程内の全員に50ダメージ</li>
-                        <li><b>パンチングマシン(同マスのみ):</b> 80ダメージ</li>
-                        <li><b>レーザー銃(射程5・広域):</b> 射程内の全員に100ダメージ</li>
+                        <li><b>ステルス行動:</b> 次に遭遇する敵・NPCを回避 <span style="color:#2ecc71;">[0AP]</span></li>
+                        <li><b>身分証明書:</b> +1P ＆ 次の警察を回避 <span style="color:#2ecc71;">[0AP]</span></li>
+                        <li><b>通報:</b> 他のプレイヤー1人に次回AP-2 <span style="color:#2ecc71;">[0AP]</span></li>
+                        <li><b>缶泥棒:</b> 他人から最大2Pを奪う <span style="color:#2ecc71;">[0AP]</span></li>
+                        <li><b>領土挑戦状:</b> サイコロ4以上で他人の陣地を<em>選んで</em>乗っ取る <span style="color:#2ecc71;">[0AP]</span></li>
+                        <li><b>レンガ(射程2):</b> 10ダメージ <span style="color:#e74c3c;">[2AP]</span></li>
+                        <li><b>バット(射程1):</b> 20ダメージ <span style="color:#e74c3c;">[2AP]</span></li>
+                        <li><b>釘バット(射程1):</b> 30ダメージ <span style="color:#e74c3c;">[2AP]</span></li>
+                        <li><b>拳銃(射程3):</b> 40ダメージ <span style="color:#e74c3c;">[2AP]</span></li>
+                        <li><b>ショットガン(射程2・広域):</b> 射程内の全員に50ダメージ <span style="color:#e74c3c;">[2AP]</span></li>
+                        <li><b>パンチングマシン(同マスのみ):</b> 80ダメージ <span style="color:#e74c3c;">[2AP]</span></li>
+                        <li><b>レーザー銃(射程5・広域):</b> 射程内の全員に100ダメージ <span style="color:#e74c3c;">[2AP]</span></li>
                     </ul>
 
                     <h4 style="margin:12px 0 4px 0; font-size:14px; color:#8e44ad; border-bottom:1px solid #ccc;">【強力な全体効果（逆転用）】</h4>
                     <ul style="font-size:12px; margin-top:0;">
-                        <li><b>大暴落:</b> 全員の所持Pが半分になる</li>
-                        <li><b>下剋上:</b> 1位プレイヤーと自分の所持Pをそっくり入れ替える</li>
+                        <li><b>大暴落:</b> 自分以外の全員の所持Pが半分になる（チームメイトは効果を受けない） <span style="color:#2ecc71;">[0AP]</span></li>
+                        <li><b>下剋上:</b> 1位プレイヤーと自分の所持Pをそっくり入れ替える <span style="color:#2ecc71;">[0AP]</span></li>
                     </ul>
 
                     <h4 style="margin:12px 0 4px 0; font-size:14px; color:#16a085; border-bottom:1px solid #ccc;">【リアクション系（相手の効果を無効・反射）】</h4>
                     <ul style="font-size:12px; margin-top:0;">
-                        <li><b>弁護士の盾:</b> 次に受ける攻撃・カツアゲを完全無効化（1回）</li>
-                        <li><b>裏取引:</b> 次の「下剋上」「大暴落」を使った相手に反射（1回）</li>
-                        <li><b>反撃の一撃:</b> 次にダメージを受けた時、同量を相手に返す（1回）</li>
+                        <li><b>弁護士の盾:</b> 次に受ける攻撃・カツアゲを完全無効化（1回） <span style="color:#2ecc71;">[0AP]</span></li>
+                        <li><b>裏取引:</b> 次の「下剋上」「大暴落」を使った相手に反射（1回） <span style="color:#2ecc71;">[0AP]</span></li>
+                        <li><b>反撃の一撃:</b> 次にダメージを受けた時、同量を相手に返す（1回） <span style="color:#2ecc71;">[0AP]</span></li>
                     </ul>
                 </div>
 
@@ -1548,7 +1550,7 @@ const pIdColors = ["#e74c3c", "#3498db", "#2ecc71", "#f1c40f", "#e67e22", "#9b59
 
 const deckData = [
     {id:0,name:"ステルス行動",icon:"🔵",desc:"次の敵回避",color:"#3498db",type:"action"},
-    {id:1,name:"雨具ゲット",icon:"🔵",desc:"雨影響無効(装備)",color:"#3498db",type:"equip"},
+    {id:1,name:"雨具ゲット",icon:"🔵",desc:"雨影響を1回だけ無効",color:"#3498db",type:"equip"},
     {id:2,name:"身分証明書",icon:"🔵",desc:"+1P＆次回警察無効",color:"#3498db",type:"action"},
     {id:3,name:"通報",icon:"🔴",desc:"他者に次回AP-2",color:"#e74c3c",type:"action"},
     {id:4,name:"缶泥棒",icon:"🔴",desc:"他者から最大2P",color:"#e74c3c",type:"action"},
@@ -1559,7 +1561,7 @@ const deckData = [
     {id:9,name:"今日の運勢",icon:"🟡",desc:"50%で±3P",color:"#f1c40f",type:"action"},
     {id:10,name:"野良猫の導き",icon:"🟡",desc:"+2P確定",color:"#f1c40f",type:"action"},
     {id:11,name:"密かなバイト",icon:"🟡",desc:"50%で+6P/-3P",color:"#f1c40f",type:"action"},
-    {id:12,name:"大暴落",icon:"💜",desc:"全員5P減少",color:"#8e44ad",type:"action"},
+    {id:12,name:"大暴落",icon:"💜",desc:"自分以外全員のP半減",color:"#8e44ad",type:"action"},
     {id:13,name:"下剋上",icon:"💜",desc:"トップから最大15P奪取",color:"#8e44ad",type:"action"},
     {id:14,name:"宝くじ当選",icon:"🟡",desc:"10%で+15P",color:"#f39c12",type:"action"},
     {id:15,name:"エナジードリンク",icon:"🟢",desc:"即座にAP+5",color:"#2ecc71",type:"action"},
@@ -1571,11 +1573,11 @@ const deckData = [
     {id:21,name:"ショットガン",icon:"💜",desc:"射程2:全員30ダメ",color:"#8e44ad",type:"weapon",range:2,dmg:30,aoe:true},
     {id:22,name:"パンチングマシン",icon:"🔴",desc:"同マス:50ダメージ",color:"#2c3e50",type:"weapon",range:0,dmg:50},
     {id:23,name:"レーザー銃",icon:"💜",desc:"射程5:全員40ダメ",color:"#8e44ad",type:"weapon",range:5,dmg:40,aoe:true},
-    {id:24,name:"ボロボロの自転車",icon:"🟢",desc:"毎ターンAP+2(装備)",color:"#2ecc71",type:"equip"},
+    {id:24,name:"ボロボロの自転車",icon:"🟢",desc:"毎ターンAP+2(5ターン)",color:"#2ecc71",type:"equip"},
     {id:25,name:"安全靴",icon:"🟢",desc:"ゴミ漁り1AP(装備)",color:"#2ecc71",type:"equip"},
-    {id:26,name:"大きなリヤカー",icon:"🟢",desc:"陣地収入2倍(装備)",color:"#2ecc71",type:"equip"},
-    {id:27,name:"段ボールの盾",icon:"🟢",desc:"ダメージ半減(1回)",color:"#2ecc71",type:"equip"},
-    {id:28,name:"ヘルメット",icon:"🟢",desc:"ダメージ完全無効(1回)",color:"#2ecc71",type:"equip"},
+    {id:26,name:"大きなリヤカー",icon:"🟢",desc:"陣地収入2倍(5ターン)",color:"#2ecc71",type:"equip"},
+    {id:27,name:"段ボールの盾",icon:"🟢",desc:"50%でダメージ半減(1回)",color:"#2ecc71",type:"equip"},
+    {id:28,name:"ヘルメット",icon:"🟢",desc:"次のダメージ半減(1回)",color:"#2ecc71",type:"equip"},
     {id:29,name:"身代わり人形",icon:"🟢",desc:"NPC妨害1回無効",color:"#2ecc71",type:"equip"},
     // 回復系カード
     {id:30,name:"腐ったバーガー",icon:"🍔",desc:"HP+20回復(当たり外れあり)",color:"#27ae60",type:"heal",heal:20,risk:10},
@@ -1664,7 +1666,8 @@ window.extractGameState = function() {
             deaths: p.deaths||0, kills: p.kills||0, respawnShield: p.respawnShield||0,
             color: p.color, charType: p.charType, userId: p.userId,
             teamColor: p.teamColor || 'none',
-            equip: {...p.equip}
+            equip: {...p.equip},
+            equipTimer: {...(p.equipTimer || {bicycle:0, cart:0})}
         })),
         turn, diceRolled, canPickedThisTurn, territories: {...territories}, gameOver,
         truckPos, policePos, unclePos, animalPos, yakuzaPos, loansharkPos, friendPos,
@@ -1700,6 +1703,7 @@ window.applyGameState = function(state) {
         p.userId = sp.userId;
         p.teamColor = sp.teamColor || 'none';
         if (sp.equip) p.equip = {...sp.equip};
+        if (sp.equipTimer) p.equipTimer = {...sp.equipTimer};
         return p;
     });
     
@@ -1744,7 +1748,8 @@ function createPlayer(id, name, isCPU, charType, teamColor) {
         respawnShield: 0,
         color: pIdColors[id % 8], charType,
         teamColor: teamColor || 'none', // 'none' = ソロ, or color key
-        equip: { bicycle: false, shoes: false, cart: false, shield: false, helmet: false, doll: false, backpack: false }
+        equip: { bicycle: false, shoes: false, cart: false, shield: false, helmet: false, doll: false, backpack: false },
+        equipTimer: { bicycle: 0, cart: 0 }
     };
 }
 
@@ -1814,15 +1819,20 @@ function dealDamage(target, dmg, source, attacker = null) {
     }
     if (target.equip.helmet) {
         target.equip.helmet = false;
-        log(`🪖 ${target.name}のヘルメットがダメージを完全吸収！`);
+        dmg = Math.floor(dmg / 2);
+        log(`🪖 ${target.name}のヘルメットがダメージを半減！(${dmg}ダメージ)`);
         playSfx('success');
-        return 0;
     }
     if (target.equip.shield) {
         target.equip.shield = false;
-        dmg = Math.floor(dmg / 2);
-        log(`🛡️ ${target.name}の段ボールの盾がダメージを半減！(${dmg}ダメージ)`);
-        playSfx('hit');
+        if (Math.random() < 0.5) {
+            dmg = Math.floor(dmg / 2);
+            log(`🛡️ ${target.name}の段ボールの盾がダメージを半減！(${dmg}ダメージ)`);
+            playSfx('hit');
+        } else {
+            log(`🛡️ ${target.name}の段ボールの盾は壊れた...（半減失敗）`);
+            playSfx('hit');
+        }
     }
     
     target.hp -= dmg;
@@ -2622,12 +2632,16 @@ async function showTurnBanner(player) {
     // ターン開始時に自動スクロール
     setTimeout(() => scrollToCurrentPlayer(), 300);
 
-    // バナーアニメーション完了後にフラグを解除＆UIを再描画
+    // バナーアニメーション完了後にバナーを非表示
+    setTimeout(() => {
+        banner.style.display = "none";
+    }, 1500);
+
+    // バナー消滅後さらに1秒間サイコロ操作をブロックしてからUI解禁
     setTimeout(() => {
         turnBannerActive = false;
-        banner.style.display = "none";
         updateUI();
-    }, 1500);
+    }, 2500);
 }
 
 // 災害予兆演出（Promiseを返し、演出が終わるまで待てるようにする）
@@ -2868,7 +2882,8 @@ function renderHand(player, isNotMyTurn, isMyChar) {
         btn.style.borderColor = cardData.color;
         btn.innerHTML = `<div class="card-title-clay">${cardData.icon} ${cardData.name}</div><div style="font-size:11px;margin:3px 0;">${cardData.desc}</div>`;
         
-        let isDisabled = isNotMyTurn || !diceRolled || player.ap < 2 || mgActive || isBranchPicking;
+        let cardApCost = (cardData.type === 'weapon') ? 2 : 0;
+        let isDisabled = isNotMyTurn || !diceRolled || player.ap < cardApCost || mgActive || isBranchPicking;
         let isDiscardDisabled = isNotMyTurn || mgActive || isBranchPicking;
         
         let actionsDiv = document.createElement("div");
@@ -2876,7 +2891,7 @@ function renderHand(player, isNotMyTurn, isMyChar) {
         
         let useBtn = document.createElement("button");
         useBtn.className = "card-mini-btn";
-        useBtn.innerText = "使用(2AP)";
+        useBtn.innerText = cardApCost > 0 ? `使用(${cardApCost}AP)` : "使用";
         useBtn.disabled = isDisabled;
         useBtn.onclick = () => useCard(index, cardData.id);
         if (!isDisabled && player.hand.length <= player.maxHand) useBtn.classList.add("btn-active-highlight");
@@ -3088,6 +3103,20 @@ function updateUI() {
         const tcInfo = teamColors[otherPlayer.teamColor] || teamColors.none;
         const teamTag = otherPlayer.teamColor && otherPlayer.teamColor !== 'none' ? `<span style="color:${tcInfo.color};font-size:9px;">●${tcInfo.label}</span>` : '';
         let pointsFormat = otherPlayer.p < 0 ? `<span style="color:#e74c3c;">${otherPlayer.p}P</span>` : `${otherPlayer.p}P`;
+        // 領土数計算
+        const terrCount = Object.keys(territories).filter(k => territories[k] === otherPlayer.id).length;
+        // 装備アイコン一覧
+        const eq = otherPlayer.equip || {};
+        let equipIcons = '';
+        if (eq.bicycle) equipIcons += '🚲';
+        if (eq.shoes) equipIcons += '👢';
+        if (eq.cart) equipIcons += '🛒';
+        if (eq.shield) equipIcons += '🛡️';
+        if (eq.helmet) equipIcons += '🪖';
+        if (eq.doll) equipIcons += '🎎';
+        if (eq.backpack) equipIcons += '🎒';
+        if (otherPlayer.rainGear) equipIcons += '☂️';
+        if (!equipIcons) equipIcons = '-';
         const div = document.createElement('div');
         div.className = 'mini-player-clay';
         const teamBorderStyle = otherPlayer.teamColor && otherPlayer.teamColor !== 'none' ? `border-left:4px solid ${tcInfo.color};` : '';
@@ -3096,9 +3125,10 @@ function updateUI() {
         div.onclick = () => showCharInfoModal(otherPlayer);
         div.innerHTML = `
             <div class="avatar-small-clay" style="border-color:${otherPlayer.color};">${charEmoji[otherPlayer.charType]}</div>
-            <div style="font-size:10px;font-weight:bold;line-height:1.3;overflow:hidden;">
+            <div style="font-size:10px;font-weight:bold;line-height:1.3;overflow:hidden;flex:1;">
                 <div style="color:${otherPlayer.color};white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${otherPlayer.name}${cpuTag}${teamTag}${otherPlayer.respawnShield > 0 ? ` <span style="color:#f1c40f;">🛡️${otherPlayer.respawnShield}</span>` : ''}</div>
-                <div style="color:#fdf5e6;">❤️${otherPlayer.hp} 💰${pointsFormat} 🎴${otherPlayer.hand.length}</div>
+                <div style="color:#fdf5e6;">❤️${otherPlayer.hp} 💰${pointsFormat} 🎴${otherPlayer.hand.length} 🚩${terrCount}</div>
+                <div style="color:#bdc3c7;font-size:9px;">${equipIcons}</div>
             </div>`;
         listContainer.appendChild(div);
     });
@@ -3253,14 +3283,25 @@ function updateUI() {
     renderHand(currentPlayer, (!isMyChar || currentPlayer.isCPU || cpuActing || currentPlayer.skipTurn), isMyChar);
     updateTokens();
     
-    // CPU行動トリガー
-    let canRunCPU = currentPlayer.isCPU && !cpuActing && !gameOver && !currentPlayer.skipTurn;
+    // CPU行動トリガー（ターンバナー表示中はCPUも待機）
+    let canRunCPU = currentPlayer.isCPU && !cpuActing && !gameOver && !currentPlayer.skipTurn && !turnBannerActive;
     if (typeof isOnlineMode !== 'undefined' && isOnlineMode && typeof isHost !== 'undefined' && !isHost) {
         canRunCPU = false; // CPUの処理はホストのみが行う
     }
     if (canRunCPU) {
         cpuActing = true;
         processCPUTurn();
+    }
+    
+    // AP=0で自動ターンエンド（人間プレイヤー・ダイス済み・ミニゲーム中でない・分岐中でない・手札超過でない）
+    if (!currentPlayer.isCPU && isMyChar && diceRolled && currentPlayer.ap <= 0 && !mgActive && !isBranchPicking && !gameOver && !turnBannerActive && currentPlayer.hand.length <= currentPlayer.maxHand) {
+        // 少し遅延してから自動終了（演出のため）
+        setTimeout(() => {
+            if (players.length > 0 && players[turn] && players[turn].id === currentPlayer.id && diceRolled && currentPlayer.ap <= 0 && !mgActive && !isBranchPicking && !gameOver) {
+                log(`<span class="system">⚡ APが0のため自動ターンエンド</span>`);
+                endTurnLogic();
+            }
+        }, 1200);
     }
 }
 
@@ -3956,6 +3997,13 @@ function executeMove(targetTileId) {
     let currentPlayer = players[turn];
     let moveCost = (isRainy && !currentPlayer.rainGear && currentPlayer.charType !== "athlete") ? 2 : 1;
     
+    // 雨具を使って移動コスト軽減した場合、消費する
+    if (isRainy && currentPlayer.rainGear && currentPlayer.charType !== "athlete") {
+        currentPlayer.rainGear = false;
+        log(`☂️ ${currentPlayer.name}の雨具を使用して雨を回避！（消費済み）`);
+        triggerEventPopup(currentPlayer.id, "☂️", "雨具使用！", "雨を回避（使い切り）", "card");
+    }
+    
     const prevPos = currentPlayer.pos;
     currentPlayer.ap -= moveCost;
     currentPlayer.pos = targetTileId;
@@ -3993,9 +4041,10 @@ function executeMove(targetTileId) {
     }
 
     if (tileType === "koban") {
-        log("🚓 交番！職務質問で足止め！");
-        triggerEventPopup(currentPlayer.id, "🚓", "交番！職務質問！", "このターンは移動できない", "bad");
+        log("🚓 交番！職務質問で足止め！ターンエンドしてください。");
+        triggerEventPopup(currentPlayer.id, "🚓", "交番！職務質問！", "ターンエンドしてください", "bad");
         currentPlayer.cannotMove = true;
+        currentPlayer.ap = 0;
     }
     
     // 警察NPCマス
@@ -4575,11 +4624,14 @@ function closeShop() {
 // ========== CARD USE ==========
 function useCard(index, cardId) {
     let currentPlayer = players[turn];
-    currentPlayer.ap -= 2;
+    let cardData = deckData[cardId];
+    
+    // 武器カードのみ2AP消費、その他は0AP
+    let apCost = (cardData.type === 'weapon') ? 2 : 0;
+    currentPlayer.ap -= apCost;
     currentPlayer.hand.splice(index, 1);
     
-    let cardData = deckData[cardId];
-    log(`🎴 「${cardData.name}」を使用！`);
+    log(`🎴 「${cardData.name}」を使用！${apCost > 0 ? `(${apCost}AP消費)` : ''}`);
     playSfx('card');
     
     // 武器カードの処理 → 弧型UIを使用
@@ -4594,7 +4646,7 @@ function useCard(index, cardId) {
     // アクション/装備カードの処理
     switch (cardId) {
         case 0: currentPlayer.stealth = true; log(`🔵 ステルス発動！`); triggerEventPopup(currentPlayer.id, "💨", "ステルス発動！", "次の敵を1回やり過ごす", "card"); break;
-        case 1: currentPlayer.rainGear = true; log(`🔵 雨具装備！`); triggerEventPopup(currentPlayer.id, "🌂", "雨具装備！", "雨の日のペナルティを無効化", "card"); break;
+        case 1: currentPlayer.rainGear = true; log(`🔵 雨具装備！次の雨を1回回避！`); triggerEventPopup(currentPlayer.id, "🌂", "雨具装備！", "次の雨を1回だけ無効化", "card"); break;
         case 2: currentPlayer.hasID = true; currentPlayer.p += 1; log(`🔵 身分証+1P！`); triggerEventPopup(currentPlayer.id, "🪪", "身分証明書！", "+1P・次の警察を回避", "card"); break;
         case 3: 
             let others1 = players.filter(t => t.id !== currentPlayer.id && !isSameTeam(currentPlayer, t));
@@ -4624,10 +4676,19 @@ function useCard(index, cardId) {
             if (diceRoll >= 4) {
                 let enemyTerritories = Object.keys(territories).filter(k => territories[k] !== currentPlayer.id && !isSameTeam(currentPlayer, players.find(p=>p.id===territories[k])));
                 if (enemyTerritories.length > 0) {
-                    let targetTerritory = enemyTerritories[Math.floor(Math.random() * enemyTerritories.length)];
-                    territories[targetTerritory] = currentPlayer.id;
-                    log(`🔴 領土挑戦(出目${diceRoll})成功！陣地を奪った！`);
-                    triggerEventPopup(currentPlayer.id, "🚩", "領土挑戦成功！", `出目${diceRoll}・陣地を乗っ取った`, "good");
+                    if (currentPlayer.isCPU) {
+                        // CPUはランダム選択
+                        let targetTerritory = enemyTerritories[Math.floor(Math.random() * enemyTerritories.length)];
+                        territories[targetTerritory] = currentPlayer.id;
+                        log(`🔴 領土挑戦(出目${diceRoll})成功！陣地を奪った！`);
+                        triggerEventPopup(currentPlayer.id, "🚩", "領土挑戦成功！", `出目${diceRoll}・陣地を乗っ取った`, "good");
+                    } else {
+                        log(`🔴 領土挑戦(出目${diceRoll})成功！奪う陣地を選んでください。`);
+                        triggerEventPopup(currentPlayer.id, "🚩", "領土挑戦成功！", `出目${diceRoll}・陣地を選択してください`, "good");
+                        // 領土選択UIを表示
+                        showTerritorySelectUI(enemyTerritories, currentPlayer);
+                        return; // syncOnline/updateUIは選択後に呼ぶ
+                    }
                 } else {
                     log(`🔴 奪える領土なし`);
                 }
@@ -4650,18 +4711,23 @@ function useCard(index, cardId) {
             break;
         case 12:
             players.forEach(op => {
+                if (op.id === currentPlayer.id) return; // 自分は除外
                 if (isSameTeam(currentPlayer, op)) return; // チームメイトは除外
                 if (op.reaction === 'reflect') {
                     op.reaction = null;
-                    log(`🤝 ${op.name}の裏取引で大暴落を反射！${currentPlayer.name}が10P失った！`);
+                    log(`🤝 ${op.name}の裏取引で大暴落を反射！${currentPlayer.name}のPが半減！`);
                     triggerEventPopup(op.id, "🤝", "裏取引反射！", `大暴落を${currentPlayer.name}に返した`, "good");
-                    currentPlayer.p = Math.max(0, currentPlayer.p - 10);
+                    currentPlayer.p = Math.floor(currentPlayer.p / 2);
                 } else {
-                    op.p = Math.max(0, op.p - 5);
+                    op.p = Math.floor(op.p / 2);
                 }
             });
-            log(`😱 大暴落！全員-5P！`);
-            players.forEach(op => triggerEventPopup(op.id, "📉", "大暴落！", "全員-5P！", "bad"));
+            log(`😱 大暴落！自分以外全員の所持Pが半分に！`);
+            players.forEach(op => {
+                if (op.id !== currentPlayer.id && !isSameTeam(currentPlayer, op))
+                    triggerEventPopup(op.id, "📉", "大暴落！", "所持Pが半分に！", "bad");
+            });
+            triggerEventPopup(currentPlayer.id, "📉", "大暴落発動！", "他プレイヤーのPが半分に", "good");
             break;
         case 13:
             let richerPlayers = players.filter(op => op.id !== currentPlayer.id && op.p > currentPlayer.p && !isSameTeam(currentPlayer, op));
@@ -4692,11 +4758,11 @@ function useCard(index, cardId) {
             break;
         case 15: currentPlayer.ap += 5; log(`⚡ エナジードリンク！AP+5！`); triggerEventPopup(currentPlayer.id, "⚡", "エナジードリンク！", "AP+5", "good"); break;
         case 16: currentPlayer.bonusAP += 5; log(`🛹 スケボー！次回ダイス+5AP！`); triggerEventPopup(currentPlayer.id, "🛹", "スケボー！", "次回ダイス+5AP", "card"); break;
-        case 24: currentPlayer.equip.bicycle = true; log(`🚲 自転車装備！毎ターンAP+2！`); triggerEventPopup(currentPlayer.id, "🚲", "自転車装備！", "毎ターンAP+2", "card"); break;
+        case 24: currentPlayer.equip.bicycle = true; currentPlayer.equipTimer.bicycle = 5; log(`🚲 自転車装備！毎ターンAP+2（5ターン）！`); triggerEventPopup(currentPlayer.id, "🚲", "自転車装備！", "毎ターンAP+2（5ターン）", "card"); break;
         case 25: currentPlayer.equip.shoes = true; log(`👢 安全靴装備！ゴミ漁り1AP！`); triggerEventPopup(currentPlayer.id, "👢", "安全靴装備！", "ゴミ漁りが1APに", "card"); break;
-        case 26: currentPlayer.equip.cart = true; log(`🛒 リヤカー装備！陣地収入2倍！`); triggerEventPopup(currentPlayer.id, "🛒", "リヤカー装備！", "陣地収入2倍", "card"); break;
-        case 27: currentPlayer.equip.shield = true; log(`🛡️ 段ボールの盾装備！ダメージ半減！`); triggerEventPopup(currentPlayer.id, "🛡️", "段ボールの盾装備！", "次のダメージを半減", "card"); break;
-        case 28: currentPlayer.equip.helmet = true; log(`🪖 ヘルメット装備！ダメージ1回無効！`); triggerEventPopup(currentPlayer.id, "🪖", "ヘルメット装備！", "次のダメージを完全無効", "card"); break;
+        case 26: currentPlayer.equip.cart = true; currentPlayer.equipTimer.cart = 5; log(`🛒 リヤカー装備！陣地収入2倍（5ターン）！`); triggerEventPopup(currentPlayer.id, "🛒", "リヤカー装備！", "陣地収入2倍（5ターン）", "card"); break;
+        case 27: currentPlayer.equip.shield = true; log(`🛡️ 段ボールの盾装備！50%でダメージ半減！`); triggerEventPopup(currentPlayer.id, "🛡️", "段ボールの盾装備！", "50%でダメージ半減", "card"); break;
+        case 28: currentPlayer.equip.helmet = true; log(`🪖 ヘルメット装備！次のダメージ半減！`); triggerEventPopup(currentPlayer.id, "🪖", "ヘルメット装備！", "次のダメージを半減", "card"); break;
         case 29: currentPlayer.equip.doll = true; log(`🎎 身代わり人形装備！NPC妨害1回無効！`); triggerEventPopup(currentPlayer.id, "🎎", "身代わり人形装備！", "NPC妨害を1回無効化", "card"); break;
         // リアクションカード
         case 35: currentPlayer.reaction = 'block';   log(`⚖️ 弁護士の盾発動！次の攻撃を無効化！`); triggerEventPopup(currentPlayer.id, "⚖️", "弁護士の盾！", "次の攻撃/カツアゲを無効化", "good"); break;
@@ -4731,6 +4797,47 @@ function useCard(index, cardId) {
 
 function closeAttackOverlay() {
     document.getElementById("attack-overlay").style.display = "none";
+}
+
+// ===== 領土選択UI =====
+function showTerritorySelectUI(enemyTerritories, currentPlayer) {
+    let overlay = document.getElementById('territory-select-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'territory-select-overlay';
+        overlay.className = 'modal-overlay';
+        overlay.style.zIndex = '10002';
+        overlay.innerHTML = '<div class="modal-box" style="max-width:500px;"><h3 style="color:var(--clay-text);margin-top:0;">🚩 奪う陣地を選択</h3><div id="territory-select-list" style="max-height:50vh;overflow-y:auto;"></div></div>';
+        document.body.appendChild(overlay);
+    }
+    const listEl = document.getElementById('territory-select-list');
+    listEl.innerHTML = '';
+    
+    enemyTerritories.forEach(tileIdStr => {
+        const tileId = parseInt(tileIdStr);
+        const tile = mapData.find(t => t.id === tileId);
+        const ownerId = territories[tileIdStr];
+        const owner = players.find(p => p.id === ownerId);
+        const areaLabel = tile.area === 'slum' ? 'スラム' : tile.area === 'commercial' ? '商業' : '高級';
+        const areaValue = tile.area === 'slum' ? 3 : tile.area === 'commercial' ? 6 : 10;
+        
+        const btn = document.createElement('button');
+        btn.className = 'btn-clay';
+        btn.style.cssText = 'width:100%;margin:4px 0;text-align:left;padding:8px;';
+        btn.innerHTML = `🚩 マス${tileId}「${tile.name}」(${areaLabel}・${areaValue}pt)<br><span style="font-size:10px;color:#e74c3c;">所有者: ${owner ? owner.name : '不明'}</span>`;
+        btn.onclick = () => {
+            territories[tileIdStr] = currentPlayer.id;
+            log(`🚩 マス${tileId}「${tile.name}」を奪取！（${owner ? owner.name : '?'}から）`);
+            triggerEventPopup(currentPlayer.id, "🚩", "陣地奪取！", `${tile.name}を乗っ取った`, "good");
+            if (owner) triggerEventPopup(owner.id, "😱", "陣地を奪われた！", `${currentPlayer.name}にマス${tileId}を奪取された`, "bad");
+            overlay.style.display = 'none';
+            syncOnline();
+            updateUI();
+        };
+        listEl.appendChild(btn);
+    });
+    
+    overlay.style.display = 'flex';
 }
 
 // ===== 武器弧型UIシステム（ボード内canvas・スクロール追従）=====
@@ -5101,6 +5208,32 @@ async function endTurnLogic() {
         }
     }
     
+    // 雨具消費（雨の日に使ったら消費）
+    if (isRainy && currentPlayer.rainGear) {
+        currentPlayer.rainGear = false;
+        log(`☂️ ${currentPlayer.name}の雨具が使い切りで消耗した`);
+        triggerEventPopup(currentPlayer.id, "☂️", "雨具が壊れた", "1回使い切り", "bad");
+    }
+    
+    // 装備タイマーカウントダウン（自転車・リヤカー）
+    if (!currentPlayer.equipTimer) currentPlayer.equipTimer = { bicycle: 0, cart: 0 };
+    if (currentPlayer.equip.bicycle && currentPlayer.equipTimer.bicycle > 0) {
+        currentPlayer.equipTimer.bicycle--;
+        if (currentPlayer.equipTimer.bicycle <= 0) {
+            currentPlayer.equip.bicycle = false;
+            log(`🚲 ${currentPlayer.name}の自転車が壊れた！（5ターン経過）`);
+            triggerEventPopup(currentPlayer.id, "🚲", "自転車が壊れた！", "5ターン経過で使用不能", "bad");
+        }
+    }
+    if (currentPlayer.equip.cart && currentPlayer.equipTimer.cart > 0) {
+        currentPlayer.equipTimer.cart--;
+        if (currentPlayer.equipTimer.cart <= 0) {
+            currentPlayer.equip.cart = false;
+            log(`🛒 ${currentPlayer.name}のリヤカーが壊れた！（5ターン経過）`);
+            triggerEventPopup(currentPlayer.id, "🛒", "リヤカーが壊れた！", "5ターン経過で使用不能", "bad");
+        }
+    }
+    
     if (turn === players.length - 1) {
         await processRoundEvents();
     }
@@ -5374,29 +5507,86 @@ function endGame() {
             terrValue += (area === "slum" ? 3 : area === "commercial" ? 6 : 10);
         });
         let resourceValue = p.cans * canPrice + p.trash * trashPrice;
-        // スコア計算：P×2.0（最大比重）+ 領土 + 資源 + キル×3 - デス×8
-        const scaledP     = Math.round(p.p * 2.0);       // Pは2倍換算で最大比重
-        const killBonus   = (p.kills  || 0) * 3;         // キル1回 +3
-        const deathPenalty= (p.deaths || 0) * 5;         // デス1回 -5（緩和）
+        const scaledP     = Math.round(p.p * 2.0);
+        const killBonus   = (p.kills  || 0) * 3;
+        const deathPenalty= (p.deaths || 0) * 5;
         const totalScore  = scaledP + terrValue + resourceValue + killBonus - deathPenalty;
         
-        return { name: p.name, color: p.color, p: p.p, scaledP, terrValue, resourceValue, killBonus, deathPenalty, totalScore, emoji: charEmoji[p.charType], deaths: p.deaths||0, kills: p.kills||0 };
+        return { name: p.name, color: p.color, p: p.p, scaledP, terrValue, resourceValue, killBonus, deathPenalty, totalScore, emoji: charEmoji[p.charType], deaths: p.deaths||0, kills: p.kills||0, teamColor: p.teamColor || 'none' };
     }).sort((a, b) => b.totalScore - a.totalScore);
     
-    let rankHTML = results.map((r, i) => {
-        let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '4️⃣';
-        let fontSize = i === 0 ? 22 : 16;
-        return `<div style="margin:8px 0;font-size:${fontSize}px;">${rankIcon} <span style="color:${r.color};">${r.emoji}${r.name}</span>: <b>${r.totalScore}pt</b> <span style="font-size:11px;color:#bdc3c7;">(💰${r.p}P×2=<b style="color:#f1c40f;">${r.scaledP}</b> 🚩${r.terrValue} ⚔️${r.kills}K<span style="color:#2ecc71;">+${r.killBonus}</span> 💀${r.deaths}D<span style="color:#e74c3c;">-${r.deathPenalty}</span>)</span></div>`;
-    }).join('');
+    // チーム戦判定：2人以上がチームに所属していればチーム戦
+    const hasTeams = players.some(p => p.teamColor && p.teamColor !== 'none');
+    const teamPlayerCount = players.filter(p => p.teamColor && p.teamColor !== 'none').length;
+    const isTeamGame = hasTeams && teamPlayerCount >= 2;
     
-    document.getElementById("win-title").innerText = `${results[0].emoji} ${results[0].name} 優勝！`;
+    let rankHTML = '';
+    let winTitle = '';
+    
+    if (isTeamGame) {
+        // チーム別スコア集計
+        const teamScores = {};
+        results.forEach(r => {
+            const tc = r.teamColor || 'none';
+            if (tc === 'none') return;
+            if (!teamScores[tc]) teamScores[tc] = { color: tc, totalScore: 0, members: [] };
+            teamScores[tc].totalScore += r.totalScore;
+            teamScores[tc].members.push(r);
+        });
+        // ソロプレイヤーも個人チームとして追加
+        results.forEach(r => {
+            if (!r.teamColor || r.teamColor === 'none') {
+                const soloKey = '_solo_' + r.name;
+                teamScores[soloKey] = { color: 'none', totalScore: r.totalScore, members: [r] };
+            }
+        });
+        
+        const sortedTeams = Object.values(teamScores).sort((a, b) => b.totalScore - a.totalScore);
+        
+        // チーム順位表示
+        rankHTML += '<div style="margin-bottom:12px;font-size:14px;color:#f1c40f;border-bottom:1px dashed #f1c40f;padding-bottom:6px;">🏆 チーム順位</div>';
+        sortedTeams.forEach((team, i) => {
+            let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '4️⃣';
+            const tcInfo = teamColors[team.color] || teamColors.none;
+            const teamLabel = team.color === 'none' || team.color.startsWith('_solo_') ? `${team.members[0].emoji}${team.members[0].name}（ソロ）` : `${tcInfo.icon} ${tcInfo.label}チーム`;
+            rankHTML += `<div style="margin:8px 0;font-size:${i===0?20:15}px;">${rankIcon} <span style="color:${tcInfo.color || '#bdc3c7'};">${teamLabel}</span>: <b>${team.totalScore}pt</b></div>`;
+            team.members.forEach(r => {
+                rankHTML += `<div style="margin:2px 0 2px 20px;font-size:12px;color:#bdc3c7;">${r.emoji}${r.name}: ${r.totalScore}pt (💰${r.p}P×2=${r.scaledP} 🚩${r.terrValue} ⚔️${r.kills}K+${r.killBonus} 💀${r.deaths}D-${r.deathPenalty})</div>`;
+            });
+        });
+        
+        const winTeam = sortedTeams[0];
+        const winTcInfo = teamColors[winTeam.color] || teamColors.none;
+        if (winTeam.color !== 'none' && !winTeam.color.startsWith('_solo_')) {
+            winTitle = `${winTcInfo.icon} ${winTcInfo.label}チーム 優勝！`;
+        } else {
+            winTitle = `${winTeam.members[0].emoji} ${winTeam.members[0].name} 優勝！`;
+        }
+        
+        // 個人順位も追加
+        rankHTML += '<div style="margin-top:12px;font-size:13px;color:#bdc3c7;border-top:1px dashed #8d6e63;padding-top:8px;">📊 個人スコア</div>';
+        results.forEach((r, i) => {
+            let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '4️⃣';
+            rankHTML += `<div style="margin:4px 0;font-size:13px;">${rankIcon} <span style="color:${r.color};">${r.emoji}${r.name}</span>: <b>${r.totalScore}pt</b></div>`;
+        });
+    } else {
+        // 通常の個人戦
+        rankHTML = results.map((r, i) => {
+            let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '4️⃣';
+            let fontSize = i === 0 ? 22 : 16;
+            return `<div style="margin:8px 0;font-size:${fontSize}px;">${rankIcon} <span style="color:${r.color};">${r.emoji}${r.name}</span>: <b>${r.totalScore}pt</b> <span style="font-size:11px;color:#bdc3c7;">(💰${r.p}P×2=<b style="color:#f1c40f;">${r.scaledP}</b> 🚩${r.terrValue} ⚔️${r.kills}K<span style="color:#2ecc71;">+${r.killBonus}</span> 💀${r.deaths}D<span style="color:#e74c3c;">-${r.deathPenalty}</span>)</span></div>`;
+        }).join('');
+        winTitle = `${results[0].emoji} ${results[0].name} 優勝！`;
+    }
+    
+    document.getElementById("win-title").innerText = winTitle;
     document.getElementById("win-ranking").innerHTML = rankHTML;
     document.getElementById("win-overlay").style.display = "flex";
     playSfx('win');
-    log(`🏆 ゲーム終了！優勝: ${results[0].name} (${results[0].totalScore}P)`);
+    log(`🏆 ゲーム終了！${winTitle}`);
     
     if (isOnlineMode) {
-        broadcastNetworkData({ type: 'game_end', rankHTML: rankHTML, winTitle: `${results[0].emoji} ${results[0].name} 優勝！` });
+        broadcastNetworkData({ type: 'game_end', rankHTML: rankHTML, winTitle: winTitle });
     }
 }
 
